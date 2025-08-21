@@ -9,9 +9,12 @@ class ServerConfig {
   static const String phoneUrl =
       'http://192.168.68.105:3000/api'; // Updated to your current IP
 
+  // For cloud deployment (Render, Railway, etc.)
+  static const String cloudUrl = 'https://eduvision-alrd.onrender.com/api'; // Your Render URL
+
   // Current active URL - change this based on where you're running the app
   static const String currentBaseUrl =
-      phoneUrl; // Change to localhostUrl for computer development
+      cloudUrl; // Change to: cloudUrl for internet, phoneUrl for local network, localhostUrl for computer
 
   // Helper method to get the current base URL
   static String get baseUrl => currentBaseUrl;
