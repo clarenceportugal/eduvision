@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "build": "npm rebuild bcrypt --build-from-source",
+    "postinstall": "npm rebuild bcrypt --build-from-source"
   },
   "dependencies": {
     "express": "^4.18.2",
@@ -20,5 +22,8 @@
   },
   "keywords": ["nodejs", "express", "mongodb", "flutter", "authentication"],
   "author": "EduVision Team",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": "18.x"
+  }
 }
