@@ -12,6 +12,12 @@ import 'screens/data_management_screen.dart';
 import 'screens/privacy_settings_screen.dart';
 import 'screens/help_center_screen.dart';
 import 'screens/send_feedback_screen.dart';
+import 'screens/superadmin_dashboard_screen.dart';
+import 'screens/dean_dashboard_screen.dart';
+import 'screens/program_chairperson_dashboard_screen.dart';
+import 'screens/superadmin_settings_screen.dart';
+import 'screens/dean_settings_screen.dart';
+import 'screens/program_chairperson_settings_screen.dart';
 import 'test_capture_screen.dart';
 import 'widgets/animated_wave_background.dart';
 import 'utils/logger.dart';
@@ -3368,10 +3374,77 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   void initState() {
     super.initState();
-    _screens = [
-      DashboardScreen(userData: widget.userData),
-      SettingsScreen(userData: widget.userData),
-    ];
+    _screens = _buildScreensBasedOnRole();
+  }
+
+  List<Widget> _buildScreensBasedOnRole() {
+    final String userRole =
+        widget.userData['role']?.toString().toLowerCase() ?? 'instructor';
+
+    Widget dashboardScreen;
+
+    switch (userRole) {
+      case 'superadmin':
+        dashboardScreen = SuperAdminDashboardScreen(userData: widget.userData);
+        break;
+      case 'dean':
+        dashboardScreen = DeanDashboardScreen(userData: widget.userData);
+        break;
+      case 'programchairperson':
+      case 'program chairperson':
+        dashboardScreen = ProgramChairpersonDashboardScreen(
+          userData: widget.userData,
+        );
+        break;
+      case 'instructor':
+      case 'instructors':
+      default:
+        dashboardScreen = DashboardScreen(userData: widget.userData);
+        break;
+    }
+
+    Widget settingsScreen;
+
+    switch (userRole) {
+      case 'superadmin':
+        settingsScreen = SuperAdminSettingsScreen(userData: widget.userData);
+        break;
+      case 'dean':
+        settingsScreen = DeanSettingsScreen(userData: widget.userData);
+        break;
+      case 'programchairperson':
+      case 'program chairperson':
+        settingsScreen = ProgramChairpersonSettingsScreen(
+          userData: widget.userData,
+        );
+        break;
+      case 'instructor':
+      case 'instructors':
+      default:
+        settingsScreen = SettingsScreen(userData: widget.userData);
+        break;
+    }
+
+    return [dashboardScreen, settingsScreen];
+  }
+
+  String _getDashboardLabel() {
+    final String userRole =
+        widget.userData['role']?.toString().toLowerCase() ?? 'instructor';
+
+    switch (userRole) {
+      case 'superadmin':
+        return 'Admin';
+      case 'dean':
+        return 'Dean';
+      case 'programchairperson':
+      case 'program chairperson':
+        return 'Program';
+      case 'instructor':
+      case 'instructors':
+      default:
+        return 'Dashboard';
+    }
   }
 
   @override
@@ -3437,7 +3510,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   size: 24,
                 ),
               ),
-              label: 'Dashboard',
+              label: _getDashboardLabel(),
             ),
             BottomNavigationBarItem(
               icon: Container(
