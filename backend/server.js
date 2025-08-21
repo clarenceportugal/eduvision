@@ -441,7 +441,7 @@ app.post('/api/upload-face', upload.single('face_image'), async (req, res) => {
       cloudinary.uploader.upload_stream(
         {
           resource_type: 'image',
-          folder: `eduvision/users/${userId}/face_registration`,
+          folder: `eduvision/facedata/roles/${userId}`,
           public_id: publicIdSuffix,
           overwrite: false, // Don't overwrite to keep all angles
           transformation: [
