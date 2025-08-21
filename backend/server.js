@@ -431,18 +431,35 @@ app.post('/api/upload-face', upload.single('face_image'), async (req, res) => {
     console.log('Step name:', stepName);
     console.log('Step number:', stepNumber);
 
+    // First, get the user's role from the database
+    const user = await db.collection(COLLECTION_NAME).findOne(
+      { _id: new ObjectId(userId) },
+      { projection: { role: 1 } }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Get user's role, default to 'user' if not specified
+    const userRole = user.role || 'user';
+    console.log('User role:', userRole);
+
     // Create a more descriptive public_id that includes the angle/step
     const publicIdSuffix = stepName ? 
       `${stepName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}` : 
       `${imageType}_${Date.now()}`;
 
-    // Upload to Cloudinary with user-specific folder structure
+    // Upload to Cloudinary with user-specific folder structure based on role
     const uploadResult = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        {
-          resource_type: 'image',
-          folder: `eduvision/facedata/roles/${userId}`,
-          public_id: publicIdSuffix,
+              cloudinary.uploader.upload_stream(
+          {
+            resource_type: 'image',
+            folder: `eduvision/facedata/${userRole}/${userId}`,
+            public_id: publicIdSuffix,
           overwrite: false, // Don't overwrite to keep all angles
           transformation: [
             { quality: '100' },
