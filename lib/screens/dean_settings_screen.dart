@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../main.dart'; // For ThemeProvider
+import '../services/auth_service.dart';
 
 class DeanSettingsScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -173,7 +174,9 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
 
                     // Support Section
                     _buildSupportSection(context),
-                    const SizedBox(height: 50),
+                    const SizedBox(
+                      height: 170,
+                    ), // Bottom padding for BottomNavigationBar
                   ],
                 ),
               ),
@@ -883,10 +886,13 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                // Add logout logic here
-                _showComingSoonDialog('Logout');
+                await AuthService.logout();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const SplashScreen()),
+                  (route) => false,
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.error,

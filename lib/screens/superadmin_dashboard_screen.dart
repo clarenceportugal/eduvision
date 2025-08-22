@@ -79,7 +79,9 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
                       _buildUserManagementSection(),
                       const SizedBox(height: 24),
                       _buildSystemHealthSection(),
-                      const SizedBox(height: 100), // Bottom padding
+                      const SizedBox(
+                        height: 170,
+                      ), // Bottom padding for BottomNavigationBar
                     ],
                   ),
                 ),
@@ -239,7 +241,7 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: 1.2,
+          childAspectRatio: 1.6,
           children: [
             _buildSummaryCard(
               'Total Users',
@@ -294,7 +296,7 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: 1.1,
+          childAspectRatio: 1.5,
           children: [
             _buildEnhancedActionCard(
               'User Management',

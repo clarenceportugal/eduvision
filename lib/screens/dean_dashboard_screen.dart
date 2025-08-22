@@ -80,7 +80,9 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                       _buildProgramOverviewSection(),
                       const SizedBox(height: 24),
                       _buildAcademicPerformanceSection(),
-                      const SizedBox(height: 100), // Bottom padding
+                      const SizedBox(
+                        height: 170,
+                      ), // Bottom padding for BottomNavigationBar
                     ],
                   ),
                 ),
@@ -240,7 +242,7 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: 1.2,
+          childAspectRatio: 1.6,
           children: [
             _buildSummaryCard(
               'Total Students',
@@ -295,7 +297,7 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: 1.1,
+          childAspectRatio: 1.5,
           children: [
             _buildEnhancedActionCard(
               'Faculty Management',

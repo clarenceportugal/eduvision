@@ -1671,7 +1671,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                       // Recent Activity
                       _buildRecentActivitySection(context),
 
-                      const SizedBox(height: 60),
+                      const SizedBox(
+                        height: 170,
+                      ), // Bottom padding for BottomNavigationBar
                     ],
                   ),
                 ),
@@ -3713,7 +3715,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                       // Support Section
                       _buildSupportSection(context),
 
-                      const SizedBox(height: 50),
+                      const SizedBox(
+                        height: 170,
+                      ), // Bottom padding for BottomNavigationBar
                     ],
                   ),
                 ),

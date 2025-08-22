@@ -83,7 +83,9 @@ class _ProgramChairpersonDashboardScreenState
                       _buildCurriculumManagementSection(),
                       const SizedBox(height: 24),
                       _buildProgramPerformanceSection(),
-                      const SizedBox(height: 100), // Bottom padding
+                      const SizedBox(
+                        height: 170,
+                      ), // Bottom padding for BottomNavigationBar
                     ],
                   ),
                 ),
@@ -243,7 +245,7 @@ class _ProgramChairpersonDashboardScreenState
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: 1.2,
+          childAspectRatio: 1.6,
           children: [
             _buildSummaryCard(
               'Enrolled Students',
@@ -298,7 +300,7 @@ class _ProgramChairpersonDashboardScreenState
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: 1.1,
+          childAspectRatio: 1.5,
           children: [
             _buildEnhancedActionCard(
               'Curriculum Review',
