@@ -1,6 +1,6 @@
 {
-    "name": "eduvision",
-    "short_name": "eduvision",
+    "name": "EduVision",
+    "short_name": "EduVision",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
