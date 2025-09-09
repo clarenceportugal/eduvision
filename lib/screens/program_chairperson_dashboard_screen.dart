@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+<<<<<<< HEAD
 import '../widgets/dashboard_components.dart';
+=======
+>>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
 
 class ProgramChairpersonDashboardScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -99,12 +102,88 @@ class _ProgramChairpersonDashboardScreenState
   }
 
   Widget _buildSliverAppBar(String displayName) {
+<<<<<<< HEAD
     return DashboardComponents.buildSliverAppBar(
       context: context,
       title: 'Program Management',
       subtitle: 'Welcome back,',
       icon: Icons.book_rounded,
       displayName: displayName,
+=======
+    return SliverAppBar(
+      expandedHeight: 120,
+      floating: false,
+      pinned: true,
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      elevation: 0,
+      flexibleSpace: FlexibleSpaceBar(
+        title: Text(
+          'Program Management',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        background: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.primary.withOpacity(0.8),
+              ],
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.book_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Welcome back,',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: Colors.white.withOpacity(0.8),
+                          ),
+                        ),
+                        Text(
+                          displayName,
+                          style: GoogleFonts.inter(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+>>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
     );
   }
 

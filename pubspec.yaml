@@ -45,7 +45,11 @@ dependencies:
   native_device_orientation: ^2.0.1
   path_provider: ^2.1.1
   crypto: ^3.0.3
+<<<<<<< HEAD
   tflite_flutter: ^0.11.0
+=======
+  tflite_flutter: ^0.10.4
+>>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
   dio: ^5.4.0
 
 dev_dependencies:
