@@ -1,0 +1,81 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "dart",
+      "request": "launch",
+      "name": "Flutter Web (Debug)",
+      "program": "lib/main.dart",
+      "args": ["-d", "chrome", "--web-port", "3000"]
+    },
+    {
+      "type": "dart",
+      "request": "launch",
+      "name": "Flutter Web (No Debug)",
+      "program": "lib/main.dart",
+      "args": ["-d", "chrome", "--web-port", "3000", "--no-hot"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "dart",
+      "request": "launch",
+      "name": "Flutter (Windows)",
+      "program": "lib/main.dart",
+      "args": ["-d", "windows"]
+    },
+    {
+      "type": "dart",
+      "request": "launch",
+      "name": "Flutter (Android)",
+      "program": "lib/main.dart",
+      "args": ["-d", "android"]
+    },
+    {
+      "type": "dart",
+      "request": "launch",
+      "name": "Flutter (iOS)",
+      "program": "lib/main.dart",
+      "args": ["-d", "ios"]
+    },
+    {
+      "type": "pwa-chrome",
+      "request": "launch",
+      "name": "Launch Chrome (Windows)",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "runtimeExecutable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    },
+    {
+      "type": "pwa-chrome",
+      "request": "launch",
+      "name": "Launch Chrome (Portable)",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "runtimeExecutable": "chrome"
+    },
+    {
+      "type": "pwa-edge",
+      "request": "launch",
+      "name": "Launch Edge (Windows)",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "runtimeExecutable": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+    },
+    {
+      "type": "pwa-edge",
+      "request": "launch",
+      "name": "Launch Edge (Portable)",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "runtimeExecutable": "msedge"
+    },
+    {
+      "type": "pwa-firefox",
+      "request": "launch",
+      "name": "Launch Firefox (Portable)",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "runtimeExecutable": "firefox"
+    }
+  ]
+}
