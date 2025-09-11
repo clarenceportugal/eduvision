@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-<<<<<<< HEAD
 import '../widgets/dashboard_components.dart';
-=======
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
 
 class SuperAdminDashboardScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -98,156 +95,30 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
   }
 
   Widget _buildSliverAppBar(String displayName) {
-<<<<<<< HEAD
     return DashboardComponents.buildSliverAppBar(
       context: context,
       title: 'System Administration',
       subtitle: 'Welcome back,',
       icon: Icons.admin_panel_settings_rounded,
       displayName: displayName,
-=======
-    return SliverAppBar(
-      expandedHeight: 120,
-      floating: false,
-      pinned: true,
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      elevation: 0,
-      flexibleSpace: FlexibleSpaceBar(
-        title: Text(
-          'System Administration',
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).colorScheme.primary,
-                Theme.of(context).colorScheme.primary.withOpacity(0.8),
-              ],
-            ),
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.admin_panel_settings_rounded,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Welcome back,',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: Colors.white.withOpacity(0.8),
-                          ),
-                        ),
-                        Text(
-                          displayName,
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
     );
   }
 
+
   Widget _buildWelcomeSection(String displayName) {
-<<<<<<< HEAD
     return DashboardComponents.buildWelcomeSection(
       context: context,
       title: 'System Control Center',
       description: 'You have full administrative access to manage the entire EduVision system, including user accounts, system settings, and security configurations.',
       icon: Icons.security_rounded,
-=======
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
-            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.05),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.security_rounded,
-                color: Theme.of(context).colorScheme.primary,
-                size: 24,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'System Control Center',
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'You have full administrative access to manage the entire EduVision system, including user accounts, system settings, and security configurations.',
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
     );
   }
+
 
   Widget _buildSystemOverviewSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-<<<<<<< HEAD
         DashboardComponents.buildSectionHeader(
           context: context,
           title: 'System Overview',
@@ -255,7 +126,6 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
           subtitle: 'System health and metrics',
         ),
         const SizedBox(height: 20),
-=======
         Text(
           'System Overview',
           style: GoogleFonts.inter(
@@ -265,14 +135,12 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
           ),
         ),
         const SizedBox(height: 16),
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-<<<<<<< HEAD
           childAspectRatio: 1.4,
           children: [
             DashboardComponents.buildSummaryCard(
@@ -306,43 +174,13 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
               icon: Icons.shield_rounded,
               color: Colors.red,
               subtitle: 'All systems secure',
-=======
-          childAspectRatio: 1.6,
-          children: [
-            _buildSummaryCard(
-              'Total Users',
-              '2,847',
-              Icons.people_rounded,
-              Colors.blue,
-              'Active accounts',
-            ),
-            _buildSummaryCard(
-              'System Status',
-              'Online',
-              Icons.check_circle_rounded,
-              Colors.green,
-              'All services operational',
-            ),
-            _buildSummaryCard(
-              'Storage Used',
-              '78%',
-              Icons.storage_rounded,
-              Colors.orange,
-              '2.3TB / 3TB',
-            ),
-            _buildSummaryCard(
-              'Security Level',
-              'High',
-              Icons.shield_rounded,
-              Colors.red,
-              'All systems secure',
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
             ),
           ],
         ),
       ],
     );
   }
+
 
   Widget _buildQuickActionsSection() {
     return Column(

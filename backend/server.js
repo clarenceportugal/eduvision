@@ -7,18 +7,18 @@ const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // MongoDB connection details
-const MONGODB_URI = 'mongodb+srv://saynoseanniel:mathematics10@cluster0.crfzw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-const DATABASE_NAME = 'eduvision';
-const COLLECTION_NAME = 'users';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://saynoseanniel:mathematics10@cluster0.crfzw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const DATABASE_NAME = process.env.DATABASE_NAME || 'eduvision';
+const COLLECTION_NAME = process.env.COLLECTION_NAME || 'users';
 
 // Cloudinary configuration
 cloudinary.config({
-  cloud_name: 'deqtxoewp',
-  api_key: '429458566368881',
-  api_secret: '1NPDJVTgxydH8VCOD7w-NLhFVdc'
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'deqtxoewp',
+  api_key: process.env.CLOUDINARY_API_KEY || '429458566368881',
+  api_secret: process.env.CLOUDINARY_API_SECRET || '1NPDJVTgxydH8VCOD7w-NLhFVdc'
 });
 
 // Configure multer for handling multipart/form-data

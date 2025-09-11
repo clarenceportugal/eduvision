@@ -37,18 +37,18 @@ packages:
     dependency: transitive
     description:
       name: camera_android
-      sha256: "4f40d053a67e99029b5be7f00ef8047b63edb65ccc4e2546b84d47e302c6bf62"
+      sha256: cd49ccb409201a893bf625dca2df8746b88679f302826ab4d12748788a3a24b3
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.10+4"
+    version: "0.10.10+7"
   camera_avfoundation:
     dependency: transitive
     description:
       name: camera_avfoundation
-      sha256: "04e1f052ef268085a4f0550389211cc46005a9af015e444c7b1ee7aa19332e5d"
+      sha256: "951ef122d01ebba68b7a54bfe294e8b25585635a90465c311b2f875ae72c412f"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.20+6"
+    version: "0.9.21+2"
   camera_platform_interface:
     dependency: transitive
     description:
@@ -170,10 +170,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_plugin_android_lifecycle
-      sha256: f948e346c12f8d5480d2825e03de228d0eb8c3a737e4cdaa122267b89c022b5e
+      sha256: b0694b7fb1689b0e6cc193b3f1fcac6423c4f93c74fb20b806c6b6f196db0c31
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.28"
+    version: "2.0.30"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -188,10 +188,10 @@ packages:
     dependency: "direct main"
     description:
       name: google_fonts
-      sha256: df9763500dadba0155373e9cb44e202ce21bd9ed5de6bdbd05c5854e86839cb8
+      sha256: ebc94ed30fd13cefd397cb1658b593f21571f014b7d1197eeb41fb95f05d899a
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.0"
+    version: "6.3.1"
   google_mlkit_commons:
     dependency: transitive
     description:
@@ -212,10 +212,10 @@ packages:
     dependency: "direct main"
     description:
       name: http
-      sha256: "2c11f3f94c687ee9bad77c171151672986360b2b001d109814ee7140b2cf261b"
+      sha256: bb2ce4590bc2667c96f318d68cac1b5a7987ec819351d32b1c987239a815e007
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.0"
+    version: "1.5.0"
   http_parser:
     dependency: transitive
     description:
@@ -236,10 +236,10 @@ packages:
     dependency: transitive
     description:
       name: leak_tracker
-      sha256: "8dcda04c3fc16c14f48a7bb586d4be1f0d1572731b6d81d51772ef47c02081e0"
+      sha256: "33e2e26bdd85a0112ec15400c8cbffea70d0f9c3407491f672a2fad47915e2de"
       url: "https://pub.dev"
     source: hosted
-    version: "11.0.1"
+    version: "11.0.2"
   leak_tracker_flutter_testing:
     dependency: transitive
     description:
@@ -332,18 +332,18 @@ packages:
     dependency: transitive
     description:
       name: path_provider_android
-      sha256: d0d310befe2c8ab9e7f393288ccbb11b60c019c6b5afc21973eeee4dda2b35e9
+      sha256: "993381400e94d18469750e5b9dcb8206f15bc09f9da86b9e44a9b0092a0066db"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.17"
+    version: "2.2.18"
   path_provider_foundation:
     dependency: transitive
     description:
       name: path_provider_foundation
-      sha256: "4843174df4d288f5e29185bd6e72a6fbdf5a4a4602717eed565497429f179942"
+      sha256: "16eef174aacb07e09c351502740fa6254c165757638eba1e9116b0a781201bbd"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.1"
+    version: "2.4.2"
   path_provider_linux:
     dependency: transitive
     description:
@@ -420,10 +420,10 @@ packages:
     dependency: transitive
     description:
       name: petitparser
-      sha256: "07c8f0b1913bcde1ff0d26e57ace2f3012ccbf2b204e070290dad3bb22797646"
+      sha256: "1a97266a94f7350d30ae522c0af07890c70b8e62c71e8e3920d1db4d23c057d1"
       url: "https://pub.dev"
     source: hosted
-    version: "6.1.0"
+    version: "7.0.1"
   platform:
     dependency: transitive
     description:
@@ -444,10 +444,10 @@ packages:
     dependency: "direct main"
     description:
       name: provider
-      sha256: "4abbd070a04e9ddc287673bf5a030c7ca8b685ff70218720abab8b092f53dd84"
+      sha256: "4e82183fa20e5ca25703ead7e05de9e4cceed1fbd1eadc1ac3cb6f565a09f272"
       url: "https://pub.dev"
     source: hosted
-    version: "6.1.5"
+    version: "6.1.5+1"
   quiver:
     dependency: transitive
     description:
@@ -468,10 +468,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_android
-      sha256: "20cbd561f743a342c76c151d6ddb93a9ce6005751e7aa458baad3858bfbfb6ac"
+      sha256: a2608114b1ffdcbc9c120eb71a0e207c71da56202852d4aab8a5e30a82269e74
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.10"
+    version: "2.4.12"
   shared_preferences_foundation:
     dependency: transitive
     description:
@@ -577,17 +577,10 @@ packages:
     dependency: "direct main"
     description:
       name: tflite_flutter
-<<<<<<< HEAD
       sha256: "48e6fde2ad97162bb66a16a142f4c4698add9e8cd397ce9d1cc7451b55537ac1"
       url: "https://pub.dev"
     source: hosted
     version: "0.11.0"
-=======
-      sha256: ffb8651fdb116ab0131d6dc47ff73883e0f634ad1ab12bb2852eef1bbeab4a6a
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.10.4"
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
   typed_data:
     dependency: transitive
     description:
@@ -608,10 +601,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: ddfa8d30d89985b96407efce8acbdd124701f96741f2d981ca860662f1c0dc02
+      sha256: "45caa6c5917fa127b5dbcfbd1fa60b14e583afdc08bfc96dda38886ca252eb60"
       url: "https://pub.dev"
     source: hosted
-    version: "15.0.0"
+    version: "15.0.2"
   web:
     dependency: transitive
     description:
@@ -632,10 +625,10 @@ packages:
     dependency: transitive
     description:
       name: xml
-      sha256: b015a8ad1c488f66851d762d3090a21c600e479dc75e68328c52774040cf9226
+      sha256: "971043b3a0d3da28727e40ed3e0b5d18b742fa5a68665cca88e74b7876d5e025"
       url: "https://pub.dev"
     source: hosted
-    version: "6.5.0"
+    version: "6.6.1"
 sdks:
-  dart: ">=3.8.1 <4.0.0"
-  flutter: ">=3.27.0"
+  dart: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.0"

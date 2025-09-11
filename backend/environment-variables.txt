@@ -1,0 +1,19 @@
+# Environment Variables for Render Deployment
+# Copy these to your Render environment variables section
+
+# Server Configuration
+NODE_ENV=production
+PORT=10000
+
+# MongoDB Configuration
+MONGODB_URI=mongodb+srv://saynoseanniel:mathematics10@cluster0.crfzw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+DATABASE_NAME=eduvision
+COLLECTION_NAME=users
+
+# Cloudinary Configuration (for image uploads)
+CLOUDINARY_CLOUD_NAME=deqtxoewp
+CLOUDINARY_API_KEY=429458566368881
+CLOUDINARY_API_SECRET=1NPDJVTgxydH8VCOD7w-NLhFVdc
+
+# Optional: JWT Secret (if you add authentication later)
+JWT_SECRET=your_super_secret_jwt_key_here

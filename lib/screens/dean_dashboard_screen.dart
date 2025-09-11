@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-<<<<<<< HEAD
 import '../widgets/dashboard_components.dart';
 import '../utils/responsive_utils.dart';
-=======
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
 
 class DeanDashboardScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -68,16 +65,11 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
               child: SlideTransition(
                 position: _slideAnimation,
                 child: Padding(
-<<<<<<< HEAD
                   padding: ResponsiveUtils.getResponsivePadding(context),
-=======
-                  padding: const EdgeInsets.all(20.0),
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildWelcomeSection(displayName),
-<<<<<<< HEAD
                       SizedBox(height: ResponsiveUtils.getResponsiveSpacing(context)),
                       _buildAcademicOverviewSection(),
                       SizedBox(height: ResponsiveUtils.getResponsiveSpacing(context)),
@@ -89,19 +81,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                       SizedBox(height: ResponsiveUtils.getResponsiveSpacing(context)),
                       _buildProgramOverviewSection(),
                       SizedBox(height: ResponsiveUtils.getResponsiveSpacing(context)),
-=======
-                      const SizedBox(height: 24),
-                      _buildAcademicOverviewSection(),
-                      const SizedBox(height: 24),
-                      _buildQuickActionsSection(),
-                      const SizedBox(height: 24),
-                      _buildAcademicAnalyticsSection(),
-                      const SizedBox(height: 24),
-                      _buildFacultyManagementSection(),
-                      const SizedBox(height: 24),
-                      _buildProgramOverviewSection(),
-                      const SizedBox(height: 24),
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
                       _buildAcademicPerformanceSection(),
                       const SizedBox(
                         height: 170,
@@ -118,14 +97,16 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
   }
 
   Widget _buildSliverAppBar(String displayName) {
-<<<<<<< HEAD
     return DashboardComponents.buildSliverAppBar(
       context: context,
       title: 'Academic Administration',
       subtitle: 'Welcome back,',
       icon: Icons.school_rounded,
       displayName: displayName,
-=======
+    );
+  }
+
+  Widget _buildSliverAppBarOld(String displayName) {
     return SliverAppBar(
       expandedHeight: 120,
       floating: false,
@@ -199,18 +180,19 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           ),
         ),
       ),
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
     );
   }
 
   Widget _buildWelcomeSection(String displayName) {
-<<<<<<< HEAD
     return DashboardComponents.buildWelcomeSection(
       context: context,
       title: 'Academic Leadership Center',
       description: 'You have comprehensive oversight of academic programs, faculty management, and institutional excellence across all departments.',
       icon: Icons.school_rounded,
-=======
+    );
+  }
+
+  Widget _buildWelcomeSectionOld(String displayName) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -259,7 +241,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           ),
         ],
       ),
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
     );
   }
 
@@ -267,7 +248,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-<<<<<<< HEAD
         DashboardComponents.buildSectionHeader(
           context: context,
           title: 'Academic Overview',
@@ -314,52 +294,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
               icon: Icons.trending_up_rounded,
               color: Colors.orange,
               subtitle: 'Last academic year',
-=======
-        Text(
-          'Academic Overview',
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 16),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1.6,
-          children: [
-            _buildSummaryCard(
-              'Total Students',
-              '3,456',
-              Icons.people_rounded,
-              Colors.blue,
-              'Enrolled students',
-            ),
-            _buildSummaryCard(
-              'Faculty Members',
-              '234',
-              Icons.school_rounded,
-              Colors.green,
-              'Active faculty',
-            ),
-            _buildSummaryCard(
-              'Programs',
-              '45',
-              Icons.book_rounded,
-              Colors.purple,
-              'Active programs',
-            ),
-            _buildSummaryCard(
-              'Graduation Rate',
-              '89%',
-              Icons.trending_up_rounded,
-              Colors.orange,
-              'Last academic year',
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
             ),
           ],
         ),
@@ -371,7 +305,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-<<<<<<< HEAD
         DashboardComponents.buildSectionHeader(
           context: context,
           title: 'Quick Actions',
@@ -452,66 +385,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                 context: context,
                 feature: 'Student Affairs',
               ),
-=======
-        Text(
-          'Quick Actions',
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 16),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1.5,
-          children: [
-            _buildEnhancedActionCard(
-              'Faculty Management',
-              'Review faculty performance and manage appointments',
-              Icons.manage_accounts_rounded,
-              Colors.blue,
-              () => _showComingSoonDialog('Faculty Management'),
-            ),
-            _buildEnhancedActionCard(
-              'Program Approval',
-              'Review and approve new academic programs',
-              Icons.approval_rounded,
-              Colors.green,
-              () => _showComingSoonDialog('Program Approval'),
-            ),
-            _buildEnhancedActionCard(
-              'Academic Policies',
-              'Manage academic policies and regulations',
-              Icons.policy_rounded,
-              Colors.purple,
-              () => _showComingSoonDialog('Academic Policies'),
-            ),
-            _buildEnhancedActionCard(
-              'Budget Management',
-              'Oversee academic budget allocation',
-              Icons.account_balance_wallet_rounded,
-              Colors.orange,
-              () => _showComingSoonDialog('Budget Management'),
-            ),
-            _buildEnhancedActionCard(
-              'Accreditation',
-              'Manage accreditation processes and reports',
-              Icons.verified_rounded,
-              Colors.teal,
-              () => _showComingSoonDialog('Accreditation'),
-            ),
-            _buildEnhancedActionCard(
-              'Student Affairs',
-              'Oversee student services and support',
-              Icons.support_agent_rounded,
-              Colors.indigo,
-              () => _showComingSoonDialog('Student Affairs'),
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
             ),
           ],
         ),
@@ -523,7 +396,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-<<<<<<< HEAD
         DashboardComponents.buildSectionHeader(
           context: context,
           title: 'Academic Analytics',
@@ -556,39 +428,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           icon: Icons.assessment_rounded,
           color: Colors.orange,
           subtitle: 'Program success metrics',
-=======
-        Text(
-          'Academic Analytics',
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildAnalyticsCard(
-          'Student Performance',
-          'Average GPA: 3.2 | Retention Rate: 92%',
-          Icons.trending_up_rounded,
-          Colors.green,
-          'Academic performance metrics',
-        ),
-        const SizedBox(height: 12),
-        _buildAnalyticsCard(
-          'Faculty Productivity',
-          'Research Output: 156 papers | Teaching Score: 4.3/5',
-          Icons.work_rounded,
-          Colors.blue,
-          'Faculty performance indicators',
-        ),
-        const SizedBox(height: 12),
-        _buildAnalyticsCard(
-          'Program Effectiveness',
-          'Employment Rate: 87% | Industry Satisfaction: 4.1/5',
-          Icons.assessment_rounded,
-          Colors.orange,
-          'Program success metrics',
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
         ),
       ],
     );
@@ -598,7 +437,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-<<<<<<< HEAD
         DashboardComponents.buildSectionHeader(
           context: context,
           title: 'Faculty Overview',
@@ -606,7 +444,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           subtitle: 'Faculty distribution by rank',
         ),
         SizedBox(height: ResponsiveUtils.getResponsiveSpacing(context)),
-=======
         Text(
           'Faculty Overview',
           style: GoogleFonts.inter(
@@ -616,7 +453,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           ),
         ),
         const SizedBox(height: 16),
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -635,7 +471,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           ),
           child: Column(
             children: [
-<<<<<<< HEAD
               DashboardComponents.buildListRow(
                 context: context,
                 title: 'Full Professors',
@@ -666,34 +501,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                 value: '33',
                 icon: Icons.person_rounded,
                 color: Colors.purple,
-=======
-              _buildFacultyRow(
-                'Full Professors',
-                '45',
-                Icons.person_rounded,
-                Colors.blue,
-              ),
-              const Divider(),
-              _buildFacultyRow(
-                'Associate Professors',
-                '67',
-                Icons.person_rounded,
-                Colors.green,
-              ),
-              const Divider(),
-              _buildFacultyRow(
-                'Assistant Professors',
-                '89',
-                Icons.person_rounded,
-                Colors.orange,
-              ),
-              const Divider(),
-              _buildFacultyRow(
-                'Lecturers',
-                '33',
-                Icons.person_rounded,
-                Colors.purple,
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
               ),
             ],
           ),
@@ -706,7 +513,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-<<<<<<< HEAD
         DashboardComponents.buildSectionHeader(
           context: context,
           title: 'Program Overview',
@@ -714,7 +520,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           subtitle: 'Programs by department',
         ),
         SizedBox(height: ResponsiveUtils.getResponsiveSpacing(context)),
-=======
         Text(
           'Program Overview',
           style: GoogleFonts.inter(
@@ -724,7 +529,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           ),
         ),
         const SizedBox(height: 16),
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -743,7 +547,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           ),
           child: Column(
             children: [
-<<<<<<< HEAD
               DashboardComponents.buildListRow(
                 context: context,
                 title: 'Engineering',
@@ -774,34 +577,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                 value: '10 programs',
                 icon: Icons.medical_services_rounded,
                 color: Colors.red,
-=======
-              _buildProgramRow(
-                'Engineering',
-                '12 programs',
-                Icons.engineering_rounded,
-                Colors.blue,
-              ),
-              const Divider(),
-              _buildProgramRow(
-                'Business',
-                '8 programs',
-                Icons.business_rounded,
-                Colors.green,
-              ),
-              const Divider(),
-              _buildProgramRow(
-                'Arts & Sciences',
-                '15 programs',
-                Icons.science_rounded,
-                Colors.orange,
-              ),
-              const Divider(),
-              _buildProgramRow(
-                'Health Sciences',
-                '10 programs',
-                Icons.medical_services_rounded,
-                Colors.red,
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
               ),
             ],
           ),
@@ -814,7 +589,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-<<<<<<< HEAD
         DashboardComponents.buildSectionHeader(
           context: context,
           title: 'Academic Performance',
@@ -822,7 +596,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           subtitle: 'Key performance indicators',
         ),
         SizedBox(height: ResponsiveUtils.getResponsiveSpacing(context)),
-=======
         Text(
           'Academic Performance',
           style: GoogleFonts.inter(
@@ -832,7 +605,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           ),
         ),
         const SizedBox(height: 16),
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -851,7 +623,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           ),
           child: Column(
             children: [
-<<<<<<< HEAD
               DashboardComponents.buildPerformanceIndicator(
                 context: context,
                 metric: 'Student Satisfaction',
@@ -878,30 +649,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                 metric: 'International Rankings',
                 value: 'Top 500',
                 color: Colors.purple,
-=======
-              _buildPerformanceIndicator(
-                'Student Satisfaction',
-                '4.2/5',
-                Colors.green,
-              ),
-              const SizedBox(height: 12),
-              _buildPerformanceIndicator(
-                'Research Output',
-                '156 papers',
-                Colors.blue,
-              ),
-              const SizedBox(height: 12),
-              _buildPerformanceIndicator(
-                'Industry Partnerships',
-                '23 active',
-                Colors.orange,
-              ),
-              const SizedBox(height: 12),
-              _buildPerformanceIndicator(
-                'International Rankings',
-                'Top 500',
-                Colors.purple,
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
               ),
             ],
           ),
@@ -910,8 +657,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
     );
   }
 
-<<<<<<< HEAD
-=======
   Widget _buildSummaryCard(
     String title,
     String value,
@@ -1277,5 +1022,4 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
       },
     );
   }
->>>>>>> 60cf4f3b2dfd41f06f3eab28e0557d97d3326664
 }

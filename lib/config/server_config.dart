@@ -10,7 +10,7 @@ class ServerConfig {
       'http://192.168.68.105:3000/api'; // Updated to your current IP
 
   // For cloud deployment (Render, Railway, etc.)
-  static const String cloudUrl = 'https://eduvision-alrd.onrender.com/api'; // Your Render URL
+  static const String cloudUrl = 'https://eduvision-3ps1.onrender.com/api'; // Your Render URL
 
   // Current active URL - change this based on where you're running the app
   static const String currentBaseUrl =
