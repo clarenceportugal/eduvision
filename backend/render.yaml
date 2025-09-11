@@ -4,9 +4,21 @@ services:
     env: node
     plan: free
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+      - key: MONGODB_URI
+        value: mongodb+srv://saynoseanniel:mathematics10@cluster0.crfzw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - key: DATABASE_NAME
+        value: eduvision
+      - key: COLLECTION_NAME
+        value: users
+      - key: CLOUDINARY_CLOUD_NAME
+        value: deqtxoewp
+      - key: CLOUDINARY_API_KEY
+        value: 429458566368881
+      - key: CLOUDINARY_API_SECRET
+        value: 1NPDJVTgxydH8VCOD7w-NLhFVdc

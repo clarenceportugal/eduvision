@@ -7,7 +7,7 @@ const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 10000;
 
 // MongoDB connection details
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://saynoseanniel:mathematics10@cluster0.crfzw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
