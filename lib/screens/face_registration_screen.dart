@@ -711,7 +711,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                     ? CustomColors.getSuccessColor(context)
                     : isCurrent
                     ? CustomColors.getPrimaryColor(context)
-                    : CustomColors.getSecondaryColor(context).withOpacity(0.3),
+                    : CustomColors.getSecondaryColor(context).withValues(alpha: 0.3),
                 border: isCurrent
                     ? Border.all(
                         color: CustomColors.getPrimaryColor(context),
@@ -731,7 +731,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
           height: 6,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(3),
-            color: CustomColors.getSecondaryColor(context).withOpacity(0.2),
+            color: CustomColors.getSecondaryColor(context).withValues(alpha: 0.2),
           ),
           child: FractionallySizedBox(
             alignment: Alignment.centerLeft,
@@ -742,7 +742,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                 gradient: LinearGradient(
                   colors: [
                     CustomColors.getPrimaryColor(context),
-                    CustomColors.getPrimaryColor(context).withOpacity(0.8),
+                    CustomColors.getPrimaryColor(context).withValues(alpha: 0.8),
                   ],
                 ),
               ),
@@ -757,7 +757,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
           'Step ${_currentStep + 1} of ${_registrationSteps.length}',
           style: GoogleFonts.inter(
             fontSize: 12,
-            color: CustomColors.getOnSurfaceColor(context).withOpacity(0.7),
+            color: CustomColors.getOnSurfaceColor(context).withValues(alpha: 0.7),
           ),
         ),
       ],
@@ -776,9 +776,9 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: step.color.withOpacity(0.1),
+        color: step.color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: step.color.withOpacity(0.3), width: 1),
+        border: Border.all(color: step.color.withValues(alpha: 0.3), width: 1),
       ),
       child: Column(
         children: [
@@ -789,7 +789,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: step.color.withOpacity(0.2),
+                  color: step.color.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(step.icon, color: step.color, size: 24),
@@ -815,7 +815,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
             step.description,
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: CustomColors.getOnSurfaceColor(context).withOpacity(0.8),
+              color: CustomColors.getOnSurfaceColor(context).withValues(alpha: 0.8),
             ),
             textAlign: TextAlign.center,
           ),
@@ -911,7 +911,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: CustomColors.getPrimaryColor(context).withOpacity(0.1),
+                color: CustomColors.getPrimaryColor(context).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -944,7 +944,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                       fontSize: 12,
                       color: CustomColors.getOnSurfaceColor(
                         context,
-                      ).withOpacity(0.8),
+                      ).withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -961,7 +961,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         color: CustomColors.getSurfaceColor(context),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -1046,7 +1046,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: CustomColors.getPrimaryColor(context).withOpacity(0.1),
+        color: CustomColors.getPrimaryColor(context).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -1161,7 +1161,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.7),
+          color: Colors.black.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -1169,7 +1169,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: step.color.withOpacity(0.2),
+                color: step.color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(step.icon, color: step.color, size: 20),
@@ -1193,7 +1193,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                     step.description,
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -1219,7 +1219,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: CustomColors.getWarningColor(context).withOpacity(0.9),
+                color: CustomColors.getWarningColor(context).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -1246,7 +1246,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: CustomColors.getErrorColor(context).withOpacity(0.9),
+                color: CustomColors.getErrorColor(context).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -1276,7 +1276,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: CustomColors.getPrimaryColor(context).withOpacity(0.9),
+                color: CustomColors.getPrimaryColor(context).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -1314,7 +1314,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: CustomColors.getSuccessColor(context).withOpacity(0.9),
+                color: CustomColors.getSuccessColor(context).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -1346,13 +1346,13 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primary.withOpacity(0.1),
-            Theme.of(context).colorScheme.primary.withOpacity(0.05),
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -1388,7 +1388,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                         fontSize: 14,
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.7),
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -1412,7 +1412,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
           width: 2,
         ),
       ),
@@ -1463,7 +1463,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
             right: 20,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: IconButton(
@@ -1518,7 +1518,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: CustomColors.getPrimaryColor(context).withOpacity(0.1),
+            color: CustomColors.getPrimaryColor(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(50),
           ),
           child: Icon(
@@ -1541,7 +1541,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
           'Press "Start Face Registration" to begin',
           style: GoogleFonts.inter(
             fontSize: 14,
-            color: CustomColors.getOnSurfaceColor(context).withOpacity(0.7),
+            color: CustomColors.getOnSurfaceColor(context).withValues(alpha: 0.7),
           ),
           textAlign: TextAlign.center,
         ),
@@ -1557,7 +1557,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
           Icon(
             Icons.camera_alt_rounded,
             size: 64,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -1573,7 +1573,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
             'Please grant camera permission to register your face',
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -1630,7 +1630,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -1702,7 +1702,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: CustomColors.getSuccessColor(context).withOpacity(0.1),
+            color: CustomColors.getSuccessColor(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(50),
           ),
           child: Icon(
@@ -1725,7 +1725,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
           'Your face is now registered for login',
           style: GoogleFonts.inter(
             fontSize: 14,
-            color: CustomColors.getOnSurfaceColor(context).withOpacity(0.7),
+            color: CustomColors.getOnSurfaceColor(context).withValues(alpha: 0.7),
           ),
         ),
       ],
@@ -1834,7 +1834,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                     fontSize: 12,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.7),
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -1937,7 +1937,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
             style: TextButton.styleFrom(
               foregroundColor: CustomColors.getOnSurfaceColor(
                 context,
-              ).withOpacity(0.7),
+              ).withValues(alpha: 0.7),
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
             icon: Icon(Icons.arrow_back_rounded, size: 20),
@@ -3517,7 +3517,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         children: [
           // Center guide overlay - always visible
           CustomPaint(
-            painter: CenterGuidePainter(color: Colors.white.withOpacity(0.5)),
+            painter: CenterGuidePainter(color: Colors.white.withValues(alpha: 0.5)),
           ),
           // Face detection overlay
           CustomPaint(
@@ -3560,7 +3560,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.7),
+          color: Colors.black.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -3587,7 +3587,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
             // Progress indicator
             LinearProgressIndicator(
               value: _completedSteps.length / _registrationSteps.length,
-              backgroundColor: Colors.white.withOpacity(0.3),
+              backgroundColor: Colors.white.withValues(alpha: 0.3),
               valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
             ),
             const SizedBox(height: 8),
@@ -3595,7 +3595,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
               '${_completedSteps.length}/${_registrationSteps.length} steps completed',
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
             const SizedBox(height: 4),
@@ -3606,7 +3606,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                 ),
               ),
             ],
@@ -3625,9 +3625,9 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.8),
+          color: Colors.black.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -3651,14 +3651,14 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
               _getStepInstructions(_currentStep),
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
             ),
             const SizedBox(height: 16),
             // Progress bar
             LinearProgressIndicator(
               value: _completedSteps.length / _registrationSteps.length,
-              backgroundColor: Colors.white.withOpacity(0.3),
+              backgroundColor: Colors.white.withValues(alpha: 0.3),
               valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
             ),
             const SizedBox(height: 8),
@@ -3666,7 +3666,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
               '${_completedSteps.length}/${_registrationSteps.length} steps completed',
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
               ),
             ),
             if (!_completedSteps.containsKey(_currentStep)) ...[
@@ -3677,7 +3677,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.2),
+                  color: Colors.blue.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -3685,7 +3685,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ),
@@ -3728,7 +3728,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         children: [
           // Center guide overlay - always visible
           CustomPaint(
-            painter: CenterGuidePainter(color: Colors.white.withOpacity(0.5)),
+            painter: CenterGuidePainter(color: Colors.white.withValues(alpha: 0.5)),
           ),
           // Face detection overlay
           CustomPaint(
@@ -3783,7 +3783,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.7),
+          color: Colors.black.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -3810,7 +3810,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                   ),
                   Text(
@@ -4046,13 +4046,13 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: _isTFLiteInitialized
-            ? CustomColors.getSuccessColor(context).withOpacity(0.1)
-            : CustomColors.getWarningColor(context).withOpacity(0.1),
+            ? CustomColors.getSuccessColor(context).withValues(alpha: 0.1)
+            : CustomColors.getWarningColor(context).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: _isTFLiteInitialized
-              ? CustomColors.getSuccessColor(context).withOpacity(0.3)
-              : CustomColors.getWarningColor(context).withOpacity(0.3),
+              ? CustomColors.getSuccessColor(context).withValues(alpha: 0.3)
+              : CustomColors.getWarningColor(context).withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -4362,7 +4362,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -4394,7 +4394,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                   fontSize: 16,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.8),
+                  ).colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
               ),
               const SizedBox(height: 16),
@@ -4410,9 +4410,9 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: Colors.blue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                  border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -4434,9 +4434,9 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
+                  color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -4987,7 +4987,7 @@ class _FaceRegistrationFullScreenState
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -5019,7 +5019,7 @@ class _FaceRegistrationFullScreenState
                   fontSize: 16,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.8),
+                  ).colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
               ),
               const SizedBox(height: 16),
@@ -5035,12 +5035,12 @@ class _FaceRegistrationFullScreenState
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: CustomColors.getPrimaryColor(context).withOpacity(0.1),
+                  color: CustomColors.getPrimaryColor(context).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: CustomColors.getPrimaryColor(
                       context,
-                    ).withOpacity(0.3),
+                    ).withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -5067,12 +5067,12 @@ class _FaceRegistrationFullScreenState
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: CustomColors.getWarningColor(context).withOpacity(0.1),
+                  color: CustomColors.getWarningColor(context).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: CustomColors.getWarningColor(
                       context,
-                    ).withOpacity(0.3),
+                    ).withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -5305,7 +5305,7 @@ class _FaceRegistrationFullScreenState
           if (_isCapturing)
             Positioned.fill(
               child: Container(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -5344,7 +5344,7 @@ class _FaceRegistrationFullScreenState
             left: 20,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: IconButton(
@@ -5364,7 +5364,7 @@ class _FaceRegistrationFullScreenState
             right: 20,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.8),
+                color: Colors.orange.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: IconButton(
@@ -5390,7 +5390,7 @@ class _FaceRegistrationFullScreenState
             child: Center(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Padding(
@@ -5462,7 +5462,7 @@ class _FaceRegistrationFullScreenState
                                 : 'Position your face in the camera',
                             style: GoogleFonts.inter(
                               fontSize: 12,
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                               fontWeight: FontWeight.w400,
                             ),
                           ),
@@ -5484,7 +5484,7 @@ class _FaceRegistrationFullScreenState
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(25),
       ),
       child: Row(
@@ -5529,7 +5529,7 @@ class _FaceRegistrationFullScreenState
             '${_currentStep + 1}/${_registrationSteps.length}',
             style: GoogleFonts.inter(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -6154,9 +6154,9 @@ class _FaceRegistrationFullScreenState
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.8),
+          color: Colors.black.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -6180,7 +6180,7 @@ class _FaceRegistrationFullScreenState
               _getStepInstructions(_currentStep),
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
             ),
           ],
@@ -6197,7 +6197,7 @@ class _FaceRegistrationFullScreenState
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.7),
+          color: Colors.black.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -6226,7 +6226,7 @@ class _FaceRegistrationFullScreenState
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                         ),
                       ),
                       Text(
@@ -6251,7 +6251,7 @@ class _FaceRegistrationFullScreenState
             const SizedBox(height: 12),
             LinearProgressIndicator(
               value: _completedSteps.length / _registrationSteps.length,
-              backgroundColor: Colors.white.withOpacity(0.3),
+              backgroundColor: Colors.white.withValues(alpha: 0.3),
               valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
             ),
             const SizedBox(height: 8),
@@ -6259,7 +6259,7 @@ class _FaceRegistrationFullScreenState
               '${_completedSteps.length}/${_registrationSteps.length} steps completed',
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
               ),
             ),
             if (!_completedSteps.contains(_currentStep)) ...[
@@ -6270,7 +6270,7 @@ class _FaceRegistrationFullScreenState
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.2),
+                  color: Colors.blue.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -6278,7 +6278,7 @@ class _FaceRegistrationFullScreenState
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ),
@@ -6394,7 +6394,7 @@ class _FaceRegistrationSuccessScreen extends StatelessWidget {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(60),
                   border: Border.all(color: Colors.green, width: 3),
                 ),
@@ -6423,7 +6423,7 @@ class _FaceRegistrationSuccessScreen extends StatelessWidget {
                   fontSize: 16,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.7),
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
                 textAlign: TextAlign.center,
               ),

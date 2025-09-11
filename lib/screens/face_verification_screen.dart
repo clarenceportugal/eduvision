@@ -436,7 +436,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
                   decoration: BoxDecoration(
                     color: CustomColors.getSurfaceColor(
                       context,
-                    ).withOpacity(0.9),
+                    ).withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -491,8 +491,8 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            CustomColors.getPrimaryColor(context).withOpacity(0.1),
-            CustomColors.getPrimaryColor(context).withOpacity(0.05),
+            CustomColors.getPrimaryColor(context).withValues(alpha: 0.1),
+            CustomColors.getPrimaryColor(context).withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
@@ -531,7 +531,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
                     fontSize: 14,
                     color: CustomColors.getOnSurfaceColor(
                       context,
-                    ).withOpacity(0.7),
+                    ).withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -551,7 +551,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
         border: Border.all(
           color: _detectedFace != null
               ? CustomColors.getSuccessColor(context)
-              : CustomColors.getSecondaryColor(context).withOpacity(0.2),
+              : CustomColors.getSecondaryColor(context).withValues(alpha: 0.2),
           width: _detectedFace != null ? 3 : 2,
         ),
       ),
@@ -567,7 +567,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
           Icon(
             Icons.camera_alt_rounded,
             size: 64,
-            color: CustomColors.getOnSurfaceColor(context).withOpacity(0.5),
+            color: CustomColors.getOnSurfaceColor(context).withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -643,7 +643,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
         if (_isVerifying)
           Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.7),
+              color: Colors.black.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Center(
@@ -669,7 +669,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.7),
+              color: Colors.black.withValues(alpha: 0.7),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -724,8 +724,8 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: _isVerified
-                    ? CustomColors.getSuccessColor(context).withOpacity(0.1)
-                    : CustomColors.getErrorColor(context).withOpacity(0.1),
+                    ? CustomColors.getSuccessColor(context).withValues(alpha: 0.1)
+                    : CustomColors.getErrorColor(context).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -761,7 +761,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
               'Similarity Score: ${(_similarityScore! * 100).toStringAsFixed(1)}%',
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: CustomColors.getOnSurfaceColor(context).withOpacity(0.7),
+                color: CustomColors.getOnSurfaceColor(context).withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 8),
@@ -769,7 +769,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
               value: _similarityScore!,
               backgroundColor: CustomColors.getSecondaryColor(
                 context,
-              ).withOpacity(0.3),
+              ).withValues(alpha: 0.3),
               valueColor: AlwaysStoppedAnimation<Color>(
                 _similarityScore! >= 0.6
                     ? CustomColors.getSuccessColor(context)
@@ -781,7 +781,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
               'Threshold: 60%',
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: CustomColors.getOnSurfaceColor(context).withOpacity(0.5),
+                color: CustomColors.getOnSurfaceColor(context).withValues(alpha: 0.5),
               ),
             ),
           ] else ...[
@@ -789,7 +789,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
               'User: ${widget.userId}',
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: CustomColors.getOnSurfaceColor(context).withOpacity(0.7),
+                color: CustomColors.getOnSurfaceColor(context).withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 8),
@@ -797,7 +797,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
               'Position your face in the camera and tap "Verify Face" when ready.',
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: CustomColors.getOnSurfaceColor(context).withOpacity(0.5),
+                color: CustomColors.getOnSurfaceColor(context).withValues(alpha: 0.5),
               ),
             ),
           ],

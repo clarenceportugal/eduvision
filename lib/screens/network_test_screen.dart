@@ -92,7 +92,7 @@ class _NetworkTestScreenState extends State<NetworkTestScreen> {
                 border: Border.all(
                   color: CustomColors.getSecondaryColor(
                     context,
-                  ).withOpacity(0.2),
+                  ).withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -105,7 +105,7 @@ class _NetworkTestScreenState extends State<NetworkTestScreen> {
                       fontWeight: FontWeight.w500,
                       color: CustomColors.getOnSurfaceColor(
                         context,
-                      ).withOpacity(0.7),
+                      ).withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -132,7 +132,7 @@ class _NetworkTestScreenState extends State<NetworkTestScreen> {
                 border: Border.all(
                   color: CustomColors.getSecondaryColor(
                     context,
-                  ).withOpacity(0.2),
+                  ).withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -206,7 +206,7 @@ class _NetworkTestScreenState extends State<NetworkTestScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: CustomColors.getSurfaceColor(context).withOpacity(0.3),
+                color: CustomColors.getSurfaceColor(context).withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -230,7 +230,7 @@ class _NetworkTestScreenState extends State<NetworkTestScreen> {
                       fontSize: 14,
                       color: CustomColors.getOnSurfaceColor(
                         context,
-                      ).withOpacity(0.7),
+                      ).withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -264,7 +264,7 @@ class _NetworkTestScreenState extends State<NetworkTestScreen> {
                 ? CustomColors.getSuccessColor(context)
                 : status.contains('❌')
                 ? CustomColors.getErrorColor(context)
-                : CustomColors.getOnSurfaceColor(context).withOpacity(0.7),
+                : CustomColors.getOnSurfaceColor(context).withValues(alpha: 0.7),
           ),
         ),
       ],

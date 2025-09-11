@@ -194,7 +194,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                   Icons.search,
                   color: CustomColors.getOnSurfaceColor(
                     context,
-                  ).withOpacity(0.5),
+                  ).withValues(alpha: 0.5),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),

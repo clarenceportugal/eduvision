@@ -69,7 +69,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
                     colors: [
                       Theme.of(
                         context,
-                      ).colorScheme.primaryContainer.withOpacity(0.8),
+                      ).colorScheme.primaryContainer.withValues(alpha: 0.8),
                       Theme.of(context).colorScheme.surface,
                     ],
                   ),
@@ -89,7 +89,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
                                 Theme.of(context).colorScheme.primary,
                                 Theme.of(
                                   context,
-                                ).colorScheme.primary.withOpacity(0.8),
+                                ).colorScheme.primary.withValues(alpha: 0.8),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(16),
@@ -97,7 +97,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
                               BoxShadow(
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.primary.withOpacity(0.3),
+                                ).colorScheme.primary.withValues(alpha: 0.3),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -130,7 +130,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
                                   fontWeight: FontWeight.w500,
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.onSurface.withOpacity(0.7),
+                                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                                 ),
                               ),
                             ],
@@ -197,18 +197,18 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primaryContainer.withOpacity(0.6),
-            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4),
+            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
+            Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.4),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -249,7 +249,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
                     fontWeight: FontWeight.w500,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.7),
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -259,7 +259,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.error.withOpacity(0.1),
+                    color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -308,7 +308,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('System Configuration'),
         ),
@@ -321,7 +321,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Backup & Recovery'),
         ),
@@ -334,7 +334,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Database Management'),
         ),
@@ -347,7 +347,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('System Logs'),
         ),
@@ -377,7 +377,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('User Directory'),
         ),
@@ -390,7 +390,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Role Management'),
         ),
@@ -403,7 +403,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Access Control'),
         ),
@@ -416,7 +416,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Account Verification'),
         ),
@@ -478,7 +478,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('System Monitoring'),
         ),
@@ -566,7 +566,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Change Password'),
         ),
@@ -596,7 +596,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Administrator Guide'),
         ),
@@ -609,7 +609,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('System Feedback'),
         ),
@@ -622,7 +622,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showAboutDialog(context),
         ),
@@ -677,12 +677,12 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -702,7 +702,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.1),
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -732,7 +732,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
                           fontWeight: FontWeight.w500,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.6),
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -809,7 +809,7 @@ class _SuperAdminSettingsScreenState extends State<SuperAdminSettingsScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(

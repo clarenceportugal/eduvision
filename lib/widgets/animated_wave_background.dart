@@ -147,19 +147,19 @@ class WavePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Define color palettes for light and dark modes - ultra subtle
     final List<Color> lightColors = [
-      Color(0xFF667EEA).withOpacity(0.01),
-      Color(0xFF764BA2).withOpacity(0.015),
-      Color(0xFF6B73FF).withOpacity(0.008),
-      Color(0xFF9FACE6).withOpacity(0.012),
-      Color(0xFF74EBD5).withOpacity(0.01),
+      Color(0xFF667EEA).withValues(alpha: 0.01),
+      Color(0xFF764BA2).withValues(alpha: 0.015),
+      Color(0xFF6B73FF).withValues(alpha: 0.008),
+      Color(0xFF9FACE6).withValues(alpha: 0.012),
+      Color(0xFF74EBD5).withValues(alpha: 0.01),
     ];
 
     final List<Color> darkColors = [
-      Color(0xFF667EEA).withOpacity(0.008),
-      Color(0xFF764BA2).withOpacity(0.012),
-      Color(0xFF6B73FF).withOpacity(0.006),
-      Color(0xFF9FACE6).withOpacity(0.01),
-      Color(0xFF74EBD5).withOpacity(0.008),
+      Color(0xFF667EEA).withValues(alpha: 0.008),
+      Color(0xFF764BA2).withValues(alpha: 0.012),
+      Color(0xFF6B73FF).withValues(alpha: 0.006),
+      Color(0xFF9FACE6).withValues(alpha: 0.01),
+      Color(0xFF74EBD5).withValues(alpha: 0.008),
     ];
 
     final colors = isDarkMode ? darkColors : lightColors;
@@ -257,7 +257,7 @@ class WavePainter extends CustomPainter {
       final radius = 2 + (random.nextDouble() * 3);
       final opacity = 0.1 + (random.nextDouble() * 0.2);
 
-      paint.color = colors[i % colors.length].withOpacity(opacity);
+      paint.color = colors[i % colors.length].withValues(alpha: opacity);
       canvas.drawCircle(Offset(x, y), radius, paint);
     }
   }

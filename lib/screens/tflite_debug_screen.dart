@@ -214,7 +214,7 @@ class _TFLiteDebugScreenState extends State<TFLiteDebugScreen>
                   decoration: BoxDecoration(
                     color: CustomColors.getSurfaceColor(
                       context,
-                    ).withOpacity(0.9),
+                    ).withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -270,8 +270,8 @@ class _TFLiteDebugScreenState extends State<TFLiteDebugScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            CustomColors.getPrimaryColor(context).withOpacity(0.1),
-            CustomColors.getPrimaryColor(context).withOpacity(0.05),
+            CustomColors.getPrimaryColor(context).withValues(alpha: 0.1),
+            CustomColors.getPrimaryColor(context).withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
@@ -310,7 +310,7 @@ class _TFLiteDebugScreenState extends State<TFLiteDebugScreen>
                     fontSize: 14,
                     color: CustomColors.getOnSurfaceColor(
                       context,
-                    ).withOpacity(0.7),
+                    ).withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -328,7 +328,7 @@ class _TFLiteDebugScreenState extends State<TFLiteDebugScreen>
         color: CustomColors.getSurfaceColor(context),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: CustomColors.getSecondaryColor(context).withOpacity(0.2),
+          color: CustomColors.getSecondaryColor(context).withValues(alpha: 0.2),
           width: 2,
         ),
       ),
@@ -473,7 +473,7 @@ class _TFLiteDebugScreenState extends State<TFLiteDebugScreen>
             const SizedBox(height: 4),
             LinearProgressIndicator(
               value: value,
-              backgroundColor: Colors.grey.withOpacity(0.3),
+              backgroundColor: Colors.grey.withValues(alpha: 0.3),
               valueColor: AlwaysStoppedAnimation<Color>(
                 _getEmotionColor(emotion),
               ),

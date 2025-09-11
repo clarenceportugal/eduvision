@@ -59,7 +59,7 @@ class EnhancedFacePainter extends CustomPainter {
 
   void _drawGuidelines(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = primaryColor.withOpacity(0.2 * animationValue)
+      ..color = primaryColor.withValues(alpha: 0.2 * animationValue)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -127,7 +127,7 @@ class EnhancedFacePainter extends CustomPainter {
 
     // Draw main bounding box with animated thickness
     final boxPaint = Paint()
-      ..color = faceColor.withOpacity(0.8 * animationValue)
+      ..color = faceColor.withValues(alpha: 0.8 * animationValue)
       ..strokeWidth = 3.0 + (2.0 * animationValue)
       ..style = PaintingStyle.stroke;
 
@@ -148,7 +148,7 @@ class EnhancedFacePainter extends CustomPainter {
 
   void _drawCornerMarkers(Canvas canvas, Rect rect, Color color) {
     final cornerPaint = Paint()
-      ..color = color.withOpacity(0.9 * animationValue)
+      ..color = color.withValues(alpha: 0.9 * animationValue)
       ..strokeWidth = 4.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -248,26 +248,26 @@ class EnhancedFacePainter extends CustomPainter {
   ) {
     // Outer glow
     final glowPaint = Paint()
-      ..color = color.withOpacity(0.3 * animationValue)
+      ..color = color.withValues(alpha: 0.3 * animationValue)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
     canvas.drawCircle(point, size * 2.0 * animationValue, glowPaint);
 
     // Middle ring
     final ringPaint = Paint()
-      ..color = color.withOpacity(0.6 * animationValue)
+      ..color = color.withValues(alpha: 0.6 * animationValue)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
     canvas.drawCircle(point, size * 1.2, ringPaint);
 
     // Inner dot
     final dotPaint = Paint()
-      ..color = color.withOpacity(0.9 * animationValue)
+      ..color = color.withValues(alpha: 0.9 * animationValue)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(point, size, dotPaint);
 
     // Center highlight
     final highlightPaint = Paint()
-      ..color = Colors.white.withOpacity(0.8 * animationValue)
+      ..color = Colors.white.withValues(alpha: 0.8 * animationValue)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(point, size * 0.3, highlightPaint);
   }
@@ -296,7 +296,7 @@ class EnhancedFacePainter extends CustomPainter {
     
     // Background
     final bgPaint = Paint()
-      ..color = Colors.black.withOpacity(0.6)
+      ..color = Colors.black.withValues(alpha: 0.6)
       ..style = PaintingStyle.fill;
     
     canvas.drawRRect(
@@ -329,7 +329,7 @@ class EnhancedFacePainter extends CustomPainter {
         final opacity = isEmphasized ? 0.9 : 0.6;
 
         final paint = Paint()
-          ..color = color.withOpacity(opacity * animationValue)
+          ..color = color.withValues(alpha: opacity * animationValue)
           ..strokeWidth = strokeWidth
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round
@@ -407,13 +407,13 @@ class EnhancedFacePainter extends CustomPainter {
   ) {
     // Background circle
     final bgPaint = Paint()
-      ..color = Colors.black.withOpacity(0.6)
+      ..color = Colors.black.withValues(alpha: 0.6)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(center, size / 2, bgPaint);
 
     // Quality arc
     final arcPaint = Paint()
-      ..color = color.withOpacity(0.8)
+      ..color = color.withValues(alpha: 0.8)
       ..strokeWidth = 6.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -478,7 +478,7 @@ class EnhancedFacePainter extends CustomPainter {
   ) {
     // Background
     final bgPaint = Paint()
-      ..color = Colors.black.withOpacity(0.4)
+      ..color = Colors.black.withValues(alpha: 0.4)
       ..style = PaintingStyle.fill;
     canvas.drawRect(
       Rect.fromLTWH(position.dx, position.dy, width, height),
@@ -487,7 +487,7 @@ class EnhancedFacePainter extends CustomPainter {
 
     // Progress bar
     final progressPaint = Paint()
-      ..color = color.withOpacity(0.8)
+      ..color = color.withValues(alpha: 0.8)
       ..style = PaintingStyle.fill;
     canvas.drawRect(
       Rect.fromLTWH(position.dx, position.dy, width * value, height),
@@ -538,7 +538,7 @@ class EnhancedFacePainter extends CustomPainter {
     Color color,
   ) {
     final paint = Paint()
-      ..color = color.withOpacity(0.7 * animationValue)
+      ..color = color.withValues(alpha: 0.7 * animationValue)
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

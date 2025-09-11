@@ -255,7 +255,7 @@ class _FaceDataDebugScreenState extends State<FaceDataDebugScreen> {
                 border: Border.all(
                   color: CustomColors.getSecondaryColor(
                     context,
-                  ).withOpacity(0.3),
+                  ).withValues(alpha: 0.3),
                 ),
               ),
               child: SingleChildScrollView(

@@ -36,8 +36,8 @@ class FaceRecognitionDemo extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    CustomColors.getPrimaryColor(context).withOpacity(0.1),
-                    CustomColors.getPrimaryColor(context).withOpacity(0.05),
+                    CustomColors.getPrimaryColor(context).withValues(alpha: 0.1),
+                    CustomColors.getPrimaryColor(context).withValues(alpha: 0.05),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
@@ -66,7 +66,7 @@ class FaceRecognitionDemo extends StatelessWidget {
                       fontSize: 14,
                       color: CustomColors.getOnSurfaceColor(
                         context,
-                      ).withOpacity(0.7),
+                      ).withValues(alpha: 0.7),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -207,9 +207,9 @@ class FaceRecognitionDemo extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         children: [
@@ -241,7 +241,7 @@ class FaceRecognitionDemo extends StatelessWidget {
                     fontSize: 12,
                     color: CustomColors.getOnSurfaceColor(
                       context,
-                    ).withOpacity(0.7),
+                    ).withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -314,7 +314,7 @@ class FaceRecognitionDemo extends StatelessWidget {
               style: TextButton.styleFrom(
                 foregroundColor: CustomColors.getOnSurfaceColor(
                   context,
-                ).withOpacity(0.7),
+                ).withValues(alpha: 0.7),
               ),
               child: Text('Cancel'),
             ),

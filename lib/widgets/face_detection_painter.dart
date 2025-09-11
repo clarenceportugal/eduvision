@@ -212,7 +212,7 @@ class FaceDetectionPainter extends CustomPainter {
 
         // Add glow effect for better visibility
         final glowPaint = Paint()
-          ..color = style.color.withOpacity(0.3)
+          ..color = style.color.withValues(alpha: 0.3)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.0);
         canvas.drawCircle(point, style.size * 1.5, glowPaint);
 
@@ -257,7 +257,7 @@ class FaceDetectionPainter extends CustomPainter {
             contourStyles[type] ?? ContourStyle(faceColor, 2.0, false);
 
         final paint = Paint()
-          ..color = style.color.withOpacity(0.8)
+          ..color = style.color.withValues(alpha: 0.8)
           ..strokeWidth = style.strokeWidth
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round
@@ -286,7 +286,7 @@ class FaceDetectionPainter extends CustomPainter {
         // Add glow effect for thicker contours
         if (style.strokeWidth >= 2.0) {
           final glowPaint = Paint()
-            ..color = style.color.withOpacity(0.2)
+            ..color = style.color.withValues(alpha: 0.2)
             ..strokeWidth = style.strokeWidth + 2.0
             ..style = PaintingStyle.stroke
             ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.0);
@@ -374,7 +374,7 @@ class FaceDetectionPainter extends CustomPainter {
     );
 
     final paint = Paint()
-      ..color = color.withOpacity(0.8 * animationValue)
+      ..color = color.withValues(alpha: 0.8 * animationValue)
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke;
 
@@ -421,20 +421,20 @@ class FaceDetectionPainter extends CustomPainter {
 
         // Draw main landmark with enhanced visibility
         final paint = Paint()
-          ..color = style.color.withOpacity(0.9 * animationValue)
+          ..color = style.color.withValues(alpha: 0.9 * animationValue)
           ..style = PaintingStyle.fill;
 
         canvas.drawCircle(point, style.size, paint);
 
         // Enhanced glow effect
         final glowPaint = Paint()
-          ..color = style.color.withOpacity(0.4 * animationValue)
+          ..color = style.color.withValues(alpha: 0.4 * animationValue)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
         canvas.drawCircle(point, style.size * 1.8, glowPaint);
 
         // Precise center dot
         final centerPaint = Paint()
-          ..color = Colors.white.withOpacity(0.9)
+          ..color = Colors.white.withValues(alpha: 0.9)
           ..style = PaintingStyle.fill;
         canvas.drawCircle(point, 1.2, centerPaint);
       }
@@ -477,7 +477,7 @@ class FaceDetectionPainter extends CustomPainter {
             contourStyles[type] ?? ContourStyle(baseColor, 2.0, false);
 
         final paint = Paint()
-          ..color = style.color.withOpacity(0.7 * animationValue)
+          ..color = style.color.withValues(alpha: 0.7 * animationValue)
           ..strokeWidth = style.strokeWidth
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round
@@ -534,7 +534,7 @@ class FaceDetectionPainter extends CustomPainter {
     // Draw corner markers for better visibility
     final cornerLength = 20.0;
     final cornerPaint = Paint()
-      ..color = primaryColor.withOpacity(animationValue)
+      ..color = primaryColor.withValues(alpha: animationValue)
       ..strokeWidth = 4.0
       ..style = PaintingStyle.stroke;
 
@@ -632,7 +632,7 @@ class FaceDetectionPainter extends CustomPainter {
       if (landmark != null) {
         final color = landmarkColors[type] ?? primaryColor;
         final paint = Paint()
-          ..color = color.withOpacity(0.8 * animationValue)
+          ..color = color.withValues(alpha: 0.8 * animationValue)
           ..style = PaintingStyle.fill;
 
         final point = _transformPoint(
@@ -648,7 +648,7 @@ class FaceDetectionPainter extends CustomPainter {
 
         // Add subtle glow effect
         final glowPaint = Paint()
-          ..color = color.withOpacity(0.3 * animationValue)
+          ..color = color.withValues(alpha: 0.3 * animationValue)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2.0);
         canvas.drawCircle(point, 6.0, glowPaint);
       }
@@ -668,7 +668,7 @@ class FaceDetectionPainter extends CustomPainter {
     contours.forEach((type, contour) {
       if (contour != null && contour.points.isNotEmpty) {
         final paint = Paint()
-          ..color = primaryColor.withOpacity(0.6 * animationValue)
+          ..color = primaryColor.withValues(alpha: 0.6 * animationValue)
           ..strokeWidth = 2.0
           ..style = PaintingStyle.stroke;
 

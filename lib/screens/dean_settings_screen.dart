@@ -68,7 +68,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
                     colors: [
                       Theme.of(
                         context,
-                      ).colorScheme.primaryContainer.withOpacity(0.8),
+                      ).colorScheme.primaryContainer.withValues(alpha: 0.8),
                       Theme.of(context).colorScheme.surface,
                     ],
                   ),
@@ -88,7 +88,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
                                 Theme.of(context).colorScheme.primary,
                                 Theme.of(
                                   context,
-                                ).colorScheme.primary.withOpacity(0.8),
+                                ).colorScheme.primary.withValues(alpha: 0.8),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(16),
@@ -96,7 +96,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
                               BoxShadow(
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.primary.withOpacity(0.3),
+                                ).colorScheme.primary.withValues(alpha: 0.3),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -129,7 +129,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
                                   fontWeight: FontWeight.w500,
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.onSurface.withOpacity(0.7),
+                                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                                 ),
                               ),
                             ],
@@ -196,18 +196,18 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primaryContainer.withOpacity(0.6),
-            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4),
+            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
+            Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.4),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -248,7 +248,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
                     fontWeight: FontWeight.w500,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.7),
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -260,7 +260,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.1),
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -309,7 +309,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Program Approval'),
         ),
@@ -322,7 +322,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Academic Policies'),
         ),
@@ -335,7 +335,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Accreditation'),
         ),
@@ -348,7 +348,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Budget Management'),
         ),
@@ -378,7 +378,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Faculty Directory'),
         ),
@@ -391,7 +391,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Performance Reviews'),
         ),
@@ -404,7 +404,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Workload Management'),
         ),
@@ -417,7 +417,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Professional Development'),
         ),
@@ -489,7 +489,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Change Password'),
         ),
@@ -584,7 +584,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Academic Guide'),
         ),
@@ -597,7 +597,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Academic Feedback'),
         ),
@@ -610,7 +610,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showAboutDialog(context),
         ),
@@ -665,12 +665,12 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -690,7 +690,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.1),
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -720,7 +720,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
                           fontWeight: FontWeight.w500,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.6),
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -797,7 +797,7 @@ class _DeanSettingsScreenState extends State<DeanSettingsScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(

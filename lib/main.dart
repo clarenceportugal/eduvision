@@ -237,10 +237,10 @@ class _SplashScreenState extends State<SplashScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Theme.of(context).colorScheme.primaryContainer.withOpacity(0.12),
+              Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.12),
               Theme.of(
                 context,
-              ).colorScheme.secondaryContainer.withOpacity(0.08),
+              ).colorScheme.secondaryContainer.withValues(alpha: 0.08),
             ],
           ),
         ),
@@ -258,13 +258,13 @@ class _SplashScreenState extends State<SplashScreen>
                       BoxShadow(
                         color: Theme.of(
                           context,
-                        ).colorScheme.primary.withOpacity(0.08),
+                        ).colorScheme.primary.withValues(alpha: 0.08),
                         spreadRadius: 0,
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         spreadRadius: 0,
                         blurRadius: 8,
                         offset: const Offset(0, 2),
@@ -273,7 +273,7 @@ class _SplashScreenState extends State<SplashScreen>
                     border: Border.all(
                       color: Theme.of(
                         context,
-                      ).colorScheme.outline.withOpacity(0.08),
+                      ).colorScheme.outline.withValues(alpha: 0.08),
                       width: 1,
                     ),
                   ),
@@ -438,10 +438,10 @@ class _TermsScreenState extends State<TermsScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Theme.of(context).colorScheme.primaryContainer.withOpacity(0.12),
+              Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.12),
               Theme.of(
                 context,
-              ).colorScheme.secondaryContainer.withOpacity(0.08),
+              ).colorScheme.secondaryContainer.withValues(alpha: 0.08),
             ],
           ),
         ),
@@ -464,10 +464,10 @@ class _TermsScreenState extends State<TermsScreen>
                           colors: [
                             Theme.of(
                               context,
-                            ).colorScheme.primaryContainer.withOpacity(0.3),
+                            ).colorScheme.primaryContainer.withValues(alpha: 0.3),
                             Theme.of(
                               context,
-                            ).colorScheme.secondaryContainer.withOpacity(0.2),
+                            ).colorScheme.secondaryContainer.withValues(alpha: 0.2),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(20),
@@ -475,7 +475,7 @@ class _TermsScreenState extends State<TermsScreen>
                           BoxShadow(
                             color: Theme.of(
                               context,
-                            ).colorScheme.primary.withOpacity(0.15),
+                            ).colorScheme.primary.withValues(alpha: 0.15),
                             spreadRadius: 0,
                             blurRadius: 20,
                             offset: const Offset(0, 8),
@@ -513,21 +513,21 @@ class _TermsScreenState extends State<TermsScreen>
                             Theme.of(context).colorScheme.surface,
                             Theme.of(
                               context,
-                            ).colorScheme.surface.withOpacity(0.9),
+                            ).colorScheme.surface.withValues(alpha: 0.9),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: Theme.of(
                             context,
-                          ).colorScheme.outline.withOpacity(0.12),
+                          ).colorScheme.outline.withValues(alpha: 0.12),
                           width: 1,
                         ),
                         boxShadow: [
                           BoxShadow(
                             color: Theme.of(
                               context,
-                            ).colorScheme.primary.withOpacity(0.12),
+                            ).colorScheme.primary.withValues(alpha: 0.12),
                             spreadRadius: 0,
                             blurRadius: 30,
                             offset: const Offset(0, 8),
@@ -535,7 +535,7 @@ class _TermsScreenState extends State<TermsScreen>
                           BoxShadow(
                             color: Theme.of(
                               context,
-                            ).colorScheme.outline.withOpacity(0.06),
+                            ).colorScheme.outline.withValues(alpha: 0.06),
                             spreadRadius: 0,
                             blurRadius: 15,
                             offset: const Offset(0, 4),
@@ -642,7 +642,7 @@ class _TermsScreenState extends State<TermsScreen>
                             side: BorderSide(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.outline.withOpacity(0.4),
+                              ).colorScheme.outline.withValues(alpha: 0.4),
                               width: 1.5,
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 18),
@@ -680,7 +680,7 @@ class _TermsScreenState extends State<TermsScreen>
                             elevation: 3,
                             shadowColor: Theme.of(
                               context,
-                            ).colorScheme.primary.withOpacity(0.3),
+                            ).colorScheme.primary.withValues(alpha: 0.3),
                           ),
                           child: Text(
                             'Accept & Continue',
@@ -942,10 +942,10 @@ class _LoginScreenState extends State<LoginScreen>
               colors: [
                 Theme.of(
                   context,
-                ).colorScheme.primaryContainer.withOpacity(0.15),
+                ).colorScheme.primaryContainer.withValues(alpha: 0.15),
                 Theme.of(
                   context,
-                ).colorScheme.secondaryContainer.withOpacity(0.10),
+                ).colorScheme.secondaryContainer.withValues(alpha: 0.10),
               ],
             ),
           ),
@@ -977,7 +977,7 @@ class _LoginScreenState extends State<LoginScreen>
                                           color: Theme.of(context)
                                               .colorScheme
                                               .primary
-                                              .withOpacity(0.15),
+                                              .withValues(alpha: 0.15),
                                           spreadRadius: 3,
                                           blurRadius: 20,
                                           offset: const Offset(0, 8),
@@ -1016,7 +1016,7 @@ class _LoginScreenState extends State<LoginScreen>
                               fontWeight: FontWeight.w400,
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.7),
+                              ).colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
                           const SizedBox(height: 40),
@@ -1034,21 +1034,21 @@ class _LoginScreenState extends State<LoginScreen>
                                       Theme.of(context).colorScheme.surface,
                                       Theme.of(
                                         context,
-                                      ).colorScheme.surface.withOpacity(0.95),
+                                      ).colorScheme.surface.withValues(alpha: 0.95),
                                     ],
                                   ),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.outline.withOpacity(0.15),
+                                    ).colorScheme.outline.withValues(alpha: 0.15),
                                     width: 1,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.primary.withOpacity(0.15),
+                                      ).colorScheme.primary.withValues(alpha: 0.15),
                                       spreadRadius: 0,
                                       blurRadius: 35,
                                       offset: const Offset(0, 12),
@@ -1056,7 +1056,7 @@ class _LoginScreenState extends State<LoginScreen>
                                     BoxShadow(
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.outline.withOpacity(0.08),
+                                      ).colorScheme.outline.withValues(alpha: 0.08),
                                       spreadRadius: 0,
                                       blurRadius: 20,
                                       offset: const Offset(0, 6),
@@ -1084,7 +1084,7 @@ class _LoginScreenState extends State<LoginScreen>
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .onSurface
-                                                .withOpacity(0.6),
+                                                .withValues(alpha: 0.6),
                                           ),
                                           border: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(
@@ -1094,7 +1094,7 @@ class _LoginScreenState extends State<LoginScreen>
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .outline
-                                                  .withOpacity(0.4),
+                                                  .withValues(alpha: 0.4),
                                               width: 1.5,
                                             ),
                                           ),
@@ -1117,7 +1117,7 @@ class _LoginScreenState extends State<LoginScreen>
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .outline
-                                                  .withOpacity(0.3),
+                                                  .withValues(alpha: 0.3),
                                               width: 1,
                                             ),
                                           ),
@@ -1126,7 +1126,7 @@ class _LoginScreenState extends State<LoginScreen>
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .primary
-                                                .withOpacity(0.7),
+                                                .withValues(alpha: 0.7),
                                           ),
                                         ),
                                         style: GoogleFonts.inter(),
@@ -1150,7 +1150,7 @@ class _LoginScreenState extends State<LoginScreen>
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .onSurface
-                                                .withOpacity(0.6),
+                                                .withValues(alpha: 0.6),
                                           ),
                                           border: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(
@@ -1160,7 +1160,7 @@ class _LoginScreenState extends State<LoginScreen>
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .outline
-                                                  .withOpacity(0.4),
+                                                  .withValues(alpha: 0.4),
                                               width: 1.5,
                                             ),
                                           ),
@@ -1183,7 +1183,7 @@ class _LoginScreenState extends State<LoginScreen>
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .outline
-                                                  .withOpacity(0.3),
+                                                  .withValues(alpha: 0.3),
                                               width: 1,
                                             ),
                                           ),
@@ -1192,7 +1192,7 @@ class _LoginScreenState extends State<LoginScreen>
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .primary
-                                                .withOpacity(0.7),
+                                                .withValues(alpha: 0.7),
                                           ),
                                           suffixIcon: IconButton(
                                             onPressed: () {
@@ -1208,7 +1208,7 @@ class _LoginScreenState extends State<LoginScreen>
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .primary
-                                                  .withOpacity(0.7),
+                                                  .withValues(alpha: 0.7),
                                             ),
                                           ),
                                         ),
@@ -1262,7 +1262,7 @@ class _LoginScreenState extends State<LoginScreen>
                                           shadowColor: Theme.of(context)
                                               .colorScheme
                                               .primary
-                                              .withOpacity(0.4),
+                                              .withValues(alpha: 0.4),
                                         ),
                                         child: _isLoading
                                             ? SizedBox(
@@ -1473,7 +1473,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     colors: [
                       Theme.of(
                         context,
-                      ).colorScheme.primaryContainer.withOpacity(0.8),
+                      ).colorScheme.primaryContainer.withValues(alpha: 0.8),
                       Theme.of(context).colorScheme.surface,
                     ],
                   ),
@@ -1493,7 +1493,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 Theme.of(context).colorScheme.primary,
                                 Theme.of(
                                   context,
-                                ).colorScheme.primary.withOpacity(0.8),
+                                ).colorScheme.primary.withValues(alpha: 0.8),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(16),
@@ -1501,7 +1501,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                               BoxShadow(
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.primary.withOpacity(0.3),
+                                ).colorScheme.primary.withValues(alpha: 0.3),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -1534,7 +1534,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   fontWeight: FontWeight.w500,
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.onSurface.withOpacity(0.7),
+                                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                                 ),
                               ),
                             ],
@@ -1553,21 +1553,21 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   Theme.of(context)
                                       .colorScheme
                                       .surfaceContainerHighest
-                                      .withOpacity(0.8),
+                                      .withValues(alpha: 0.8),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.outline.withOpacity(0.2),
+                                ).colorScheme.outline.withValues(alpha: 0.2),
                                 width: 1,
                               ),
                               boxShadow: [
                                 BoxShadow(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.outline.withOpacity(0.1),
+                                  ).colorScheme.outline.withValues(alpha: 0.1),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -1617,7 +1617,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                         color: Theme.of(context)
                                             .colorScheme
                                             .onSurface
-                                            .withOpacity(0.6),
+                                            .withValues(alpha: 0.6),
                                       ),
                                     ),
                                   ],
@@ -1628,7 +1628,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   size: 16,
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.onSurface.withOpacity(0.7),
+                                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                                 ),
                               ],
                             ),
@@ -1694,18 +1694,18 @@ class _DashboardScreenState extends State<DashboardScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primaryContainer.withOpacity(0.6),
-            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4),
+            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
+            Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.4),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -1740,7 +1740,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         fontWeight: FontWeight.w500,
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.7),
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                     Text(
@@ -1760,7 +1760,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -1792,8 +1792,8 @@ class _DashboardScreenState extends State<DashboardScreen>
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Theme.of(context).colorScheme.primary.withOpacity(0.15),
-                    Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(12),
@@ -1824,7 +1824,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     fontWeight: FontWeight.w500,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.6),
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -1941,18 +1941,18 @@ class _DashboardScreenState extends State<DashboardScreen>
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.08),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.08),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, 6),
             spreadRadius: -2,
           ),
           BoxShadow(
-            color: gradient.colors.first.withOpacity(0.1),
+            color: gradient.colors.first.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
             spreadRadius: -8,
@@ -1979,7 +1979,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: gradient.colors.first.withOpacity(0.4),
+                        color: gradient.colors.first.withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -2011,7 +2011,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       fontWeight: FontWeight.w500,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.65),
+                      ).colorScheme.onSurface.withValues(alpha: 0.65),
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -2039,13 +2039,13 @@ class _DashboardScreenState extends State<DashboardScreen>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [color.withOpacity(0.08), color.withOpacity(0.03)],
+          colors: [color.withValues(alpha: 0.08), color.withValues(alpha: 0.03)],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -2059,7 +2059,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -2128,7 +2128,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -2165,7 +2165,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           fontWeight: FontWeight.w500,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.7),
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -2178,7 +2178,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     decoration: BoxDecoration(
                       color: _getStatusColor(
                         classInfo['status'] as String,
-                      ).withOpacity(0.1),
+                      ).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -2240,9 +2240,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -2260,7 +2260,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             label,
             style: GoogleFonts.inter(
               fontSize: 11,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -2318,7 +2318,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   size: 16,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -2339,7 +2339,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           fontSize: 11,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.6),
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -2353,7 +2353,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   decoration: BoxDecoration(
                     color: _getCaseTypeColor(
                       case_['type'] as String,
-                    ).withOpacity(0.1),
+                    ).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -2416,8 +2416,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: task['urgent'] as bool
-                      ? Colors.orange.withOpacity(0.3)
-                      : Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                      ? Colors.orange.withValues(alpha: 0.3)
+                      : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
                   width: task['urgent'] as bool ? 2 : 1,
                 ),
               ),
@@ -2447,7 +2447,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             fontSize: 11,
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withOpacity(0.6),
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                         ),
                       ],
@@ -2501,7 +2501,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 border: Border.all(
                   color: _getAnnouncementPriorityColor(
                     announcement['priority'] as String,
-                  ).withOpacity(0.3),
+                  ).withValues(alpha: 0.3),
                 ),
               ),
               child: Column(
@@ -2549,7 +2549,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       fontSize: 12,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.7),
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -2640,13 +2640,13 @@ class _DashboardScreenState extends State<DashboardScreen>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
+          colors: [color.withValues(alpha: 0.1), color.withValues(alpha: 0.05)],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -2657,7 +2657,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 24),
@@ -2676,7 +2676,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -2695,8 +2695,8 @@ class _DashboardScreenState extends State<DashboardScreen>
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Theme.of(context).colorScheme.secondary.withOpacity(0.15),
-                    Theme.of(context).colorScheme.secondary.withOpacity(0.05),
+                    Theme.of(context).colorScheme.secondary.withValues(alpha: 0.15),
+                    Theme.of(context).colorScheme.secondary.withValues(alpha: 0.05),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(12),
@@ -2727,7 +2727,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     fontWeight: FontWeight.w500,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.6),
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -2858,18 +2858,18 @@ class _DashboardScreenState extends State<DashboardScreen>
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.08),
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.08),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
+                  color: Colors.black.withValues(alpha: 0.06),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                   spreadRadius: -2,
                 ),
                 BoxShadow(
-                  color: gradient.colors.first.withOpacity(0.1),
+                  color: gradient.colors.first.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                   spreadRadius: -8,
@@ -2896,7 +2896,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                           borderRadius: BorderRadius.circular(14),
                           boxShadow: [
                             BoxShadow(
-                              color: gradient.colors.first.withOpacity(0.4),
+                              color: gradient.colors.first.withValues(alpha: 0.4),
                               blurRadius: 12,
                               offset: const Offset(0, 6),
                             ),
@@ -2928,7 +2928,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             fontWeight: FontWeight.w500,
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withOpacity(0.65),
+                            ).colorScheme.onSurface.withValues(alpha: 0.65),
                           ),
                           textAlign: TextAlign.center,
                           maxLines: 1,
@@ -2957,8 +2957,8 @@ class _DashboardScreenState extends State<DashboardScreen>
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Theme.of(context).colorScheme.tertiary.withOpacity(0.15),
-                    Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
+                    Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.15),
+                    Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(12),
@@ -2989,7 +2989,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                     fontWeight: FontWeight.w500,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.6),
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -3006,23 +3006,23 @@ class _DashboardScreenState extends State<DashboardScreen>
               end: Alignment.bottomRight,
               colors: [
                 Theme.of(context).colorScheme.surface,
-                Theme.of(context).colorScheme.surface.withOpacity(0.7),
+                Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
               ],
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.08),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.08),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
+                color: Colors.black.withValues(alpha: 0.06),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
                 spreadRadius: -4,
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 6,
                 offset: const Offset(0, 2),
               ),
@@ -3067,7 +3067,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   gradient: LinearGradient(
                     colors: [
                       Colors.transparent,
-                      Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                      Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
                       Colors.transparent,
                     ],
                   ),
@@ -3085,12 +3085,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.08),
+                    ).colorScheme.primary.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: Theme.of(
                         context,
-                      ).colorScheme.primary.withOpacity(0.2),
+                      ).colorScheme.primary.withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
@@ -3134,10 +3134,10 @@ class _DashboardScreenState extends State<DashboardScreen>
       decoration: BoxDecoration(
         color: Theme.of(
           context,
-        ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.06),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.06),
           width: 1,
         ),
       ),
@@ -3151,7 +3151,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: gradient.colors.first.withOpacity(0.3),
+                  color: gradient.colors.first.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -3183,7 +3183,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       size: 14,
                       color: Theme.of(
                         context,
-                      ).colorScheme.onSurface.withOpacity(0.5),
+                      ).colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -3193,7 +3193,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         fontWeight: FontWeight.w500,
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -3204,7 +3204,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: gradient.colors.first.withOpacity(0.1),
+              color: gradient.colors.first.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -3462,12 +3462,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               Theme.of(context).colorScheme.surface,
               Theme.of(
                 context,
-              ).colorScheme.surfaceContainerHighest.withOpacity(0.8),
+              ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, -4),
             ),
@@ -3486,7 +3486,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           selectedItemColor: Theme.of(context).colorScheme.primary,
           unselectedItemColor: Theme.of(
             context,
-          ).colorScheme.onSurface.withOpacity(0.6),
+          ).colorScheme.onSurface.withValues(alpha: 0.6),
           selectedLabelStyle: GoogleFonts.inter(
             fontWeight: FontWeight.w600,
             fontSize: 12,
@@ -3501,7 +3501,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: _currentIndex == 0
-                      ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -3519,7 +3519,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: _currentIndex == 1
-                      ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -3611,7 +3611,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                       colors: [
                         Theme.of(
                           context,
-                        ).colorScheme.primaryContainer.withOpacity(0.8),
+                        ).colorScheme.primaryContainer.withValues(alpha: 0.8),
                         Theme.of(context).colorScheme.surface,
                       ],
                     ),
@@ -3631,7 +3631,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   Theme.of(context).colorScheme.primary,
                                   Theme.of(
                                     context,
-                                  ).colorScheme.primary.withOpacity(0.8),
+                                  ).colorScheme.primary.withValues(alpha: 0.8),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(16),
@@ -3639,7 +3639,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 BoxShadow(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.primary.withOpacity(0.3),
+                                  ).colorScheme.primary.withValues(alpha: 0.3),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 ),
@@ -3674,7 +3674,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     fontWeight: FontWeight.w500,
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.onSurface.withOpacity(0.7),
+                                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                                   ),
                                 ),
                               ],
@@ -3739,18 +3739,18 @@ class _SettingsScreenState extends State<SettingsScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primaryContainer.withOpacity(0.6),
-            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4),
+            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
+            Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.4),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -3791,7 +3791,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                     fontWeight: FontWeight.w500,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.7),
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -3803,7 +3803,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.1),
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -3927,7 +3927,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () {
             Navigator.push(
@@ -3948,7 +3948,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () {
             Navigator.push(
@@ -3969,7 +3969,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () {
             Navigator.push(
@@ -4006,7 +4006,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () {
             Navigator.push(
@@ -4027,7 +4027,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => Navigator.push(
             context,
@@ -4046,7 +4046,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => Navigator.push(
             context,
@@ -4082,7 +4082,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => Navigator.push(
             context,
@@ -4100,7 +4100,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => Navigator.push(
             context,
@@ -4119,7 +4119,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showAboutDialog(context),
         ),
@@ -4174,12 +4174,12 @@ class _SettingsScreenState extends State<SettingsScreen>
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -4199,7 +4199,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.1),
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -4229,7 +4229,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                           fontWeight: FontWeight.w500,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.6),
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -4290,7 +4290,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -4336,7 +4336,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   fontSize: 12,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             ],
@@ -4558,13 +4558,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.surface.withOpacity(0.9),
+                    ).colorScheme.surface.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
                         color: Theme.of(
                           context,
-                        ).colorScheme.outline.withOpacity(0.1),
+                        ).colorScheme.outline.withValues(alpha: 0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -4586,10 +4586,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                       colors: [
                         Theme.of(
                           context,
-                        ).colorScheme.primaryContainer.withOpacity(0.8),
+                        ).colorScheme.primaryContainer.withValues(alpha: 0.8),
                         Theme.of(
                           context,
-                        ).colorScheme.secondaryContainer.withOpacity(0.6),
+                        ).colorScheme.secondaryContainer.withValues(alpha: 0.6),
                         Theme.of(context).colorScheme.surface,
                       ],
                       stops: const [0.0, 0.6, 1.0],
@@ -4612,7 +4612,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 BoxShadow(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.primary.withOpacity(0.2),
+                                  ).colorScheme.primary.withValues(alpha: 0.2),
                                   blurRadius: 15,
                                   offset: const Offset(0, 6),
                                 ),
@@ -4661,7 +4661,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   Theme.of(context).colorScheme.primary,
                                   Theme.of(
                                     context,
-                                  ).colorScheme.primary.withOpacity(0.8),
+                                  ).colorScheme.primary.withValues(alpha: 0.8),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(16),
@@ -4669,7 +4669,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 BoxShadow(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.primary.withOpacity(0.3),
+                                  ).colorScheme.primary.withValues(alpha: 0.3),
                                   blurRadius: 6,
                                   offset: const Offset(0, 2),
                                 ),
@@ -4758,17 +4758,17 @@ class _ProfileScreenState extends State<ProfileScreen>
                 Theme.of(context).colorScheme.surface,
                 Theme.of(
                   context,
-                ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
               ],
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.05),
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -4877,17 +4877,17 @@ class _ProfileScreenState extends State<ProfileScreen>
                 Theme.of(context).colorScheme.surface,
                 Theme.of(
                   context,
-                ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
               ],
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.05),
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -4950,17 +4950,17 @@ class _ProfileScreenState extends State<ProfileScreen>
                 Theme.of(context).colorScheme.surface,
                 Theme.of(
                   context,
-                ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
               ],
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.05),
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -5121,7 +5121,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
@@ -5144,7 +5144,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   fontWeight: FontWeight.w500,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.7),
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(height: 2),
@@ -5324,7 +5324,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -5340,7 +5340,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+                color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -5384,18 +5384,18 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primary.withOpacity(0.1),
-            Theme.of(context).colorScheme.primary.withOpacity(0.05),
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -5406,7 +5406,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -5438,7 +5438,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                     fontSize: 15,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.7),
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -5490,7 +5490,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                               Theme.of(context).colorScheme.primary,
                               Theme.of(
                                 context,
-                              ).colorScheme.primary.withOpacity(0.8),
+                              ).colorScheme.primary.withValues(alpha: 0.8),
                             ],
                           )
                         : null,
@@ -5503,7 +5503,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                           ? Theme.of(context).colorScheme.primary
                           : Theme.of(
                               context,
-                            ).colorScheme.outline.withOpacity(0.3),
+                            ).colorScheme.outline.withValues(alpha: 0.3),
                       width: 1.5,
                     ),
                     boxShadow: isSelected
@@ -5511,14 +5511,14 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                             BoxShadow(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.primary.withOpacity(0.3),
+                              ).colorScheme.primary.withValues(alpha: 0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
                           ]
                         : [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -5536,7 +5536,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                             ? Colors.white
                             : Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.7),
+                              ).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -5599,7 +5599,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                               Theme.of(context).colorScheme.secondary,
                               Theme.of(
                                 context,
-                              ).colorScheme.secondary.withOpacity(0.8),
+                              ).colorScheme.secondary.withValues(alpha: 0.8),
                             ],
                           )
                         : null,
@@ -5612,7 +5612,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                           ? Theme.of(context).colorScheme.secondary
                           : Theme.of(
                               context,
-                            ).colorScheme.outline.withOpacity(0.2),
+                            ).colorScheme.outline.withValues(alpha: 0.2),
                       width: 1.5,
                     ),
                     boxShadow: isSelected
@@ -5620,14 +5620,14 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                             BoxShadow(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.secondary.withOpacity(0.3),
+                              ).colorScheme.secondary.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 3),
                             ),
                           ]
                         : [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
+                              color: Colors.black.withValues(alpha: 0.03),
                               blurRadius: 2,
                               offset: const Offset(0, 1),
                             ),
@@ -5645,7 +5645,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                             ? Colors.white
                             : Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.6),
+                              ).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -5683,12 +5683,12 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -5702,7 +5702,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
             decoration: BoxDecoration(
               color: Theme.of(
                 context,
-              ).colorScheme.primaryContainer.withOpacity(0.3),
+              ).colorScheme.primaryContainer.withValues(alpha: 0.3),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -5733,7 +5733,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                           right: BorderSide(
                             color: Theme.of(
                               context,
-                            ).colorScheme.outline.withOpacity(0.1),
+                            ).colorScheme.outline.withValues(alpha: 0.1),
                             width: 1,
                           ),
                         ),
@@ -5765,7 +5765,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                       bottom: BorderSide(
                         color: Theme.of(
                           context,
-                        ).colorScheme.outline.withOpacity(0.1),
+                        ).colorScheme.outline.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -5781,7 +5781,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                             right: BorderSide(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.outline.withOpacity(0.1),
+                              ).colorScheme.outline.withValues(alpha: 0.1),
                               width: 1,
                             ),
                           ),
@@ -5793,7 +5793,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                             fontWeight: FontWeight.w500,
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withOpacity(0.7),
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
                       ),
@@ -5810,7 +5810,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                                 right: BorderSide(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.outline.withOpacity(0.1),
+                                  ).colorScheme.outline.withValues(alpha: 0.1),
                                   width: 1,
                                 ),
                               ),
@@ -5841,12 +5841,12 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [colors.first.withOpacity(0.9), colors.last.withOpacity(0.8)],
+          colors: [colors.first.withValues(alpha: 0.9), colors.last.withValues(alpha: 0.8)],
         ),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: colors.first.withOpacity(0.3),
+            color: colors.first.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -5884,7 +5884,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                     Icon(
                       Icons.room_rounded,
                       size: 9,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                     const SizedBox(width: 2),
                     Expanded(
@@ -5893,7 +5893,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                         style: GoogleFonts.inter(
                           fontSize: 8,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 1,
@@ -5909,7 +5909,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                     Icon(
                       Icons.school_rounded,
                       size: 9,
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                     ),
                     const SizedBox(width: 2),
                     Expanded(
@@ -5918,7 +5918,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                         style: GoogleFonts.inter(
                           fontSize: 8,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 1,
@@ -6320,7 +6320,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -6365,18 +6365,18 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
-            Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
+            Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.1),
+            Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.tertiary.withOpacity(0.2),
+          color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -6387,7 +6387,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -6419,7 +6419,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                     fontSize: 15,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.7),
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -6437,12 +6437,12 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                 colors: [
                   (attendanceStats['present'] ?? 0) >
                           (attendanceStats['absent'] ?? 0)
-                      ? const Color(0xFF10B981).withOpacity(0.2)
-                      : const Color(0xFFEF4444).withOpacity(0.2),
+                      ? const Color(0xFF10B981).withValues(alpha: 0.2)
+                      : const Color(0xFFEF4444).withValues(alpha: 0.2),
                   (attendanceStats['present'] ?? 0) >
                           (attendanceStats['absent'] ?? 0)
-                      ? const Color(0xFF10B981).withOpacity(0.1)
-                      : const Color(0xFFEF4444).withOpacity(0.1),
+                      ? const Color(0xFF10B981).withValues(alpha: 0.1)
+                      : const Color(0xFFEF4444).withValues(alpha: 0.1),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
@@ -6450,8 +6450,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                 color:
                     (attendanceStats['present'] ?? 0) >
                         (attendanceStats['absent'] ?? 0)
-                    ? const Color(0xFF10B981).withOpacity(0.3)
-                    : const Color(0xFFEF4444).withOpacity(0.3),
+                    ? const Color(0xFF10B981).withValues(alpha: 0.3)
+                    : const Color(0xFFEF4444).withValues(alpha: 0.3),
                 width: 1.5,
               ),
               boxShadow: [
@@ -6459,8 +6459,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                   color:
                       (attendanceStats['present'] ?? 0) >
                           (attendanceStats['absent'] ?? 0)
-                      ? const Color(0xFF10B981).withOpacity(0.2)
-                      : const Color(0xFFEF4444).withOpacity(0.2),
+                      ? const Color(0xFF10B981).withValues(alpha: 0.2)
+                      : const Color(0xFFEF4444).withValues(alpha: 0.2),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -6512,7 +6512,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                 border: Border.all(
                   color: isSelected
                       ? Theme.of(context).colorScheme.tertiary
-                      : Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                      : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -6561,7 +6561,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                 border: Border.all(
                   color: isSelected
                       ? Theme.of(context).colorScheme.tertiary
-                      : Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                      : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -6593,7 +6593,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -6605,7 +6605,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
             decoration: BoxDecoration(
               color: Theme.of(
                 context,
-              ).colorScheme.primaryContainer.withOpacity(0.1),
+              ).colorScheme.primaryContainer.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
@@ -6636,7 +6636,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                           right: BorderSide(
                             color: Theme.of(
                               context,
-                            ).colorScheme.outline.withOpacity(0.15),
+                            ).colorScheme.outline.withValues(alpha: 0.15),
                             width: 1,
                           ),
                         ),
@@ -6669,7 +6669,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                       bottom: BorderSide(
                         color: Theme.of(
                           context,
-                        ).colorScheme.outline.withOpacity(0.1),
+                        ).colorScheme.outline.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -6685,7 +6685,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                             right: BorderSide(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.outline.withOpacity(0.15),
+                              ).colorScheme.outline.withValues(alpha: 0.15),
                               width: 1,
                             ),
                           ),
@@ -6712,7 +6712,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                                 right: BorderSide(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.outline.withOpacity(0.1),
+                                  ).colorScheme.outline.withValues(alpha: 0.1),
                                   width: 1,
                                 ),
                               ),
@@ -6758,12 +6758,12 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [cellColor.withOpacity(0.9), cellColor.withOpacity(0.8)],
+          colors: [cellColor.withValues(alpha: 0.9), cellColor.withValues(alpha: 0.8)],
         ),
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: cellColor.withOpacity(0.3),
+            color: cellColor.withValues(alpha: 0.3),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -6806,7 +6806,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                   style: GoogleFonts.inter(
                     fontSize: 8,
                     fontWeight: FontWeight.w500,
-                    color: textColor.withOpacity(0.9),
+                    color: textColor.withValues(alpha: 0.9),
                   ),
                   textAlign: TextAlign.center,
                   maxLines: 2,
@@ -7098,7 +7098,7 @@ class TasksDeadlinesScreen extends StatelessWidget {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -7121,15 +7121,15 @@ class TasksDeadlinesScreen extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Theme.of(context).colorScheme.secondary.withOpacity(0.08),
-                    Theme.of(context).colorScheme.secondary.withOpacity(0.03),
+                    Theme.of(context).colorScheme.secondary.withValues(alpha: 0.08),
+                    Theme.of(context).colorScheme.secondary.withValues(alpha: 0.03),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: Theme.of(
                     context,
-                  ).colorScheme.secondary.withOpacity(0.2),
+                  ).colorScheme.secondary.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -7140,7 +7140,7 @@ class TasksDeadlinesScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(
                         context,
-                      ).colorScheme.secondary.withOpacity(0.1),
+                      ).colorScheme.secondary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -7168,7 +7168,7 @@ class TasksDeadlinesScreen extends StatelessWidget {
                             fontSize: 14,
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withOpacity(0.7),
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -7182,7 +7182,7 @@ class TasksDeadlinesScreen extends StatelessWidget {
               'Task management and deadline tracking will be implemented here.',
               style: GoogleFonts.inter(
                 fontSize: 16,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -7211,7 +7211,7 @@ class AnnouncementsScreen extends StatelessWidget {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -7234,15 +7234,15 @@ class AnnouncementsScreen extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Theme.of(context).colorScheme.tertiary.withOpacity(0.08),
-                    Theme.of(context).colorScheme.tertiary.withOpacity(0.03),
+                    Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.08),
+                    Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.03),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: Theme.of(
                     context,
-                  ).colorScheme.tertiary.withOpacity(0.2),
+                  ).colorScheme.tertiary.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -7253,7 +7253,7 @@ class AnnouncementsScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Theme.of(
                         context,
-                      ).colorScheme.tertiary.withOpacity(0.1),
+                      ).colorScheme.tertiary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -7281,7 +7281,7 @@ class AnnouncementsScreen extends StatelessWidget {
                             fontSize: 14,
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withOpacity(0.7),
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -7295,7 +7295,7 @@ class AnnouncementsScreen extends StatelessWidget {
               'Announcements and notifications will be displayed here.',
               style: GoogleFonts.inter(
                 fontSize: 16,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -7657,7 +7657,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -7957,7 +7957,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         labelText: label,
         labelStyle: GoogleFonts.inter(
           fontSize: 14,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         prefixIcon: Icon(
           icon,
@@ -7971,7 +7971,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -8032,7 +8032,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         labelText: label,
         labelStyle: GoogleFonts.inter(
           fontSize: 14,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         prefixIcon: Icon(
           icon,
@@ -8046,7 +8046,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -8167,7 +8167,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -8204,12 +8204,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(
                     context,
-                  ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: Theme.of(
                       context,
-                    ).colorScheme.outline.withOpacity(0.2),
+                    ).colorScheme.outline.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Column(
@@ -8254,7 +8254,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(
                   context,
-                ).colorScheme.onSurface.withOpacity(0.6),
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 12,
@@ -8476,7 +8476,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
             width: 1,
           ),
         ),
@@ -8510,11 +8510,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.9),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -8545,17 +8545,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     colors: [
                       Theme.of(
                         context,
-                      ).colorScheme.primaryContainer.withOpacity(0.6),
+                      ).colorScheme.primaryContainer.withValues(alpha: 0.6),
                       Theme.of(
                         context,
-                      ).colorScheme.secondaryContainer.withOpacity(0.4),
+                      ).colorScheme.secondaryContainer.withValues(alpha: 0.4),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: Theme.of(
                       context,
-                    ).colorScheme.outline.withOpacity(0.1),
+                    ).colorScheme.outline.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -8566,7 +8566,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       decoration: BoxDecoration(
                         color: Theme.of(
                           context,
-                        ).colorScheme.primary.withOpacity(0.1),
+                        ).colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -8595,7 +8595,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               fontSize: 14,
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.7),
+                              ).colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
                         ],
@@ -8688,12 +8688,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(
                     context,
-                  ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: Theme.of(
                       context,
-                    ).colorScheme.outline.withOpacity(0.2),
+                    ).colorScheme.outline.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Column(
@@ -8788,14 +8788,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           Icon(
             Icons.check_circle_outline_rounded,
             size: 14,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
           ),
           const SizedBox(width: 8),
           Text(
             text,
             style: GoogleFonts.inter(
               fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -8814,7 +8814,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             width: 4,
             height: 4,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
               shape: BoxShape.circle,
             ),
           ),
@@ -8824,7 +8824,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               text,
               style: GoogleFonts.inter(
                 fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
               ),
             ),
           ),

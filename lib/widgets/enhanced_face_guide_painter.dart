@@ -33,7 +33,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
   void _drawFaceGuideFrame(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = stepColor.withOpacity(0.6 * animationValue)
+      ..color = stepColor.withValues(alpha: 0.6 * animationValue)
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke;
 
@@ -57,7 +57,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
   void _drawCornerIndicators(Canvas canvas, Rect rect, Color color) {
     final paint = Paint()
-      ..color = color.withOpacity(0.8 * animationValue)
+      ..color = color.withValues(alpha: 0.8 * animationValue)
       ..strokeWidth = 4.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -115,7 +115,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
   void _drawAlignmentGuides(Canvas canvas, Size size, Color color) {
     final paint = Paint()
-      ..color = color.withOpacity(0.3 * animationValue)
+      ..color = color.withValues(alpha: 0.3 * animationValue)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -176,7 +176,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
   void _drawCenterIndicator(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = stepColor.withOpacity(0.8 * animationValue)
+      ..color = stepColor.withValues(alpha: 0.8 * animationValue)
       ..style = PaintingStyle.fill;
 
     final center = Offset(size.width / 2, size.height / 2);
@@ -184,7 +184,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
     // Concentric circles
     final strokePaint = Paint()
-      ..color = stepColor.withOpacity(0.4 * animationValue)
+      ..color = stepColor.withValues(alpha: 0.4 * animationValue)
       ..strokeWidth = 2.0
       ..style = PaintingStyle.stroke;
 
@@ -195,7 +195,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
   void _drawUpArrow(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = stepColor.withOpacity(0.8 * animationValue)
+      ..color = stepColor.withValues(alpha: 0.8 * animationValue)
       ..strokeWidth = 4.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -225,7 +225,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
   void _drawDownArrow(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = stepColor.withOpacity(0.8 * animationValue)
+      ..color = stepColor.withValues(alpha: 0.8 * animationValue)
       ..strokeWidth = 4.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -255,7 +255,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
   void _drawLeftArrow(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = stepColor.withOpacity(0.8 * animationValue)
+      ..color = stepColor.withValues(alpha: 0.8 * animationValue)
       ..strokeWidth = 4.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -285,7 +285,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
   void _drawRightArrow(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = stepColor.withOpacity(0.8 * animationValue)
+      ..color = stepColor.withValues(alpha: 0.8 * animationValue)
       ..strokeWidth = 4.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -315,7 +315,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
   void _drawPositioningGrid(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1 * animationValue)
+      ..color = Colors.white.withValues(alpha: 0.1 * animationValue)
       ..strokeWidth = 0.5
       ..style = PaintingStyle.stroke;
 
@@ -370,7 +370,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
     // Draw feedback indicator
     final feedbackPaint = Paint()
-      ..color = feedbackColor.withOpacity(0.8 * animationValue)
+      ..color = feedbackColor.withValues(alpha: 0.8 * animationValue)
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke;
 
@@ -387,7 +387,7 @@ class EnhancedFaceGuidePainter extends CustomPainter {
 
   void _drawPositioningArrows(Canvas canvas, Size size, String direction) {
     final paint = Paint()
-      ..color = Colors.orange.withOpacity(0.8 * animationValue)
+      ..color = Colors.orange.withValues(alpha: 0.8 * animationValue)
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

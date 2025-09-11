@@ -70,7 +70,7 @@ class _ProgramChairpersonSettingsScreenState
                     colors: [
                       Theme.of(
                         context,
-                      ).colorScheme.primaryContainer.withOpacity(0.8),
+                      ).colorScheme.primaryContainer.withValues(alpha: 0.8),
                       Theme.of(context).colorScheme.surface,
                     ],
                   ),
@@ -90,7 +90,7 @@ class _ProgramChairpersonSettingsScreenState
                                 Theme.of(context).colorScheme.primary,
                                 Theme.of(
                                   context,
-                                ).colorScheme.primary.withOpacity(0.8),
+                                ).colorScheme.primary.withValues(alpha: 0.8),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(16),
@@ -98,7 +98,7 @@ class _ProgramChairpersonSettingsScreenState
                               BoxShadow(
                                 color: Theme.of(
                                   context,
-                                ).colorScheme.primary.withOpacity(0.3),
+                                ).colorScheme.primary.withValues(alpha: 0.3),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -131,7 +131,7 @@ class _ProgramChairpersonSettingsScreenState
                                   fontWeight: FontWeight.w500,
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.onSurface.withOpacity(0.7),
+                                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                                 ),
                               ),
                             ],
@@ -202,18 +202,18 @@ class _ProgramChairpersonSettingsScreenState
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primaryContainer.withOpacity(0.6),
-            Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.4),
+            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
+            Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.4),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -254,7 +254,7 @@ class _ProgramChairpersonSettingsScreenState
                     fontWeight: FontWeight.w500,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.7),
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -266,7 +266,7 @@ class _ProgramChairpersonSettingsScreenState
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.secondary.withOpacity(0.1),
+                    ).colorScheme.secondary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -315,7 +315,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Program Overview'),
         ),
@@ -328,7 +328,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Student Directory'),
         ),
@@ -341,7 +341,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Faculty Assignment'),
         ),
@@ -354,7 +354,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Program Assessment'),
         ),
@@ -384,7 +384,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Progress Tracking'),
         ),
@@ -397,7 +397,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Academic Alerts'),
         ),
@@ -410,7 +410,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Advising Management'),
         ),
@@ -423,7 +423,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Graduation Planning'),
         ),
@@ -453,7 +453,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Course Catalog'),
         ),
@@ -466,7 +466,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Course Scheduling'),
         ),
@@ -479,7 +479,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Lab Management'),
         ),
@@ -492,7 +492,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Capstone Projects'),
         ),
@@ -564,7 +564,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Change Password'),
         ),
@@ -659,7 +659,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Program Guide'),
         ),
@@ -672,7 +672,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showComingSoonDialog('Program Feedback'),
         ),
@@ -685,7 +685,7 @@ class _ProgramChairpersonSettingsScreenState
           Icon(
             Icons.arrow_forward_ios_rounded,
             size: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           onTap: () => _showAboutDialog(context),
         ),
@@ -740,12 +740,12 @@ class _ProgramChairpersonSettingsScreenState
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -765,7 +765,7 @@ class _ProgramChairpersonSettingsScreenState
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.1),
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -795,7 +795,7 @@ class _ProgramChairpersonSettingsScreenState
                           fontWeight: FontWeight.w500,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.6),
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -872,7 +872,7 @@ class _ProgramChairpersonSettingsScreenState
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(

@@ -420,7 +420,7 @@ class _TFLiteAccuracyTestScreenState extends State<TFLiteAccuracyTestScreen>
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: CustomColors.getOnSurfaceColor(
                             context,
-                          ).withOpacity(0.7),
+                          ).withValues(alpha: 0.7),
                         ),
                       ),
                     ],

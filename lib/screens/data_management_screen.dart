@@ -71,7 +71,7 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
             style: TextButton.styleFrom(
               foregroundColor: CustomColors.getOnSurfaceColor(
                 context,
-              ).withOpacity(0.7),
+              ).withValues(alpha: 0.7),
             ),
             child: Text('Cancel'),
           ),
