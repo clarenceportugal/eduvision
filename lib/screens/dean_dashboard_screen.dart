@@ -156,13 +156,24 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
     if (!mounted) return;
     
     try {
+      // Check if courseName is available, if not use a default value
+      if (courseName.isEmpty) {
+        print('Warning: courseName is empty, using default value');
+        courseName = 'ALL';
+      }
+      
       final shortCourseValue = courseName.replaceAll(RegExp(r'^bs', caseSensitive: false), '').toUpperCase();
+      print('Fetching schedules with course: $shortCourseValue');
+      
       final response = await http.post(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/dean/all-schedules/today'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'shortCourseValue': shortCourseValue}),
       ).timeout(const Duration(seconds: 10));
 
+      print('Schedules API Response Status: ${response.statusCode}');
+      print('Schedules API Response Body: ${response.body}');
+      
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         if (mounted) {
@@ -170,8 +181,10 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
             schedules = data.map((item) => Schedule.fromJson(item)).toList();
             _generateChartData();
           });
+          print('Successfully loaded ${schedules.length} schedules');
         }
       } else {
+        print('API Error: ${response.statusCode} - ${response.body}');
         throw Exception('Failed to load schedules: ${response.statusCode}');
       }
     } catch (error) {
@@ -546,21 +559,28 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  value,
-                  style: GoogleFonts.inter(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface,
+                Flexible(
+                  child: Text(
+                    value,
+                    style: GoogleFonts.inter(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                Flexible(
+                  child: Text(
+                    title,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
