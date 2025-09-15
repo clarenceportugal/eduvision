@@ -4,17 +4,18 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/dashboard_components.dart';
+import '../utils/api_test.dart';
 
-class DeanDashboardScreen extends StatefulWidget {
+class ProgramChairDashboardScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
 
-  const DeanDashboardScreen({super.key, required this.userData});
+  const ProgramChairDashboardScreen({super.key, required this.userData});
 
   @override
-  State<DeanDashboardScreen> createState() => _DeanDashboardScreenState();
+  State<ProgramChairDashboardScreen> createState() => _ProgramChairDashboardScreenState();
 }
 
-class _DeanDashboardScreenState extends State<DeanDashboardScreen>
+class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScreen>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -22,18 +23,13 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
 
   // State variables
   int? instructorCount;
-  int? programChairCount;
+  int? schedulesCountToday;
   List<dynamic> allFacultiesLogs = [];
   List<Schedule> schedules = [];
-  List<dynamic> courses = [];
-  List<dynamic> rooms = [];
-  String courseValue = "all";
-  String roomValue = "all";
   bool loading = false;
   bool isRefreshing = false;
   String? errorMessage;
 
-  String collegeName = "";
   String courseName = "";
 
   // Chart data for timeline visualization
@@ -88,9 +84,13 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
       final prefs = await SharedPreferences.getInstance();
       if (mounted) {
         setState(() {
-          collegeName = prefs.getString('college') ?? '';
           courseName = prefs.getString('course') ?? '';
         });
+        
+        // Test all API connections after loading user data
+        if (courseName.isNotEmpty) {
+          _testApiConnections();
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -99,6 +99,12 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
         });
       }
     }
+  }
+
+  Future<void> _testApiConnections() async {
+    print('Testing all API connections for course: $courseName');
+    final results = await ApiTest.testAllConnections(courseName);
+    ApiTest.printTestResults(results);
   }
 
   Future<void> _fetchData() async {
@@ -113,9 +119,8 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
       // Fetch data in parallel for better performance
       await Future.wait([
         _fetchSchedules(),
-        _fetchCourses(),
-        _fetchRooms(),
         _fetchInstructorCount(),
+        _fetchSchedulesCountToday(),
         _fetchAllFacultiesLogs(),
       ]);
     } catch (e) {
@@ -153,15 +158,23 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
   }
 
   Future<void> _fetchSchedules() async {
-    if (!mounted) return;
+    if (!mounted || courseName.isEmpty) return;
     
     try {
-      final shortCourseValue = courseName.replaceAll(RegExp(r'^bs', caseSensitive: false), '').toUpperCase();
+      final shortCourseName = courseName.replaceAll(RegExp(r'^bs', caseSensitive: false), '').toUpperCase();
+      print('Fetching schedules for course: $shortCourseName');
+      
       final response = await http.post(
-        Uri.parse('https://eduvision-dura.onrender.com/api/auth/dean/all-schedules/today'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'shortCourseValue': shortCourseValue}),
-      ).timeout(const Duration(seconds: 10));
+        Uri.parse('https://eduvision-dura.onrender.com/api/auth/all-schedules/today'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'shortCourseName': shortCourseName}),
+      ).timeout(const Duration(seconds: 15));
+
+      print('Schedules API Response Status: ${response.statusCode}');
+      print('Schedules API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -170,17 +183,113 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
             schedules = data.map((item) => Schedule.fromJson(item)).toList();
             _generateChartData();
           });
+          print('Successfully loaded ${schedules.length} schedules');
         }
       } else {
-        throw Exception('Failed to load schedules: ${response.statusCode}');
+        throw Exception('Failed to load schedules: ${response.statusCode} - ${response.body}');
       }
     } catch (error) {
       print('Error fetching schedules: $error');
       if (mounted) {
         setState(() {
-          errorMessage = 'Failed to load schedules';
+          errorMessage = 'Failed to load schedules: $error';
         });
       }
+    }
+  }
+
+  Future<void> _fetchInstructorCount() async {
+    if (!mounted || courseName.isEmpty) return;
+    
+    try {
+      print('Fetching instructor count for course: $courseName');
+      
+      final response = await http.get(
+        Uri.parse('https://eduvision-dura.onrender.com/api/auth/count/instructors?course=$courseName'),
+        headers: {
+          'Accept': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 15));
+
+      print('Instructor Count API Response Status: ${response.statusCode}');
+      print('Instructor Count API Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (mounted) {
+          setState(() {
+            instructorCount = data['count'] ?? 0;
+          });
+          print('Successfully loaded instructor count: $instructorCount');
+        }
+      } else {
+        print('Failed to fetch instructor count: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching instructor count: $error');
+    }
+  }
+
+  Future<void> _fetchSchedulesCountToday() async {
+    if (!mounted || courseName.isEmpty) return;
+    
+    try {
+      print('Fetching schedules count for course: $courseName');
+      
+      final response = await http.get(
+        Uri.parse('https://eduvision-dura.onrender.com/api/auth/schedules-count/today?course=$courseName'),
+        headers: {
+          'Accept': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 15));
+
+      print('Schedules Count API Response Status: ${response.statusCode}');
+      print('Schedules Count API Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (mounted) {
+          setState(() {
+            schedulesCountToday = data['count'] ?? 0;
+          });
+          print('Successfully loaded schedules count: $schedulesCountToday');
+        }
+      } else {
+        print('Failed to fetch schedules count: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching schedules count: $error');
+    }
+  }
+
+  Future<void> _fetchAllFacultiesLogs() async {
+    if (!mounted || courseName.isEmpty) return;
+    
+    try {
+      print('Fetching faculty logs for course: $courseName');
+      
+      final response = await http.get(
+        Uri.parse('https://eduvision-dura.onrender.com/api/auth/logs/all-faculties/today?courseName=$courseName'),
+        headers: {
+          'Accept': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 15));
+
+      print('Faculty Logs API Response Status: ${response.statusCode}');
+      print('Faculty Logs API Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        if (mounted) {
+          setState(() {
+            allFacultiesLogs = jsonDecode(response.body) ?? [];
+          });
+          print('Successfully loaded ${allFacultiesLogs.length} faculty logs');
+        }
+      } else {
+        print('Failed to fetch faculty logs: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching faculty logs: $error');
     }
   }
 
@@ -192,14 +301,7 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
 
     final formattedData = <Map<String, dynamic>>[];
 
-    // Filter schedules based on course and room selection (like in React version)
-    final filteredSchedules = schedules.where((schedule) {
-      final courseMatch = courseValue == "all" || schedule.courseCode.toLowerCase() == courseValue.toLowerCase();
-      final roomMatch = roomValue == "all" || schedule.room.toLowerCase() == roomValue.toLowerCase();
-      return courseMatch && roomMatch;
-    }).toList();
-
-    for (final schedule in filteredSchedules) {
+    for (final schedule in schedules) {
       final startTimeParts = schedule.startTime.split(':');
       final endTimeParts = schedule.endTime.split(':');
       
@@ -222,88 +324,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
     setState(() {
       chartData = formattedData;
     });
-  }
-
-  Future<void> _fetchCourses() async {
-    if (!mounted) return;
-    
-    try {
-      final response = await http.get(
-        Uri.parse('https://eduvision-dura.onrender.com/api/auth/all-courses/college?CollegeName=$collegeName'),
-      ).timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        if (mounted) {
-          setState(() {
-            courses = jsonDecode(response.body);
-          });
-        }
-      }
-    } catch (error) {
-      print('Error fetching courses: $error');
-    }
-  }
-
-  Future<void> _fetchRooms() async {
-    if (!mounted) return;
-    
-    try {
-      final response = await http.get(
-        Uri.parse('https://eduvision-dura.onrender.com/api/auth/all-rooms/college?CollegeName=$collegeName'),
-      ).timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        if (mounted) {
-          setState(() {
-            rooms = jsonDecode(response.body);
-          });
-        }
-      }
-    } catch (error) {
-      print('Error fetching rooms: $error');
-    }
-  }
-
-  Future<void> _fetchInstructorCount() async {
-    if (!mounted) return;
-    
-    try {
-      final response = await http.get(
-        Uri.parse('https://eduvision-dura.onrender.com/api/auth/count-all/instructors?CollegeName=$collegeName'),
-      ).timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (mounted) {
-          setState(() {
-            instructorCount = data['instructorCount'];
-            programChairCount = data['programChairCount'];
-          });
-        }
-      }
-    } catch (error) {
-      print('Error fetching instructor count: $error');
-    }
-  }
-
-  Future<void> _fetchAllFacultiesLogs() async {
-    if (!mounted) return;
-    
-    try {
-      final response = await http.get(
-        Uri.parse('https://eduvision-dura.onrender.com/api/auth/logs/all-faculties/today?courseName=$courseName'),
-      ).timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        if (mounted) {
-          setState(() {
-            allFacultiesLogs = jsonDecode(response.body);
-          });
-        }
-      }
-    } catch (error) {
-      print('Error fetching faculty logs: $error');
-    }
   }
 
   @override
@@ -413,10 +433,10 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
   Widget _buildSliverAppBar() {
     return DashboardComponents.buildSliverAppBar(
       context: context,
-      title: '${collegeName.isNotEmpty ? collegeName : "Loading..."} Dean Dashboard',
+      title: '${courseName.isNotEmpty ? courseName.toUpperCase() : "Loading..."} Program Chairperson Dashboard',
       subtitle: 'Dashboard',
       icon: Icons.admin_panel_settings_rounded,
-      displayName: widget.userData['displayName'] ?? 'Dean',
+      displayName: widget.userData['displayName'] ?? 'Program Chair',
     );
   }
 
@@ -424,42 +444,36 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '${collegeName.isNotEmpty ? collegeName : "Loading..."} Dean Dashboard',
-          style: GoogleFonts.inter(
-            fontSize: 32,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                '${courseName.isNotEmpty ? courseName.toUpperCase() : "Loading..."} Program Chairperson Dashboard',
+                style: GoogleFonts.inter(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
+            ElevatedButton.icon(
+              onPressed: _testApiConnections,
+              icon: const Icon(Icons.wifi_find_rounded, size: 16),
+              label: const Text('Test Connections'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
-        RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: 'Dashboard',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
-              ),
-              TextSpan(
-                text: ' / ',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
-              ),
-              TextSpan(
-                text: 'Attendance',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontStyle: FontStyle.italic,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
-              ),
-            ],
+        Text(
+          'Displaying today\'s faculty information for the ${courseName.isNotEmpty ? courseName.toUpperCase() : "Loading..."} program.',
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ],
@@ -488,18 +502,18 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
               const Color(0xFFf3e8ff),
             ),
             _buildStatCard(
-              'Total Program Chairperson',
-              programChairCount?.toString() ?? 'Loading...',
-              Icons.people_rounded,
-              const Color(0xFF9f7aea),
-              const Color(0xFFf3e8ff),
-            ),
-            _buildStatCard(
               'Instructor Absents Today',
               '0',
               Icons.highlight_off_rounded,
               const Color(0xFF38bdf8),
               const Color(0xFFe0f2fe),
+            ),
+            _buildStatCard(
+              'Classes Today',
+              schedulesCountToday?.toString() ?? 'Loading...',
+              Icons.event_available_rounded,
+              const Color(0xFFfb923c),
+              const Color(0xFFffedd5),
             ),
             _buildStatCard(
               'Late Instructors',
@@ -566,11 +580,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
               ],
             ),
           ),
-          const Icon(
-            Icons.more_horiz_rounded,
-            color: Colors.grey,
-            size: 20,
-          ),
         ],
       ),
     );
@@ -596,132 +605,30 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final isMobile = constraints.maxWidth < 600;
-              return isMobile
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Today Schedule Chart',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildDropdown('Course', courseValue, courses, (value) {
-                          setState(() => courseValue = value);
-                          _generateChartData();
-                        }),
-                        const SizedBox(height: 12),
-                        _buildDropdown('Room', roomValue, rooms, (value) {
-                          setState(() => roomValue = value);
-                          _generateChartData();
-                        }),
-                      ],
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Today Schedule Chart',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            _buildDropdown('Course', courseValue, courses, (value) {
-                              setState(() => courseValue = value);
-                              _generateChartData();
-                            }),
-                            const SizedBox(width: 16),
-                            _buildDropdown('Room', roomValue, rooms, (value) {
-                              setState(() => roomValue = value);
-                              _generateChartData();
-                            }),
-                          ],
-                        ),
-                      ],
-                    );
-            },
+          Text(
+            'Today Schedule Chart',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
           const SizedBox(height: 20),
           SizedBox(
             height: 200,
             child: loading
                 ? const Center(child: CircularProgressIndicator())
-                : schedules.isEmpty
+                : chartData.isEmpty
                     ? Center(
                         child: Text(
-                          'No data available. Please select an option from the dropdown.',
+                          'No schedule data available.',
                           style: GoogleFonts.inter(
                             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontStyle: FontStyle.italic,
                           ),
                         ),
                       )
-                    : _buildTimelineChart(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDropdown(String label, String value, List<dynamic> items, Function(String) onChanged) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 600;
-        return Container(
-          width: isMobile ? double.infinity : 200,
-          child: DropdownButtonFormField<String>(
-            value: value,
-            decoration: InputDecoration(
-              labelText: label,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            ),
-            items: [
-              const DropdownMenuItem(value: 'all', child: Text('All')),
-              ...items.map((item) => DropdownMenuItem(
-                value: item['code'] ?? item['name'],
-                child: Text((item['code'] ?? item['name']).toString().toUpperCase()),
-              )),
-            ],
-            onChanged: (value) => onChanged(value ?? 'all'),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTimelineChart() {
-    return Container(
-      height: 200,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          Text(
-            'Schedule Timeline (6 AM - 6 PM)',
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: _buildTimelineVisualization(),
+                    : _buildTimelineVisualization(),
           ),
         ],
       ),
@@ -729,20 +636,8 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
   }
 
   Widget _buildTimelineVisualization() {
-    if (chartData.isEmpty) {
-      return Center(
-        child: Text(
-          'No schedule data available',
-          style: GoogleFonts.inter(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      );
-    }
-
-    // Create time slots from 6 AM to 6 PM (12 hours)
-    final timeSlots = List.generate(12, (index) => 6 + index);
+    // Create time slots from 7 AM to 6 PM (11 hours) - matching React version
+    final timeSlots = List.generate(11, (index) => 7 + index);
     
     return SingleChildScrollView(
       child: Column(
@@ -789,19 +684,19 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                 final startTime = data['startTime'] as DateTime;
                 final endTime = data['endTime'] as DateTime;
                 
-                // Calculate position and width based on time
+                // Calculate position and width based on time (7 AM to 6 PM = 11 hours = 660 minutes)
                 final startHour = startTime.hour;
                 final startMinute = startTime.minute;
                 final endHour = endTime.hour;
                 final endMinute = endTime.minute;
                 
-                // Convert to minutes from 6 AM
-                final startMinutes = (startHour - 6) * 60 + startMinute;
-                final endMinutes = (endHour - 6) * 60 + endMinute;
+                // Convert to minutes from 7 AM
+                final startMinutes = (startHour - 7) * 60 + startMinute;
+                final endMinutes = (endHour - 7) * 60 + endMinute;
                 
-                // Calculate position and width (720 minutes = 12 hours)
-                final left = (startMinutes / 720) * 100;
-                final width = ((endMinutes - startMinutes) / 720) * 100;
+                // Calculate position and width (660 minutes = 11 hours)
+                final left = (startMinutes / 660) * 100;
+                final width = ((endMinutes - startMinutes) / 660) * 100;
                 
                 return Positioned(
                   left: left,
@@ -1007,7 +902,7 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    schedule.section.sectionName,
+                    '${schedule.section.course} - ${schedule.section.section}${schedule.section.block}',
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
@@ -1056,7 +951,7 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
           DataCell(Text(schedule.startTime)),
           DataCell(Text(schedule.endTime)),
           DataCell(Text(schedule.room)),
-          DataCell(Text(schedule.section.sectionName)),
+          DataCell(Text('${schedule.section.course} - ${schedule.section.section}${schedule.section.block}')),
           DataCell(Text('${schedule.courseTitle} (${schedule.courseCode})')),
         ],
       );
@@ -1072,11 +967,11 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
         ),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Color(0x0D000000),
             blurRadius: 10,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -1193,7 +1088,6 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
       return 'Invalid time';
     }
   }
-
 }
 
 // Data models
@@ -1253,12 +1147,23 @@ class Instructor {
 }
 
 class Section {
+  final String course;
+  final String section;
+  final String block;
   final String sectionName;
 
-  Section({required this.sectionName});
+  Section({
+    required this.course,
+    required this.section,
+    required this.block,
+    required this.sectionName,
+  });
 
   factory Section.fromJson(Map<String, dynamic> json) {
     return Section(
+      course: json['course'] ?? '',
+      section: json['section'] ?? '',
+      block: json['block'] ?? '',
       sectionName: json['sectionName'] ?? '',
     );
   }

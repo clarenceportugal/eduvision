@@ -14,7 +14,7 @@ import 'screens/help_center_screen.dart';
 import 'screens/send_feedback_screen.dart';
 import 'screens/superadmin_dashboard_screen.dart';
 import 'screens/dean_dashboard_screen.dart';
-import 'screens/program_chairperson_dashboard_screen.dart';
+import 'screens/program_chair_dashboard_screen.dart';
 import 'screens/superadmin_settings_screen.dart';
 import 'screens/dean_settings_screen.dart';
 import 'screens/program_chairperson_settings_screen.dart';
@@ -3387,14 +3387,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     switch (userRole) {
       case 'superadmin':
-        dashboardScreen = SuperAdminDashboardScreen(userData: widget.userData);
+        dashboardScreen = SuperadminDashboardScreen(userData: widget.userData);
         break;
       case 'dean':
         dashboardScreen = DeanDashboardScreen(userData: widget.userData);
         break;
       case 'programchairperson':
       case 'program chairperson':
-        dashboardScreen = ProgramChairpersonDashboardScreen(
+        dashboardScreen = ProgramChairDashboardScreen(
           userData: widget.userData,
         );
         break;

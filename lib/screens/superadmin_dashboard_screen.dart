@@ -1,26 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/dashboard_components.dart';
+import '../utils/api_test.dart';
+import '../utils/database_verification.dart';
+import '../utils/final_verification.dart';
 
-class SuperAdminDashboardScreen extends StatefulWidget {
+class SuperadminDashboardScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
 
-  const SuperAdminDashboardScreen({super.key, required this.userData});
+  const SuperadminDashboardScreen({super.key, required this.userData});
 
   @override
-  State<SuperAdminDashboardScreen> createState() =>
-      _SuperAdminDashboardScreenState();
+  State<SuperadminDashboardScreen> createState() => _SuperadminDashboardScreenState();
 }
 
-class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
-    with TickerProviderStateMixin {
+class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
+  // State variables
+  Map<String, int> counts = {
+    'dean': 0,
+    'programChairperson': 0,
+    'instructor': 0,
+    'superadmin': 0,
+  };
+  List<dynamic> allFacultiesLogs = [];
+  List<Schedule> schedules = [];
+  List<dynamic> colleges = [];
+  List<dynamic> rooms = [];
+  List<dynamic> programs = [];
+  bool loading = false;
+  bool isRefreshing = false;
+  String? errorMessage;
+
+  String courseName = "";
+  String collegeName = "";
+
+  // Filter values
+  String collegeValue = "all";
+  String courseValue = "all";
+  String roomValue = "all";
+  bool loadingCourses = false;
+  bool loadingColleges = false;
+
+  // Chart data for timeline visualization
+  List<Map<String, dynamic>> chartData = [];
+
+  // Keep alive for better performance
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void initState() {
     super.initState();
+    _initializeAnimations();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _loadUserData();
+    if (mounted) {
+      await _fetchData();
+    }
+  }
+
+  void _initializeAnimations() {
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
@@ -33,8 +83,10 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
       ),
     );
 
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
           CurvedAnimation(
             parent: _animationController,
             curve: const Interval(0.2, 0.8, curve: Curves.easeOutCubic),
@@ -42,6 +94,356 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
         );
 
     _animationController.forward();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (mounted) {
+        setState(() {
+          courseName = prefs.getString('course') ?? '';
+          collegeName = prefs.getString('college') ?? '';
+        });
+        
+        // Test all API connections after loading user data
+        if (collegeName.isNotEmpty) {
+          _testApiConnections();
+          _verifyDatabaseHealth();
+          _runFinalVerification();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Failed to load user data: $e';
+        });
+      }
+    }
+  }
+
+  Future<void> _testApiConnections() async {
+    print('Testing all Superadmin API connections for college: $collegeName');
+    final results = await ApiTest.testSuperadminConnections(collegeName);
+    ApiTest.printTestResults(results);
+  }
+
+  Future<void> _verifyDatabaseHealth() async {
+    print('🔍 Verifying database health...');
+    final results = await DatabaseVerification.verifyAllConnections();
+    DatabaseVerification.printVerificationResults(results);
+    
+    final isHealthy = await DatabaseVerification.isDatabaseHealthy();
+    if (mounted) {
+      setState(() {
+        if (!isHealthy) {
+          errorMessage = 'Database connection issues detected. Some features may not work properly.';
+        }
+      });
+    }
+  }
+
+  Future<void> _runFinalVerification() async {
+    print('🎯 Running final verification of all features...');
+    final results = await FinalVerification.verifyAllFeatures();
+    FinalVerification.printFinalResults(results);
+  }
+
+  Future<void> _fetchData() async {
+    if (!mounted) return;
+    
+    setState(() {
+      loading = true;
+      errorMessage = null;
+    });
+
+    try {
+      // Fetch data in parallel for better performance
+      await Future.wait([
+        _fetchUserCounts(),
+        _fetchColleges(),
+        _fetchRooms(),
+        _fetchSchedules(),
+        _fetchAllFacultiesLogs(),
+      ]);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Failed to load data: $e';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _refreshData() async {
+    if (!mounted) return;
+    
+    setState(() {
+      isRefreshing = true;
+      errorMessage = null;
+    });
+
+    try {
+      await _fetchData();
+    } finally {
+      if (mounted) {
+        setState(() {
+          isRefreshing = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchUserCounts() async {
+    if (!mounted) return;
+    
+    try {
+      print('Fetching user counts...');
+      
+      final response = await http.get(
+        Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/user-counts'),
+        headers: {'Accept': 'application/json'},
+      ).timeout(const Duration(seconds: 15));
+
+      print('User Counts API Response Status: ${response.statusCode}');
+      print('User Counts API Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (mounted) {
+          setState(() {
+            counts = Map<String, int>.from(data);
+          });
+          print('Successfully loaded user counts: $counts');
+        }
+      } else {
+        print('Failed to fetch user counts: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching user counts: $error');
+    }
+  }
+
+  Future<void> _fetchColleges() async {
+    if (!mounted) return;
+    
+    try {
+      setState(() => loadingColleges = true);
+      print('Fetching colleges...');
+      
+      final response = await http.get(
+        Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/colleges'),
+        headers: {'Accept': 'application/json'},
+      ).timeout(const Duration(seconds: 15));
+
+      print('Colleges API Response Status: ${response.statusCode}');
+      print('Colleges API Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (mounted) {
+          setState(() {
+            colleges = data is List ? data : [];
+          });
+          print('Successfully loaded ${colleges.length} colleges');
+        }
+      } else {
+        print('Failed to fetch colleges: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching colleges: $error');
+    } finally {
+      if (mounted) {
+        setState(() => loadingColleges = false);
+      }
+    }
+  }
+
+  Future<void> _fetchRooms() async {
+    if (!mounted || collegeName.isEmpty) return;
+    
+    try {
+      print('Fetching rooms for college: $collegeName');
+      
+      final response = await http.get(
+        Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/all-rooms/college?CollegeName=$collegeName'),
+        headers: {'Accept': 'application/json'},
+      ).timeout(const Duration(seconds: 15));
+
+      print('Rooms API Response Status: ${response.statusCode}');
+      print('Rooms API Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (mounted) {
+          setState(() {
+            rooms = data is List ? data : [];
+          });
+          print('Successfully loaded ${rooms.length} rooms');
+        }
+      } else {
+        print('Failed to fetch rooms: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching rooms: $error');
+    }
+  }
+
+  Future<void> _fetchSchedules() async {
+    if (!mounted) return;
+    
+    try {
+      final shortCourseValue = courseValue.replaceAll(RegExp(r'^bs', caseSensitive: false), '').toUpperCase();
+      print('Fetching schedules for course: $shortCourseValue');
+      
+      final response = await http.post(
+        Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/all-schedules/today'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'shortCourseValue': shortCourseValue}),
+      ).timeout(const Duration(seconds: 15));
+
+      print('Schedules API Response Status: ${response.statusCode}');
+      print('Schedules API Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        if (mounted) {
+          setState(() {
+            schedules = data.map((item) => Schedule.fromJson(item)).toList();
+            _generateChartData();
+          });
+          print('Successfully loaded ${schedules.length} schedules');
+        }
+      } else {
+        print('Failed to fetch schedules: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching schedules: $error');
+    }
+  }
+
+  Future<void> _fetchAllFacultiesLogs() async {
+    if (!mounted || courseName.isEmpty) return;
+    
+    try {
+      print('Fetching faculty logs for course: $courseName');
+      
+      final response = await http.get(
+        Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/logs/all-faculties/today?courseName=$courseName'),
+        headers: {'Accept': 'application/json'},
+      ).timeout(const Duration(seconds: 15));
+
+      print('Faculty Logs API Response Status: ${response.statusCode}');
+      print('Faculty Logs API Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        if (mounted) {
+          setState(() {
+            allFacultiesLogs = jsonDecode(response.body) ?? [];
+          });
+          print('Successfully loaded ${allFacultiesLogs.length} faculty logs');
+        }
+      } else {
+        print('Failed to fetch faculty logs: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching faculty logs: $error');
+    }
+  }
+
+  Future<void> _handleCollegeChange(String code) async {
+    setState(() {
+      collegeValue = code;
+      courseValue = "all";
+    });
+    print('Selected college: $code');
+
+    setState(() => loadingCourses = true);
+    try {
+      final response = await http.post(
+        Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/selected-college'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'collegeCode': code}),
+      ).timeout(const Duration(seconds: 15));
+
+      print('Courses API Response Status: ${response.statusCode}');
+      print('Courses API Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (mounted) {
+          setState(() {
+            programs = data is List ? data : [];
+          });
+          print('Successfully loaded ${programs.length} programs for college: $code');
+        }
+      } else {
+        print('Failed to fetch courses for college: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching courses for college: $error');
+    } finally {
+      if (mounted) {
+        setState(() => loadingCourses = false);
+      }
+    }
+  }
+
+  void _handleCourseChange(String value) {
+    setState(() {
+      courseValue = value;
+    });
+    _fetchSchedules();
+  }
+
+  void _handleRoomChange(String value) {
+    setState(() {
+      roomValue = value;
+    });
+  }
+
+  void _generateChartData() {
+    final today = DateTime.now();
+    final year = today.year;
+    final month = today.month;
+    final date = today.day;
+
+    final formattedData = <Map<String, dynamic>>[];
+
+    for (final schedule in schedules) {
+      final startTimeParts = schedule.startTime.split(':');
+      final endTimeParts = schedule.endTime.split(':');
+      
+      final startHour = int.parse(startTimeParts[0]);
+      final startMinute = int.parse(startTimeParts[1]);
+      final endHour = int.parse(endTimeParts[0]);
+      final endMinute = int.parse(endTimeParts[1]);
+
+      formattedData.add({
+        'instructor': '${schedule.instructor.firstName} ${schedule.instructor.lastName}',
+        'subject': schedule.courseCode,
+        'startTime': DateTime(year, month, date, startHour, startMinute),
+        'endTime': DateTime(year, month, date, endHour, endMinute),
+        'room': schedule.room,
+        'section': schedule.section.sectionName,
+        'courseTitle': schedule.courseTitle,
+      });
+    }
+
+    setState(() {
+      chartData = formattedData;
+    });
   }
 
   @override
@@ -52,13 +454,21 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
 
   @override
   Widget build(BuildContext context) {
-    final String displayName = widget.userData['displayName'] ?? 'Super Admin';
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: CustomScrollView(
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          _buildSliverAppBar(displayName),
+            _buildSliverAppBar(),
+            if (errorMessage != null)
+              SliverToBoxAdapter(
+                child: _buildErrorWidget(),
+              )
+            else
           SliverToBoxAdapter(
             child: FadeTransition(
               opacity: _fadeAnimation,
@@ -69,20 +479,16 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildWelcomeSection(displayName),
+                          _buildHeader(),
                       const SizedBox(height: 24),
-                      _buildSystemOverviewSection(),
+                          _buildStatisticsCards(),
                       const SizedBox(height: 24),
-                      _buildQuickActionsSection(),
+                          _buildScheduleChart(),
                       const SizedBox(height: 24),
-                      _buildSystemAnalyticsSection(),
+                          _buildSchedulesTable(),
                       const SizedBox(height: 24),
-                      _buildUserManagementSection(),
-                      const SizedBox(height: 24),
-                      _buildSystemHealthSection(),
-                      const SizedBox(
-                        height: 170,
-                      ), // Bottom padding for BottomNavigationBar
+                          _buildTodayActivity(),
+                          const SizedBox(height: 100),
                     ],
                   ),
                 ),
@@ -90,385 +496,522 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
             ),
           ),
         ],
+        ),
       ),
     );
   }
 
-  Widget _buildSliverAppBar(String displayName) {
-    return DashboardComponents.buildSliverAppBar(
-      context: context,
-      title: 'System Administration',
-      subtitle: 'Welcome back,',
-      icon: Icons.admin_panel_settings_rounded,
-      displayName: displayName,
-    );
-  }
-
-
-  Widget _buildWelcomeSection(String displayName) {
-    return DashboardComponents.buildWelcomeSection(
-      context: context,
-      title: 'System Control Center',
-      description: 'You have full administrative access to manage the entire EduVision system, including user accounts, system settings, and security configurations.',
-      icon: Icons.security_rounded,
-    );
-  }
-
-
-  Widget _buildSystemOverviewSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        DashboardComponents.buildSectionHeader(
-          context: context,
-          title: 'System Overview',
-          icon: Icons.dashboard_rounded,
-          subtitle: 'System health and metrics',
-        ),
-        const SizedBox(height: 20),
-        Text(
-          'System Overview',
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 16),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1.4,
-          children: [
-            DashboardComponents.buildSummaryCard(
-              context: context,
-              title: 'Total Users',
-              value: '2,847',
-              icon: Icons.people_rounded,
-              color: Colors.blue,
-              subtitle: 'Active accounts',
-            ),
-            DashboardComponents.buildSummaryCard(
-              context: context,
-              title: 'System Status',
-              value: 'Online',
-              icon: Icons.check_circle_rounded,
-              color: Colors.green,
-              subtitle: 'All services operational',
-            ),
-            DashboardComponents.buildSummaryCard(
-              context: context,
-              title: 'Storage Used',
-              value: '78%',
-              icon: Icons.storage_rounded,
-              color: Colors.orange,
-              subtitle: '2.3TB / 3TB',
-            ),
-            DashboardComponents.buildSummaryCard(
-              context: context,
-              title: 'Security Level',
-              value: 'High',
-              icon: Icons.shield_rounded,
-              color: Colors.red,
-              subtitle: 'All systems secure',
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-
-  Widget _buildQuickActionsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Quick Actions',
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 16),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1.5,
-          children: [
-            _buildEnhancedActionCard(
-              'User Management',
-              'Manage all user accounts, roles, and permissions',
-              Icons.manage_accounts_rounded,
-              Colors.blue,
-              () => _showComingSoonDialog('User Management'),
-            ),
-            _buildEnhancedActionCard(
-              'System Settings',
-              'Configure system-wide settings and preferences',
-              Icons.settings_system_daydream_rounded,
-              Colors.purple,
-              () => _showComingSoonDialog('System Settings'),
-            ),
-            _buildEnhancedActionCard(
-              'Security Center',
-              'Monitor security logs and manage access controls',
-              Icons.security_rounded,
-              Colors.red,
-              () => _showComingSoonDialog('Security Center'),
-            ),
-            _buildEnhancedActionCard(
-              'Backup & Recovery',
-              'Manage system backups and disaster recovery',
-              Icons.backup_rounded,
-              Colors.green,
-              () => _showComingSoonDialog('Backup & Recovery'),
-            ),
-            _buildEnhancedActionCard(
-              'System Logs',
-              'View and analyze system activity logs',
-              Icons.article_rounded,
-              Colors.orange,
-              () => _showComingSoonDialog('System Logs'),
-            ),
-            _buildEnhancedActionCard(
-              'Database Admin',
-              'Manage database connections and maintenance',
-              Icons.storage_rounded,
-              Colors.teal,
-              () => _showComingSoonDialog('Database Admin'),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSystemAnalyticsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'System Analytics',
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildAnalyticsCard(
-          'System Performance',
-          'CPU: 45% | RAM: 62% | Network: 78%',
-          Icons.speed_rounded,
-          Colors.blue,
-          'Real-time system metrics',
-        ),
-        const SizedBox(height: 12),
-        _buildAnalyticsCard(
-          'User Activity',
-          '1,234 active sessions | 89 new logins today',
-          Icons.trending_up_rounded,
-          Colors.green,
-          'Live user activity monitoring',
-        ),
-        const SizedBox(height: 12),
-        _buildAnalyticsCard(
-          'Security Alerts',
-          '3 low priority alerts | 0 critical issues',
-          Icons.warning_rounded,
-          Colors.orange,
-          'Security monitoring dashboard',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUserManagementSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'User Management',
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              _buildUserManagementRow(
-                'Instructors',
-                '1,234',
-                Icons.school_rounded,
-                Colors.blue,
-              ),
-              const Divider(),
-              _buildUserManagementRow(
-                'Deans',
-                '12',
-                Icons.admin_panel_settings_rounded,
-                Colors.purple,
-              ),
-              const Divider(),
-              _buildUserManagementRow(
-                'Program Chairs',
-                '45',
-                Icons.people_alt_rounded,
-                Colors.green,
-              ),
-              const Divider(),
-              _buildUserManagementRow(
-                'Students',
-                '1,556',
-                Icons.person_rounded,
-                Colors.orange,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSystemHealthSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'System Health',
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              _buildHealthIndicator('Database', 'Excellent', Colors.green),
-              const SizedBox(height: 12),
-              _buildHealthIndicator('Web Server', 'Good', Colors.blue),
-              const SizedBox(height: 12),
-              _buildHealthIndicator('File Storage', 'Excellent', Colors.green),
-              const SizedBox(height: 12),
-              _buildHealthIndicator(
-                'Security Services',
-                'Excellent',
-                Colors.green,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSummaryCard(
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-    String subtitle,
-  ) {
+  Widget _buildErrorWidget() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: Colors.red.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.red.shade200),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: color, size: 20),
-              ),
-              const Spacer(),
-              Icon(Icons.trending_up_rounded, color: Colors.green, size: 16),
-            ],
+      children: [
+          Icon(
+            Icons.error_outline_rounded,
+            color: Colors.red.shade600,
+            size: 48,
           ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: GoogleFonts.inter(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-              color: Theme.of(context).colorScheme.onSurface,
+          const SizedBox(height: 16),
+        Text(
+            'Error Loading Data',
+          style: GoogleFonts.inter(
+              fontSize: 18,
+            fontWeight: FontWeight.w600,
+              color: Colors.red.shade800,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
-            title,
+            errorMessage ?? 'An unknown error occurred',
             style: GoogleFonts.inter(
               fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Colors.red.shade700,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: _refreshData,
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('Retry'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade600,
+              foregroundColor: Colors.white,
+            ),
+            ),
+          ],
+        ),
+    );
+  }
+
+  Widget _buildSliverAppBar() {
+    return DashboardComponents.buildSliverAppBar(
+      context: context,
+      title: 'Super Admin Dashboard',
+      subtitle: 'Dashboard / Attendance',
+      icon: Icons.admin_panel_settings_rounded,
+      displayName: widget.userData['displayName'] ?? 'Super Admin',
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Super Admin Dashboard',
+                style: GoogleFonts.inter(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
+            // Database Health Indicator
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: errorMessage == null ? Colors.green.shade50 : Colors.red.shade50,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: errorMessage == null ? Colors.green.shade300 : Colors.red.shade300,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    errorMessage == null ? Icons.check_circle_rounded : Icons.error_rounded,
+                    size: 16,
+                    color: errorMessage == null ? Colors.green.shade600 : Colors.red.shade600,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    errorMessage == null ? 'DB Connected' : 'DB Issues',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: errorMessage == null ? Colors.green.shade700 : Colors.red.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Dashboard / Attendance',
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Total Users per Role:',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatisticsCards() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isTablet = constraints.maxWidth > 600;
+        final crossAxisCount = isTablet ? 4 : 2;
+        
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: isTablet ? 1.4 : 1.2,
+      children: [
+            _buildStatCard(
+              'Total Dean',
+              counts['dean']?.toString() ?? '0',
+              Icons.school_rounded,
+              const Color(0xFF9f7aea),
+              const Color(0xFFf3e8ff),
+            ),
+            _buildStatCard(
+              'Total Program Chairperson',
+              counts['programChairperson']?.toString() ?? '0',
+              Icons.emoji_events_rounded,
+              const Color(0xFF9f7aea),
+              const Color(0xFFf3e8ff),
+            ),
+            _buildStatCard(
+              'Total Instructors',
+              counts['instructor']?.toString() ?? '0',
+              Icons.people_rounded,
+              const Color(0xFF38bdf8),
+              const Color(0xFFe0f2fe),
+            ),
+            _buildStatCard(
+              'Total Superadmin',
+              counts['superadmin']?.toString() ?? '0',
+              Icons.admin_panel_settings_rounded,
+              const Color(0xFFec4899),
+              const Color(0xFFfce7f3),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, IconData icon, Color iconColor, Color backgroundColor) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+            ),
+        boxShadow: const [
+              BoxShadow(
+            color: Color(0x0D000000),
+                blurRadius: 10,
+            offset: Offset(0, 2),
+              ),
+            ],
+          ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: iconColor, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+                Text(
+                  value,
+                  style: GoogleFonts.inter(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+              ),
+            ],
+          ),
+        ),
+      ],
+      ),
+    );
+  }
+
+  Widget _buildScheduleChart() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+            ),
+        boxShadow: const [
+              BoxShadow(
+            color: Color(0x0D000000),
+                blurRadius: 10,
+            offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Today Schedule Chart',
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isMobile = constraints.maxWidth < 600;
+                  
+                  if (isMobile) {
+                    return Column(
+                      children: [
+                        _buildDropdown(
+                          'College',
+                          collegeValue,
+                          colleges.map<DropdownMenuItem<String>>((college) => DropdownMenuItem<String>(
+                            value: college['code'],
+                            child: Text(college['name']),
+                          )).toList(),
+                          (value) => _handleCollegeChange(value!),
+                          loadingColleges,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildDropdown(
+                          'Course',
+                          courseValue,
+                          programs.map<DropdownMenuItem<String>>((program) => DropdownMenuItem<String>(
+                            value: program['code'].toString().toLowerCase(),
+                            child: Text(program['code'].toString().toUpperCase()),
+                          )).toList(),
+                          (value) => _handleCourseChange(value!),
+                          loadingCourses,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildDropdown(
+                          'Room',
+                          roomValue,
+                          rooms.map<DropdownMenuItem<String>>((room) => DropdownMenuItem<String>(
+                            value: room['name'],
+                            child: Text(room['name']),
+                          )).toList(),
+                          (value) => _handleRoomChange(value!),
+                          false,
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Row(
+                      children: [
+                        _buildDropdown(
+                          'College',
+                          collegeValue,
+                          colleges.map<DropdownMenuItem<String>>((college) => DropdownMenuItem<String>(
+                            value: college['code'],
+                            child: Text(college['name']),
+                          )).toList(),
+                          (value) => _handleCollegeChange(value!),
+                          loadingColleges,
+                        ),
+                        const SizedBox(width: 16),
+                        _buildDropdown(
+                          'Course',
+                          courseValue,
+                          programs.map<DropdownMenuItem<String>>((program) => DropdownMenuItem<String>(
+                            value: program['code'].toString().toLowerCase(),
+                            child: Text(program['code'].toString().toUpperCase()),
+                          )).toList(),
+                          (value) => _handleCourseChange(value!),
+                          loadingCourses,
+                        ),
+                        const SizedBox(width: 16),
+                        _buildDropdown(
+                          'Room',
+                          roomValue,
+                          rooms.map<DropdownMenuItem<String>>((room) => DropdownMenuItem<String>(
+                            value: room['name'],
+                            child: Text(room['name']),
+                          )).toList(),
+                          (value) => _handleRoomChange(value!),
+                          false,
+                        ),
+                      ],
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 200,
+            child: loading
+                ? const Center(child: CircularProgressIndicator())
+                : chartData.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No data available',
+                          style: GoogleFonts.inter(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      )
+                    : _buildTimelineVisualization(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDropdown(String label, String value, List<DropdownMenuItem<String>> items, Function(String?) onChanged, bool loading) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+        
+        return SizedBox(
+          width: isMobile ? double.infinity : 200,
+          child: DropdownButtonFormField<String>(
+            value: value == "all" ? null : value,
+            decoration: InputDecoration(
+              labelText: label,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            ),
+            items: loading ? [
+              DropdownMenuItem(
+                value: null,
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    const SizedBox(width: 8),
+                    Text('Loading...'),
+                  ],
+                ),
+              ),
+            ] : items,
+            onChanged: loading ? null : onChanged,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTimelineVisualization() {
+    // Create time slots from 7 AM to 6 PM (11 hours) - matching React version
+    final timeSlots = List.generate(11, (index) => 7 + index);
+    
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Time axis
+              Container(
+            height: 30,
+            child: Row(
+              children: timeSlots.map((hour) {
+                final isAM = hour < 12;
+                final displayHour = hour == 12 ? 12 : hour % 12;
+                final ampm = isAM ? 'AM' : 'PM';
+                
+                return Expanded(
+                  child: Container(
+                decoration: BoxDecoration(
+                      border: Border(
+                        right: BorderSide(
+                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '$displayHour $ampm',
+            style: GoogleFonts.inter(
+                          fontSize: 10,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
+          // Timeline bars
+          Container(
+            height: 120,
+            child: Stack(
+              children: chartData.map((data) {
+                final startTime = data['startTime'] as DateTime;
+                final endTime = data['endTime'] as DateTime;
+                
+                // Calculate position and width based on time (7 AM to 6 PM = 11 hours = 660 minutes)
+                final startHour = startTime.hour;
+                final startMinute = startTime.minute;
+                final endHour = endTime.hour;
+                final endMinute = endTime.minute;
+                
+                // Convert to minutes from 7 AM
+                final startMinutes = (startHour - 7) * 60 + startMinute;
+                final endMinutes = (endHour - 7) * 60 + endMinute;
+                
+                // Calculate position and width (660 minutes = 11 hours)
+                final left = (startMinutes / 660) * 100;
+                final width = ((endMinutes - startMinutes) / 660) * 100;
+                
+                return Positioned(
+                  left: left,
+                  width: width,
+                  top: 0,
+                  bottom: 0,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
           Text(
-            subtitle,
+                            data['subject'],
             style: GoogleFonts.inter(
-              fontSize: 12,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+          Text(
+                            data['instructor'],
+            style: GoogleFonts.inter(
+                              fontSize: 8,
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ),
         ],
@@ -476,250 +1019,447 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen>
     );
   }
 
-  Widget _buildEnhancedActionCard(
-    String title,
-    String description,
-    IconData icon,
-    Color color,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
+  Widget _buildSchedulesTable() {
+    return Container(
+      padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           ),
-          boxShadow: [
+        boxShadow: const [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+            color: Color(0x0D000000),
               blurRadius: 10,
-              offset: const Offset(0, 2),
+            offset: Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(height: 12),
             Text(
-              title,
+            'All Schedules Today',
               style: GoogleFonts.inter(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+              color: Theme.of(context).colorScheme.primary,
             ),
-            const SizedBox(height: 4),
-            Text(
-              description,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                height: 1.3,
-              ),
+          ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isMobile = constraints.maxWidth < 600;
+              
+              if (isMobile) {
+                return _buildMobileScheduleList();
+              } else {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columns: const [
+                      DataColumn(label: Text('S. No', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('Instructor', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('Start Time', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('End Time', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('Room', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('Section', style: TextStyle(fontWeight: FontWeight.bold))),
+                      DataColumn(label: Text('Course', style: TextStyle(fontWeight: FontWeight.bold))),
+                    ],
+                    rows: _buildDataTableRows(),
+                  ),
+                );
+              }
+            },
             ),
           ],
         ),
+    );
+  }
+
+  Widget _buildMobileScheduleList() {
+    if (schedules.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(32.0),
+          child: Text('No schedules found.'),
       ),
     );
   }
 
-  Widget _buildAnalyticsCard(
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-    String subtitle,
-  ) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: schedules.length,
+      itemBuilder: (context, index) {
+        final schedule = schedules[index];
     return Container(
+          margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+            color: index % 2 == 0
+                ? Colors.transparent
+                : Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        ),
+      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+        children: [
+          Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '${index + 1}',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                Text(
+                    '${schedule.startTime} - ${schedule.endTime}',
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${schedule.instructor.firstName} ${schedule.instructor.lastName}',
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              const SizedBox(height: 4),
+                Text(
+                '${schedule.courseTitle} (${schedule.courseCode})',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(
+                    Icons.location_on_rounded,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    schedule.room,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Icon(
+                    Icons.group_rounded,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                  const SizedBox(width: 4),
+                Text(
+                    schedule.section.sectionName,
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
+            ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  List<DataRow> _buildDataTableRows() {
+    if (schedules.isEmpty) {
+      return [
+        const DataRow(
+          cells: [
+            DataCell(Text('No schedules found.')),
+            DataCell(Text('')),
+            DataCell(Text('')),
+            DataCell(Text('')),
+            DataCell(Text('')),
+            DataCell(Text('')),
+            DataCell(Text('')),
+          ],
+        ),
+      ];
+    }
+
+    return schedules.asMap().entries.map((entry) {
+      final index = entry.key;
+      final schedule = entry.value;
+      return DataRow(
+        color: MaterialStateProperty.all(
+          index % 2 == 0
+              ? Colors.transparent
+              : Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+        ),
+        cells: [
+          DataCell(Text('${index + 1}')),
+          DataCell(Text(
+            '${schedule.instructor.firstName} ${schedule.instructor.lastName}',
+          )),
+          DataCell(Text(schedule.startTime)),
+          DataCell(Text(schedule.endTime)),
+          DataCell(Text(schedule.room)),
+          DataCell(Text(schedule.section.sectionName)),
+          DataCell(Text('${schedule.courseTitle} (${schedule.courseCode})')),
+        ],
+      );
+    }).toList();
+  }
+
+  Widget _buildTodayActivity() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.5),
-                  ),
-                ),
-              ],
-            ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 10,
+            offset: Offset(0, 2),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildUserManagementRow(
-    String role,
-    String count,
-    IconData icon,
-    Color color,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              role,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-          ),
           Text(
-            count,
+            'Today Activity',
             style: GoogleFonts.inter(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Theme.of(context).colorScheme.primary,
             ),
           ),
-          const SizedBox(width: 8),
-          Icon(
-            Icons.chevron_right_rounded,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
-            size: 20,
+          const SizedBox(height: 16),
+          allFacultiesLogs.isEmpty
+              ? Center(
+                  child: Text(
+                    'There is no current activity today.',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: allFacultiesLogs.length,
+                  itemBuilder: (context, index) {
+                    final log = allFacultiesLogs[index];
+                    return _buildActivityItem(log, index);
+                  },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildHealthIndicator(String service, String status, Color color) {
-    return Row(
+  Widget _buildActivityItem(Map<String, dynamic> log, int index) {
+    final entries = <Map<String, String>>[];
+    
+    if (log['timeIn'] != null) {
+      entries.add({'label': 'Time In', 'time': log['timeIn']});
+    }
+    if (log['timeout'] != null) {
+      entries.add({'label': 'Time Out', 'time': log['timeout']});
+    }
+
+    return Column(
+      children: entries.map((entry) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          child: Row(
       children: [
         Container(
-          width: 8,
-          height: 8,
+                width: 12,
+                height: 12,
           decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(4),
+                  color: Colors.white,
+                  border: Border.all(color: Colors.green, width: 2),
+                  borderRadius: BorderRadius.circular(6),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: Text(
-            service,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-        ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
         Text(
-          status,
+                      '${entry['label']} of ${log['instructorName'] ?? 'Unknown Instructor'}',
           style: GoogleFonts.inter(
-            fontSize: 14,
+                        fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: color,
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _showComingSoonDialog(String feature) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Row(
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
             children: [
               Icon(
-                Icons.construction_rounded,
-                color: Theme.of(context).colorScheme.primary,
+                          Icons.access_time_rounded,
+                          size: 12,
+                          color: Colors.grey[500],
               ),
-              const SizedBox(width: 8),
+                        const SizedBox(width: 4),
               Text(
-                'Coming Soon',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                          _formatTime(entry['time']!),
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: Colors.grey[500],
+                          ),
               ),
             ],
           ),
-          content: Text(
-            '$feature feature is currently under development and will be available soon.',
-            style: GoogleFonts.inter(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'OK',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  ],
               ),
             ),
           ],
+          ),
         );
-      },
+      }).toList(),
+    );
+  }
+
+  String _formatTime(String time) {
+    try {
+      final parts = time.split(':');
+      final hour = int.parse(parts[0]);
+      final minute = parts[1];
+      final hour12 = hour % 12 == 0 ? 12 : hour % 12;
+      final ampm = hour < 12 ? 'AM' : 'PM';
+      return '$hour12:$minute $ampm';
+    } catch (e) {
+      return 'Invalid time';
+    }
+  }
+}
+
+// Data models
+class Schedule {
+  final String courseTitle;
+  final String courseCode;
+  final Instructor instructor;
+  final String room;
+  final String startTime;
+  final String endTime;
+  final String semesterStartDate;
+  final String semesterEndDate;
+  final Section section;
+  final Days days;
+
+  Schedule({
+    required this.courseTitle,
+    required this.courseCode,
+    required this.instructor,
+    required this.room,
+    required this.startTime,
+    required this.endTime,
+    required this.semesterStartDate,
+    required this.semesterEndDate,
+    required this.section,
+    required this.days,
+  });
+
+  factory Schedule.fromJson(Map<String, dynamic> json) {
+    return Schedule(
+      courseTitle: json['courseTitle'] ?? '',
+      courseCode: json['courseCode'] ?? '',
+      instructor: Instructor.fromJson(json['instructor'] ?? {}),
+      room: json['room'] ?? '',
+      startTime: json['startTime'] ?? '',
+      endTime: json['endTime'] ?? '',
+      semesterStartDate: json['semesterStartDate'] ?? '',
+      semesterEndDate: json['semesterEndDate'] ?? '',
+      section: Section.fromJson(json['section'] ?? {}),
+      days: Days.fromJson(json['days'] ?? {}),
+    );
+  }
+}
+
+class Instructor {
+  final String firstName;
+  final String lastName;
+
+  Instructor({required this.firstName, required this.lastName});
+
+  factory Instructor.fromJson(Map<String, dynamic> json) {
+    return Instructor(
+      firstName: json['first_name'] ?? '',
+      lastName: json['last_name'] ?? '',
+    );
+  }
+}
+
+class Section {
+  final String sectionName;
+
+  Section({required this.sectionName});
+
+  factory Section.fromJson(Map<String, dynamic> json) {
+    return Section(
+      sectionName: json['sectionName'] ?? '',
+    );
+  }
+}
+
+class Days {
+  final bool mon;
+  final bool tue;
+  final bool wed;
+  final bool thu;
+  final bool fri;
+  final bool sat;
+  final bool sun;
+
+  Days({
+    required this.mon,
+    required this.tue,
+    required this.wed,
+    required this.thu,
+    required this.fri,
+    required this.sat,
+    required this.sun,
+  });
+
+  factory Days.fromJson(Map<String, dynamic> json) {
+    return Days(
+      mon: json['mon'] ?? false,
+      tue: json['tue'] ?? false,
+      wed: json['wed'] ?? false,
+      thu: json['thu'] ?? false,
+      fri: json['fri'] ?? false,
+      sat: json['sat'] ?? false,
+      sun: json['sun'] ?? false,
     );
   }
 }
