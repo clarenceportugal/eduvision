@@ -530,4 +530,26 @@ class ApiService {
       'course': prefs.getString('course') ?? '',
     };
   }
+
+  // Delete methods for Superadmin
+  static Future<void> deleteDean(String deanId) async {
+    await _makeRequest(
+      method: 'DELETE',
+      endpoint: '/superadmin/deans/$deanId',
+    );
+  }
+
+  static Future<void> deleteInstructor(String instructorId) async {
+    await _makeRequest(
+      method: 'DELETE',
+      endpoint: '/superadmin/instructors/$instructorId',
+    );
+  }
+
+  static Future<void> deleteProgramChair(String programChairId) async {
+    await _makeRequest(
+      method: 'DELETE',
+      endpoint: '/superadmin/program-chairs/$programChairId',
+    );
+  }
 }

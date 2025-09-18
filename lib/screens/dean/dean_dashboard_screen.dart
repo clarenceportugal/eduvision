@@ -1283,7 +1283,7 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
             },
           ),
           const SizedBox(height: 20),
-          SizedBox(
+          Container(
             height: 200,
             child: schedules.isEmpty
                 ? const EmptyStateWidget(
@@ -1957,345 +1957,516 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
   }
 
   Widget _buildSettingsContent() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Profile Section
+          _buildProfileSection(),
+          const SizedBox(height: 32),
+          // App Settings
+          _buildAppSettingsSection(),
+          const SizedBox(height: 32),
+          // Account Settings
+          _buildAccountSection(),
+          const SizedBox(height: 32),
+          // Dean Management
+          _buildDeanManagementSection(),
+          const SizedBox(height: 32),
+          // Support Section
+          _buildSupportSection(),
+          const SizedBox(height: 32),
+          // Danger Zone
+          _buildDangerSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileSection() {
+    String userName = widget.userData['displayName'] ?? 
+        widget.userData['name'] ?? 
+        widget.userData['fullName'] ?? 
+        widget.userData['firstName'] ?? 
+        widget.userData['username'] ?? 
+        widget.userData['email']?.toString().split('@')[0] ?? 
+        'Dean';
+
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
+            Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.4),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 10,
-            offset: Offset(0, 2),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Profile Information',
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            child: Text(
+              _getInitials(userName),
               style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.primary,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
-            const SizedBox(height: 24),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isMobile = constraints.maxWidth < 600;
-                
-                if (isMobile) {
-                  return Column(
-                    children: [
-                      _buildTextField(
-                        controller: _firstNameController,
-                        label: 'First Name',
-                        icon: Icons.person_rounded,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your first name';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _lastNameController,
-                        label: 'Last Name',
-                        icon: Icons.person_rounded,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your last name';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _emailController,
-                        label: 'Email',
-                        icon: Icons.email_rounded,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
-                  );
-                } else {
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: _buildTextField(
-                          controller: _firstNameController,
-                          label: 'First Name',
-                          icon: Icons.person_rounded,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your first name';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildTextField(
-                          controller: _lastNameController,
-                          label: 'Last Name',
-                          icon: Icons.person_rounded,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your last name';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildTextField(
-              controller: _emailController,
-              label: 'Email',
-              icon: Icons.email_rounded,
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                }
-                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                  return 'Please enter a valid email';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Change Password (Optional)',
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 16),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isMobile = constraints.maxWidth < 600;
-                
-                if (isMobile) {
-                  return Column(
-                    children: [
-                      _buildTextField(
-                        controller: _passwordController,
-                        label: 'New Password',
-                        icon: Icons.lock_rounded,
-                        obscureText: true,
-                        validator: (value) {
-                          if (value != null && value.isNotEmpty && value.length < 6) {
-                            return 'Password must be at least 6 characters';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _confirmPasswordController,
-                        label: 'Confirm Password',
-                        icon: Icons.lock_rounded,
-                        obscureText: true,
-                        validator: (value) {
-                          if (value != null && value.isNotEmpty && value != _passwordController.text) {
-                            return 'Passwords do not match';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
-                  );
-                } else {
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: _buildTextField(
-                          controller: _passwordController,
-                          label: 'New Password',
-                          icon: Icons.lock_rounded,
-                          obscureText: true,
-                          validator: (value) {
-                            if (value != null && value.isNotEmpty && value.length < 6) {
-                              return 'Password must be at least 6 characters';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildTextField(
-                          controller: _confirmPasswordController,
-                          label: 'Confirm Password',
-                          icon: Icons.lock_rounded,
-                          obscureText: true,
-                          validator: (value) {
-                            if (value != null && value.isNotEmpty && value != _passwordController.text) {
-                              return 'Passwords do not match';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: 24),
-            if (successMessage != null)
-              Container(
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.shade200),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  userName,
+                  style: GoogleFonts.inter(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
-                child: Row(
+                const SizedBox(height: 4),
+                Text(
+                  widget.userData['email']?.toString() ?? 'No email available',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    widget.userData['role']?.toString() ?? 'Dean',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              ErrorHandler.showSnackBar(context, 'Edit profile functionality not implemented yet');
+            },
+            icon: Icon(
+              Icons.edit_rounded,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppSettingsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'App Settings',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildSettingItem(
+          Icons.notifications_rounded,
+          'Notifications',
+          'Receive push notifications',
+          Switch(
+            value: true,
+            onChanged: (value) {
+              ErrorHandler.showSnackBar(context, 'Notification settings not implemented yet');
+            },
+            activeThumbColor: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        _buildSettingItem(
+          Icons.dark_mode_rounded,
+          'Dark Mode',
+          'Switch between light and dark themes',
+          Switch(
+            value: false,
+            onChanged: (value) {
+              ErrorHandler.showSnackBar(context, 'Theme toggle not implemented yet');
+            },
+            activeThumbColor: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        _buildSettingItem(
+          Icons.fingerprint_rounded,
+          'Biometric Login',
+          'Use fingerprint or face recognition',
+          Switch(
+            value: false,
+            onChanged: (value) {
+              ErrorHandler.showSnackBar(context, 'Biometric login not implemented yet');
+            },
+            activeThumbColor: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        _buildSettingItem(
+          Icons.face_rounded,
+          'Face Registration',
+          'Register your face for attendance monitoring',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Face registration not implemented yet'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAccountSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Account',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildSettingItem(
+          Icons.lock_rounded,
+          'Change Password',
+          'Update your account password',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Change password functionality not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.edit_rounded,
+          'Update Profile',
+          'Edit your profile information',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Update profile functionality not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.school_rounded,
+          'College Settings',
+          'Manage college-specific configurations',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'College settings not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.people_rounded,
+          'Faculty Management',
+          'Manage faculty members and permissions',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Faculty management not implemented yet'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDeanManagementSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Dean Management',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildSettingItem(
+          Icons.assessment_rounded,
+          'Reports & Analytics',
+          'View and manage college reports',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Reports & analytics not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.schedule_rounded,
+          'Schedule Management',
+          'Manage college schedules and timetables',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Schedule management not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.videocam_rounded,
+          'Live Stream Settings',
+          'Configure live streaming for college',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Live stream settings not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.person_search_rounded,
+          'Attendance Policies',
+          'Set attendance rules and policies',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Attendance policies not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.school_rounded,
+          'Faculty Management',
+          'Manage faculty members and assignments',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Faculty management not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.class_rounded,
+          'Course Management',
+          'Manage courses and curriculum',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Course management not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.room_rounded,
+          'Room Allocation',
+          'Manage classroom and facility allocation',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Room allocation not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.grade_rounded,
+          'Academic Policies',
+          'Set academic rules and grading policies',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Academic policies not implemented yet'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSupportSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Support',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildSettingItem(
+          Icons.help_rounded,
+          'Help & FAQ',
+          'Get help and find answers to common questions',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Help & FAQ not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.feedback_rounded,
+          'Send Feedback',
+          'Share your thoughts and suggestions',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Send feedback not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.info_rounded,
+          'About',
+          'App version and information',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'About not implemented yet'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDangerSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Danger Zone',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.red.shade800,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildSettingItem(
+          Icons.logout_rounded,
+          'Logout',
+          'Sign out of your account',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Colors.red.shade600,
+          ),
+          onTap: _handleLogout,
+          isDanger: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettingItem(
+    IconData icon,
+    String title,
+    String subtitle,
+    Widget trailing, {
+    VoidCallback? onTap,
+    bool isDanger = false,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDanger 
+                      ? Colors.red.shade50 
+                      : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: isDanger ? Colors.red.shade600 : Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.check_circle_rounded, color: Colors.green.shade600),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        successMessage!,
-                        style: GoogleFonts.inter(
-                          color: Colors.green.shade700,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    Text(
+                      title,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isDanger ? Colors.red.shade800 : Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: isDanger ? Colors.red.shade600 : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
                 ),
               ),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: loading ? null : _updateProfile,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: loading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : Text(
-                        'Update Profile',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  // Handle logout
-                  await _handleLogout();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  'Logout',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ],
+              trailing,
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType? keyboardType,
-    bool obscureText = false,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      validator: validator,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.red.shade300),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.red.shade300, width: 2),
-        ),
-      ),
-    );
+  String _getInitials(String name) {
+    if (name.isEmpty) return 'D';
+    final words = name.trim().split(' ');
+    if (words.length == 1) {
+      return words[0][0].toUpperCase();
+    } else {
+      return '${words[0][0]}${words[1][0]}'.toUpperCase();
+    }
   }
 
   Widget _buildStatsCards() {
@@ -2390,7 +2561,7 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                 return Column(
                   children: [
                     DropdownButtonFormField<String>(
-                      value: courseValue,
+                      initialValue: courseValue,
                       decoration: InputDecoration(
                         labelText: 'Course',
                         border: OutlineInputBorder(
@@ -2408,7 +2579,7 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: roomValue,
+                      initialValue: roomValue,
                       decoration: InputDecoration(
                         labelText: 'Room',
                         border: OutlineInputBorder(
@@ -2431,7 +2602,7 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: courseValue,
+                        initialValue: courseValue,
                         decoration: InputDecoration(
                           labelText: 'Course',
                           border: OutlineInputBorder(
@@ -2451,7 +2622,7 @@ class _DeanDashboardScreenState extends State<DeanDashboardScreen>
                     const SizedBox(width: 16),
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: roomValue,
+                        initialValue: roomValue,
                         decoration: InputDecoration(
                           labelText: 'Room',
                           border: OutlineInputBorder(

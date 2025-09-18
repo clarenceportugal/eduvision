@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/api_service.dart';
 import '../../models/schedule_model.dart';
 import '../../widgets/common/stat_card.dart';
@@ -74,7 +73,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   List<Map<String, dynamic>> chartData = [];
 
   // Keep alive for better performance
-  @override
   bool get wantKeepAlive => true;
 
   @override
@@ -1651,56 +1649,140 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     );
   }
 
-  Widget _buildSliverAppBar() {
-    return SliverAppBar(
-      expandedHeight: 120,
-      floating: false,
-      pinned: true,
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      flexibleSpace: FlexibleSpaceBar(
-        title: Text(
-          'Super Admin Dashboard',
-          style: GoogleFonts.inter(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
+  Widget _buildPendingProgramChairCard(Map<String, dynamic> programChair, int index) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.orange.shade200,
+          width: 2,
         ),
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).colorScheme.primary,
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-              ],
-            ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 10,
+            offset: Offset(0, 2),
           ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 40),
-                Icon(
-                  Icons.admin_panel_settings_rounded,
-                  size: 48,
-                  color: Colors.white.withValues(alpha: 0.9),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Dashboard / Attendance',
+                child: Icon(
+                  Icons.pending_actions_rounded,
+                  color: Colors.orange.shade600,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${programChair['firstName'] ?? ''} ${programChair['lastName'] ?? ''}',
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      programChair['email'] ?? 'No email',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.orange.shade300),
+                ),
+                child: Text(
+                  'Pending',
                   style: GoogleFonts.inter(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: 14,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.orange.shade700,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildInfoItem('College', programChair['college'] ?? 'Not specified'),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildInfoItem('Course', programChair['course'] ?? 'Not specified'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildInfoItem('Applied', _formatDate(programChair['createdAt'])),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildInfoItem('Status', 'Awaiting Approval'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => _showAcceptProgramChairDialog(programChair),
+                  icon: const Icon(Icons.check_rounded),
+                  label: const Text('Accept'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade600,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _showRejectProgramChairDialog(programChair),
+                  icon: const Icon(Icons.close_rounded),
+                  label: const Text('Reject'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red.shade600,
+                    side: BorderSide(color: Colors.red.shade300),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
+
 
   Widget _buildHeader() {
     return Column(
@@ -2179,6 +2261,980 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       return '$hour12:$minute $ampm';
     } catch (e) {
       return 'Invalid time';
+    }
+  }
+
+  Widget _buildLiveVideoContent() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildStatusCard(),
+          const SizedBox(height: 24),
+          _buildStreamControls(),
+          const SizedBox(height: 24),
+          if (isLive && streamUrl != null) _buildStreamInfo(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusCard() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isLive ? Colors.green.shade300 : Colors.red.shade300,
+          width: 2,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isLive ? Colors.green.shade50 : Colors.red.shade50,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              isLive ? Icons.videocam_rounded : Icons.videocam_off_rounded,
+              color: isLive ? Colors.green.shade600 : Colors.red.shade600,
+              size: 32,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isLive ? 'Live Stream Active' : 'Live Stream Inactive',
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                Text(
+                  isLive 
+                      ? 'Stream is currently broadcasting'
+                      : 'Stream is not currently active',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: isLive ? Colors.green.shade50 : Colors.red.shade50,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isLive ? Colors.green.shade300 : Colors.red.shade300,
+              ),
+            ),
+            child: Text(
+              isLive ? 'LIVE' : 'OFFLINE',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isLive ? Colors.green.shade700 : Colors.red.shade700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStreamControls() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Stream Controls',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: isLive ? null : _startLiveStream,
+                  icon: const Icon(Icons.play_arrow_rounded),
+                  label: const Text('Start Stream'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade600,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: isLive ? _stopLiveStream : null,
+                  icon: const Icon(Icons.stop_rounded),
+                  label: const Text('Stop Stream'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade600,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStreamInfo() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Stream Information',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildInfoItem('Stream URL', streamUrl ?? 'Not available'),
+          const SizedBox(height: 12),
+          _buildInfoItem('Stream Key', streamKey ?? 'Not available'),
+          const SizedBox(height: 16),
+          Text(
+            'Note: Use these credentials to configure your streaming software (OBS, etc.)',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsContent() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Profile Section
+          _buildProfileSection(),
+          const SizedBox(height: 32),
+          // App Settings
+          _buildAppSettingsSection(),
+          const SizedBox(height: 32),
+          // Account Settings
+          _buildAccountSection(),
+          const SizedBox(height: 32),
+          // System Settings
+          _buildSystemSection(),
+          const SizedBox(height: 32),
+          // Support Section
+          _buildSupportSection(),
+          const SizedBox(height: 32),
+          // Danger Zone
+          _buildDangerSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileSection() {
+    String userName = userData['displayName'] ?? 
+        userData['name'] ?? 
+        userData['fullName'] ?? 
+        userData['firstName'] ?? 
+        userData['username'] ?? 
+        userData['email']?.toString().split('@')[0] ?? 
+        'Superadmin';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.6),
+            Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.4),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            child: Text(
+              _getInitials(userName),
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  userName,
+                  style: GoogleFonts.inter(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  userData['email']?.toString() ?? 'No email available',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    userData['role']?.toString() ?? 'Superadmin',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              ErrorHandler.showSnackBar(context, 'Edit profile functionality not implemented yet');
+            },
+            icon: Icon(
+              Icons.edit_rounded,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppSettingsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'App Settings',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildSettingItem(
+          Icons.notifications_rounded,
+          'Notifications',
+          'Receive push notifications',
+          Switch(
+            value: true,
+            onChanged: (value) {
+              ErrorHandler.showSnackBar(context, 'Notification settings not implemented yet');
+            },
+            activeThumbColor: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        _buildSettingItem(
+          Icons.dark_mode_rounded,
+          'Dark Mode',
+          'Switch between light and dark themes',
+          Switch(
+            value: false,
+            onChanged: (value) {
+              ErrorHandler.showSnackBar(context, 'Theme toggle not implemented yet');
+            },
+            activeThumbColor: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        _buildSettingItem(
+          Icons.fingerprint_rounded,
+          'Biometric Login',
+          'Use fingerprint or face recognition',
+          Switch(
+            value: false,
+            onChanged: (value) {
+              ErrorHandler.showSnackBar(context, 'Biometric login not implemented yet');
+            },
+            activeThumbColor: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        _buildSettingItem(
+          Icons.face_rounded,
+          'Face Registration',
+          'Register your face for attendance monitoring',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Face registration not implemented yet'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAccountSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Account',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildSettingItem(
+          Icons.lock_rounded,
+          'Change Password',
+          'Update your account password',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Change password functionality not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.edit_rounded,
+          'Update Profile',
+          'Edit your profile information',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Update profile functionality not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.admin_panel_settings_rounded,
+          'Admin Settings',
+          'Manage system-wide admin configurations',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Admin settings not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.security_rounded,
+          'Security Settings',
+          'Configure system security and access controls',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Security settings not implemented yet'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSystemSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'System Management',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildSettingItem(
+          Icons.storage_rounded,
+          'Database Status',
+          'Check database connection and performance',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Database status check not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.health_and_safety_rounded,
+          'API Health Check',
+          'Verify all API endpoints are working',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'API health check not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.backup_rounded,
+          'System Backup',
+          'Create and manage system backups',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'System backup not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.update_rounded,
+          'System Updates',
+          'Check for and install system updates',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'System updates not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.clear_all_rounded,
+          'Clear Cache',
+          'Clear application cache and temporary data',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Clear cache functionality not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.admin_panel_settings_rounded,
+          'User Management',
+          'Manage all system users and permissions',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'User management not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.security_rounded,
+          'Security Settings',
+          'Configure system security and access controls',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Security settings not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.analytics_rounded,
+          'System Analytics',
+          'View system performance and usage analytics',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'System analytics not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.description_rounded,
+          'System Logs',
+          'View and manage system logs and audit trails',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'System logs not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.settings_applications_rounded,
+          'Application Settings',
+          'Configure application-wide settings and preferences',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Application settings not implemented yet'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSupportSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Support',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildSettingItem(
+          Icons.help_rounded,
+          'Help & FAQ',
+          'Get help and find answers to common questions',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Help & FAQ not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.feedback_rounded,
+          'Send Feedback',
+          'Share your thoughts and suggestions',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'Send feedback not implemented yet'),
+        ),
+        _buildSettingItem(
+          Icons.info_rounded,
+          'About',
+          'App version and information',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+          onTap: () => ErrorHandler.showSnackBar(context, 'About not implemented yet'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDangerSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Danger Zone',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.red.shade800,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildSettingItem(
+          Icons.logout_rounded,
+          'Logout',
+          'Sign out of your account',
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: Colors.red.shade600,
+          ),
+          onTap: _handleLogout,
+          isDanger: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettingItem(
+    IconData icon,
+    String title,
+    String subtitle,
+    Widget trailing, {
+    VoidCallback? onTap,
+    bool isDanger = false,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDanger 
+                      ? Colors.red.shade50 
+                      : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: isDanger ? Colors.red.shade600 : Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isDanger ? Colors.red.shade800 : Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: isDanger ? Colors.red.shade600 : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              trailing,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Utility methods
+  String _getInitials(String name) {
+    if (name.isEmpty) return 'S';
+    final words = name.trim().split(' ');
+    if (words.length == 1) {
+      return words[0][0].toUpperCase();
+    } else {
+      return '${words[0][0]}${words[1][0]}'.toUpperCase();
+    }
+  }
+
+  Widget _buildInfoItem(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatDate(dynamic date) {
+    if (date == null) return 'Not available';
+    try {
+      final dateTime = DateTime.parse(date.toString());
+      return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+    } catch (e) {
+      return 'Invalid date';
+    }
+  }
+
+  // Dialog methods
+  void _showAcceptDeanDialog(Map<String, dynamic> dean) {
+    ErrorHandler.showConfirmDialog(
+      context,
+      'Accept Dean',
+      'Are you sure you want to accept ${dean['firstName']} ${dean['lastName']} as a dean?',
+      () => _acceptDean(dean['id']),
+    );
+  }
+
+  void _showRejectDeanDialog(Map<String, dynamic> dean) {
+    ErrorHandler.showConfirmDialog(
+      context,
+      'Reject Dean',
+      'Are you sure you want to reject ${dean['firstName']} ${dean['lastName']}? This action cannot be undone.',
+      () => _rejectDean(dean['id']),
+    );
+  }
+
+  void _showAcceptInstructorDialog(Map<String, dynamic> instructor) {
+    ErrorHandler.showConfirmDialog(
+      context,
+      'Accept Instructor',
+      'Are you sure you want to accept ${instructor['firstName']} ${instructor['lastName']} as an instructor?',
+      () => _acceptInstructor(instructor['id']),
+    );
+  }
+
+  void _showRejectInstructorDialog(Map<String, dynamic> instructor) {
+    ErrorHandler.showConfirmDialog(
+      context,
+      'Reject Instructor',
+      'Are you sure you want to reject ${instructor['firstName']} ${instructor['lastName']}? This action cannot be undone.',
+      () => _rejectInstructor(instructor['id']),
+    );
+  }
+
+  void _showAcceptProgramChairDialog(Map<String, dynamic> programChair) {
+    ErrorHandler.showConfirmDialog(
+      context,
+      'Accept Program Chair',
+      'Are you sure you want to accept ${programChair['firstName']} ${programChair['lastName']} as a program chair?',
+      () => _acceptProgramChair(programChair['id']),
+    );
+  }
+
+  void _showRejectProgramChairDialog(Map<String, dynamic> programChair) {
+    ErrorHandler.showConfirmDialog(
+      context,
+      'Reject Program Chair',
+      'Are you sure you want to reject ${programChair['firstName']} ${programChair['lastName']}? This action cannot be undone.',
+      () => _rejectProgramChair(programChair['id']),
+    );
+  }
+
+  void _showDeleteDeanDialog(Map<String, dynamic> dean) {
+    ErrorHandler.showConfirmDialog(
+      context,
+      'Delete Dean',
+      'Are you sure you want to delete ${dean['firstName']} ${dean['lastName']}? This action cannot be undone.',
+      () => _deleteDean(dean['id']),
+    );
+  }
+
+  void _showDeleteInstructorDialog(Map<String, dynamic> instructor) {
+    ErrorHandler.showConfirmDialog(
+      context,
+      'Delete Instructor',
+      'Are you sure you want to delete ${instructor['firstName']} ${instructor['lastName']}? This action cannot be undone.',
+      () => _deleteInstructor(instructor['id']),
+    );
+  }
+
+  void _showDeleteProgramChairDialog(Map<String, dynamic> programChair) {
+    ErrorHandler.showConfirmDialog(
+      context,
+      'Delete Program Chair',
+      'Are you sure you want to delete ${programChair['firstName']} ${programChair['lastName']}? This action cannot be undone.',
+      () => _deleteProgramChair(programChair['id']),
+    );
+  }
+
+  // Action methods
+  Future<void> _acceptDean(String deanId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Accepting dean...');
+      await ApiService.acceptDean(deanId);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Dean accepted successfully');
+      _fetchPendingDeans();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  Future<void> _rejectDean(String deanId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Rejecting dean...');
+      await ApiService.rejectDean(deanId);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Dean rejected successfully');
+      _fetchPendingDeans();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  Future<void> _acceptInstructor(String instructorId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Accepting instructor...');
+      await ApiService.acceptInstructor(instructorId);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Instructor accepted successfully');
+      _fetchPendingInstructors();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  Future<void> _rejectInstructor(String instructorId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Rejecting instructor...');
+      await ApiService.rejectInstructor(instructorId);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Instructor rejected successfully');
+      _fetchPendingInstructors();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  Future<void> _acceptProgramChair(String programChairId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Accepting program chair...');
+      await ApiService.acceptProgramChair(programChairId);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Program chair accepted successfully');
+      _fetchPendingProgramChairs();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  Future<void> _rejectProgramChair(String programChairId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Rejecting program chair...');
+      await ApiService.rejectProgramChair(programChairId);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Program chair rejected successfully');
+      _fetchPendingProgramChairs();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  Future<void> _deleteDean(String deanId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Deleting dean...');
+      await ApiService.deleteDean(deanId);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Dean deleted successfully');
+      _fetchDeansList();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  Future<void> _deleteInstructor(String instructorId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Deleting instructor...');
+      await ApiService.deleteInstructor(instructorId);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Instructor deleted successfully');
+      _fetchInstructorsList();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  Future<void> _deleteProgramChair(String programChairId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Deleting program chair...');
+      await ApiService.deleteProgramChair(programChairId);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Program chair deleted successfully');
+      _fetchProgramChairsList();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
     }
   }
 }
