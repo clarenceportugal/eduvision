@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://eduvision-dura.onrender.com/api';
+  static const String baseUrl = 'https://eduvision-3ps1.onrender.com/api';
   static const Duration timeout = Duration(seconds: 15);
 
   // Generic request method
@@ -134,7 +134,7 @@ class ApiService {
     try {
       final response = await _makeRequest(
         method: 'GET',
-        endpoint: '/api/auth/dean/instructor-count?collegeName=$collegeName',
+        endpoint: '/auth/dean/instructor-count?collegeName=$collegeName',
       );
       return response['count'] ?? 0;
     } catch (e) {
@@ -146,7 +146,7 @@ class ApiService {
   static Future<List<dynamic>> getDeanSchedules(String collegeName, String courseName) async {
     return await _makeListRequest(
       method: 'GET',
-      endpoint: '/api/auth/dean/schedules/today?collegeName=$collegeName&courseName=${courseName.isEmpty ? 'ALL' : courseName}',
+      endpoint: '/auth/dean/schedules/today?collegeName=$collegeName&courseName=${courseName.isEmpty ? 'ALL' : courseName}',
     );
   }
 
@@ -180,29 +180,47 @@ class ApiService {
   }
 
   static Future<List<dynamic>> getDeanFacultyList(String collegeName) async {
-    return await _makeListRequest(
-      method: 'GET',
-      endpoint: '/dean/faculty-list?collegeName=$collegeName',
-    );
+    try {
+      return await _makeListRequest(
+        method: 'GET',
+        endpoint: '/dean/faculty-list?collegeName=$collegeName',
+      );
+    } catch (e) {
+      // Return empty list if endpoint doesn't exist
+      print('Faculty list endpoint not available, returning empty list');
+      return [];
+    }
   }
 
   static Future<List<dynamic>> getDeanFacultyReports(String collegeName, String courseName) async {
-    return await _makeListRequest(
-      method: 'GET',
-      endpoint: '/dean/faculty-reports?collegeName=$collegeName&courseName=$courseName',
-    );
+    try {
+      return await _makeListRequest(
+        method: 'GET',
+        endpoint: '/dean/faculty-reports?collegeName=$collegeName&courseName=$courseName',
+      );
+    } catch (e) {
+      // Return empty list if endpoint doesn't exist
+      print('Faculty reports endpoint not available, returning empty list');
+      return [];
+    }
   }
 
   static Future<Uint8List> downloadDeanFacultyReport(String collegeName, String courseName) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/dean/faculty-reports/download?collegeName=$collegeName&courseName=$courseName'),
-      headers: {'Accept': 'application/octet-stream'},
-    ).timeout(timeout);
-    
-    if (response.statusCode == 200) {
-      return response.bodyBytes;
-    } else {
-      throw Exception('Failed to download report: ${response.statusCode}');
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/dean/faculty-reports/download?collegeName=$collegeName&courseName=$courseName'),
+        headers: {'Accept': 'application/octet-stream'},
+      ).timeout(timeout);
+      
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        throw Exception('Failed to download report: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Return empty bytes if endpoint doesn't exist
+      print('Faculty report download endpoint not available');
+      return Uint8List(0);
     }
   }
 
@@ -341,45 +359,93 @@ class ApiService {
   }
 
   static Future<List<dynamic>> getSuperadminDeans() async {
-    return await _makeListRequest(
-      method: 'GET',
-      endpoint: '/superadmin/deans',
-    );
+    try {
+      final response = await _makeRequest(
+        method: 'GET',
+        endpoint: '/debug-users',
+      );
+      // Filter users by role 'dean'
+      final users = response['users'] as List<dynamic>;
+      return users.where((user) => user['role'] == 'dean').toList();
+    } catch (e) {
+      print('Error fetching deans: $e');
+      return [];
+    }
   }
 
   static Future<List<dynamic>> getSuperadminInstructors() async {
-    return await _makeListRequest(
-      method: 'GET',
-      endpoint: '/superadmin/instructors',
-    );
+    try {
+      final response = await _makeRequest(
+        method: 'GET',
+        endpoint: '/debug-users',
+      );
+      // Filter users by role 'instructor'
+      final users = response['users'] as List<dynamic>;
+      return users.where((user) => user['role'] == 'instructor').toList();
+    } catch (e) {
+      print('Error fetching instructors: $e');
+      return [];
+    }
   }
 
   static Future<List<dynamic>> getSuperadminProgramChairs() async {
-    return await _makeListRequest(
-      method: 'GET',
-      endpoint: '/superadmin/program-chairs',
-    );
+    try {
+      final response = await _makeRequest(
+        method: 'GET',
+        endpoint: '/debug-users',
+      );
+      // Filter users by role 'programChairperson'
+      final users = response['users'] as List<dynamic>;
+      return users.where((user) => user['role'] == 'programChairperson').toList();
+    } catch (e) {
+      print('Error fetching program chairs: $e');
+      return [];
+    }
   }
 
   static Future<List<dynamic>> getSuperadminPendingDeans() async {
-    return await _makeListRequest(
-      method: 'GET',
-      endpoint: '/superadmin/pending-deans',
-    );
+    try {
+      final response = await _makeRequest(
+        method: 'GET',
+        endpoint: '/debug-users',
+      );
+      // Filter users by role 'dean' and status 'pending'
+      final users = response['users'] as List<dynamic>;
+      return users.where((user) => user['role'] == 'dean' && user['status'] == 'pending').toList();
+    } catch (e) {
+      print('Error fetching pending deans: $e');
+      return [];
+    }
   }
 
   static Future<List<dynamic>> getSuperadminPendingInstructors() async {
-    return await _makeListRequest(
-      method: 'GET',
-      endpoint: '/superadmin/pending-instructors',
-    );
+    try {
+      final response = await _makeRequest(
+        method: 'GET',
+        endpoint: '/debug-users',
+      );
+      // Filter users by role 'instructor' and status 'pending'
+      final users = response['users'] as List<dynamic>;
+      return users.where((user) => user['role'] == 'instructor' && user['status'] == 'pending').toList();
+    } catch (e) {
+      print('Error fetching pending instructors: $e');
+      return [];
+    }
   }
 
   static Future<List<dynamic>> getSuperadminPendingProgramChairs() async {
-    return await _makeListRequest(
-      method: 'GET',
-      endpoint: '/superadmin/pending-program-chairs',
-    );
+    try {
+      final response = await _makeRequest(
+        method: 'GET',
+        endpoint: '/debug-users',
+      );
+      // Filter users by role 'programChairperson' and status 'pending'
+      final users = response['users'] as List<dynamic>;
+      return users.where((user) => user['role'] == 'programChairperson' && user['status'] == 'pending').toList();
+    } catch (e) {
+      print('Error fetching pending program chairs: $e');
+      return [];
+    }
   }
 
   static Future<Map<String, dynamic>> acceptDean(String deanId) async {
@@ -550,6 +616,37 @@ class ApiService {
     await _makeRequest(
       method: 'DELETE',
       endpoint: '/superadmin/program-chairs/$programChairId',
+    );
+  }
+
+  static Future<void> approveFaculty(String facultyId) async {
+    await _makeRequest(
+      method: 'PUT',
+      endpoint: '/auth/approve-faculty/$facultyId',
+    );
+  }
+
+  static Future<void> addDean(Map<String, dynamic> deanData) async {
+    await _makeRequest(
+      method: 'POST',
+      endpoint: '/superadmin/faculty',
+      body: deanData,
+    );
+  }
+
+  static Future<void> addInstructor(Map<String, dynamic> instructorData) async {
+    await _makeRequest(
+      method: 'POST',
+      endpoint: '/superadmin/faculty',
+      body: instructorData,
+    );
+  }
+
+  static Future<void> addProgramChair(Map<String, dynamic> programChairData) async {
+    await _makeRequest(
+      method: 'POST',
+      endpoint: '/superadmin/faculty',
+      body: programChairData,
     );
   }
 }

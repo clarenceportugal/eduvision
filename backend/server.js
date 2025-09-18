@@ -770,6 +770,76 @@ app.listen(port, '0.0.0.0', () => {
   console.log(`2. Use http://YOUR_COMPUTER_IP:${port} in the app`);
 });
 
+// Superadmin endpoints
+app.get('/api/superadmin/deans', async (req, res) => {
+  try {
+    const deans = await db.collection(COLLECTION_NAME).find({ role: 'dean' }).toArray();
+    res.json(deans);
+  } catch (error) {
+    console.error('Error fetching deans:', error);
+    res.status(500).json({ error: 'Failed to fetch deans' });
+  }
+});
+
+app.get('/api/superadmin/instructors', async (req, res) => {
+  try {
+    const instructors = await db.collection(COLLECTION_NAME).find({ role: 'instructor' }).toArray();
+    res.json(instructors);
+  } catch (error) {
+    console.error('Error fetching instructors:', error);
+    res.status(500).json({ error: 'Failed to fetch instructors' });
+  }
+});
+
+app.get('/api/superadmin/program-chairs', async (req, res) => {
+  try {
+    const programChairs = await db.collection(COLLECTION_NAME).find({ role: 'programChairperson' }).toArray();
+    res.json(programChairs);
+  } catch (error) {
+    console.error('Error fetching program chairs:', error);
+    res.status(500).json({ error: 'Failed to fetch program chairs' });
+  }
+});
+
+app.get('/api/superadmin/pending-deans', async (req, res) => {
+  try {
+    const pendingDeans = await db.collection(COLLECTION_NAME).find({ 
+      role: 'dean', 
+      status: 'pending' 
+    }).toArray();
+    res.json(pendingDeans);
+  } catch (error) {
+    console.error('Error fetching pending deans:', error);
+    res.status(500).json({ error: 'Failed to fetch pending deans' });
+  }
+});
+
+app.get('/api/superadmin/pending-instructors', async (req, res) => {
+  try {
+    const pendingInstructors = await db.collection(COLLECTION_NAME).find({ 
+      role: 'instructor', 
+      status: 'pending' 
+    }).toArray();
+    res.json(pendingInstructors);
+  } catch (error) {
+    console.error('Error fetching pending instructors:', error);
+    res.status(500).json({ error: 'Failed to fetch pending instructors' });
+  }
+});
+
+app.get('/api/superadmin/pending-program-chairs', async (req, res) => {
+  try {
+    const pendingProgramChairs = await db.collection(COLLECTION_NAME).find({ 
+      role: 'programChairperson', 
+      status: 'pending' 
+    }).toArray();
+    res.json(pendingProgramChairs);
+  } catch (error) {
+    console.error('Error fetching pending program chairs:', error);
+    res.status(500).json({ error: 'Failed to fetch pending program chairs' });
+  }
+});
+
 // To run this server:
 // 1. npm init -y
 // 2. npm install express mongodb cors bcrypt

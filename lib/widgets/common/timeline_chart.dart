@@ -27,13 +27,26 @@ class TimelineChart extends StatelessWidget {
                     ),
                   ),
                 )
-              : _buildTimelineVisualization(context),
+              : chartData.length > 100
+                  ? Center(
+                      child: Text(
+                        'Too much data to display (${chartData.length} items)',
+                        style: GoogleFonts.inter(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    )
+                  : _buildTimelineVisualization(context),
     );
   }
 
   Widget _buildTimelineVisualization(BuildContext context) {
     // Create time slots from 7 AM to 6 PM (11 hours) - matching React version
     final timeSlots = List.generate(11, (index) => 7 + index);
+    
+    // Memoize the expensive data processing
+    final processedData = _processChartData();
     
     return SingleChildScrollView(
       child: Column(
@@ -75,69 +88,92 @@ class TimelineChart extends StatelessWidget {
           // Timeline bars
           SizedBox(
             height: 120,
-            child: Stack(
-              children: chartData.map((data) {
-                final startTime = data['startTime'] as DateTime;
-                final endTime = data['endTime'] as DateTime;
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final availableWidth = constraints.maxWidth;
                 
-                // Calculate position and width based on time (7 AM to 6 PM = 11 hours = 660 minutes)
-                final startHour = startTime.hour;
-                final startMinute = startTime.minute;
-                final endHour = endTime.hour;
-                final endMinute = endTime.minute;
-                
-                // Convert to minutes from 7 AM
-                final startMinutes = (startHour - 7) * 60 + startMinute;
-                final endMinutes = (endHour - 7) * 60 + endMinute;
-                
-                // Calculate position and width (660 minutes = 11 hours)
-                final left = (startMinutes / 660) * 100;
-                final width = ((endMinutes - startMinutes) / 660) * 100;
-                
-                return Positioned(
-                  left: left,
-                  width: width,
-                  top: 0,
-                  bottom: 0,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            data['subject'],
-                            style: GoogleFonts.inter(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                            textAlign: TextAlign.center,
+                return Stack(
+                  children: processedData.map((data) {
+                    final startTime = (data['startTime'] ?? data['Start']) as DateTime;
+                    final endTime = (data['endTime'] ?? data['End']) as DateTime;
+                    
+                    // Calculate position and width based on time (7 AM to 6 PM = 11 hours = 660 minutes)
+                    final startHour = startTime.hour;
+                    final startMinute = startTime.minute;
+                    final endHour = endTime.hour;
+                    final endMinute = endTime.minute;
+                    
+                    // Convert to minutes from 7 AM
+                    final startMinutes = (startHour - 7) * 60 + startMinute;
+                    final endMinutes = (endHour - 7) * 60 + endMinute;
+                    
+                    // Calculate position and width (660 minutes = 11 hours)
+                    final leftPercent = (startMinutes / 660);
+                    final widthPercent = ((endMinutes - startMinutes) / 660);
+                    
+                    // Ensure valid positioning
+                    if (leftPercent < 0 || widthPercent <= 0 || leftPercent + widthPercent > 1) {
+                      return const SizedBox.shrink(); // Skip invalid positioning
+                    }
+                    
+                    final left = leftPercent * availableWidth;
+                    final width = widthPercent * availableWidth;
+                    
+                    return Positioned(
+                      left: left,
+                      width: width,
+                      top: 0,
+                      bottom: 0,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                data['subject'] ?? data['Subject'] ?? 'Unknown',
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                data['instructor'] ?? data['Instructor'] ?? 'Unknown',
+                                style: GoogleFonts.inter(
+                                  fontSize: 8,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                          Text(
-                            data['instructor'],
-                            style: GoogleFonts.inter(
-                              fontSize: 8,
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  }).toList(),
                 );
-              }).toList(),
+              },
             ),
           ),
         ],
       ),
     );
+  }
+
+  List<Map<String, dynamic>> _processChartData() {
+    // Filter out invalid data early to improve performance
+    return chartData.where((data) {
+      final startTimeValue = data['startTime'] ?? data['Start'];
+      final endTimeValue = data['endTime'] ?? data['End'];
+      return startTimeValue != null && endTimeValue != null;
+    }).take(50).toList(); // Limit to 50 items to prevent performance issues
   }
 }

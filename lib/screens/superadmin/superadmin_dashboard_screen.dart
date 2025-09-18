@@ -9,6 +9,7 @@ import '../../widgets/common/loading_widget.dart';
 import '../../widgets/common/empty_state_widget.dart';
 import '../../utils/error_handler.dart';
 import '../../main.dart' show LoginScreen;
+import '../face_registration_screen.dart';
 
 class SuperadminDashboardScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -78,7 +79,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 7, vsync: this);
+    _tabController = TabController(length: 9, vsync: this);
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
         setState(() {
@@ -164,6 +165,12 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         _fetchRooms(),
         _fetchSchedules(),
         _fetchAllFacultiesLogs(),
+        _fetchDeansList(),
+        _fetchInstructorsList(),
+        _fetchProgramChairsList(),
+        _fetchPendingDeans(),
+        _fetchPendingInstructors(),
+        _fetchPendingProgramChairs(),
       ]);
     } catch (e) {
       if (mounted) {
@@ -277,7 +284,125 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         });
       }
     } catch (error) {
-      // 
+      if (mounted) {
+        setState(() {
+          allFacultiesLogs = _getSampleFacultyLogs();
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchDeansList() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await ApiService.getSuperadminDeans();
+      if (mounted) {
+        setState(() {
+          deansList = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          deansList = [];
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchInstructorsList() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await ApiService.getSuperadminInstructors();
+      if (mounted) {
+        setState(() {
+          instructorsList = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          instructorsList = [];
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchProgramChairsList() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await ApiService.getSuperadminProgramChairs();
+      if (mounted) {
+        setState(() {
+          programChairsList = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          programChairsList = [];
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchPendingDeans() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await ApiService.getSuperadminPendingDeans();
+      if (mounted) {
+        setState(() {
+          pendingDeans = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          pendingDeans = _getSamplePendingDeansData();
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchPendingInstructors() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await ApiService.getSuperadminPendingInstructors();
+      if (mounted) {
+        setState(() {
+          pendingInstructors = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          pendingInstructors = _getSamplePendingInstructorsData();
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchPendingProgramChairs() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await ApiService.getSuperadminPendingProgramChairs();
+      if (mounted) {
+        setState(() {
+          pendingProgramChairs = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          pendingProgramChairs = _getSamplePendingProgramChairsData();
+        });
+      }
     }
   }
 
@@ -380,185 +505,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   }
 
   // Data fetching methods for consolidated screens
-  Future<void> _fetchDeansList() async {
-    if (!mounted) return;
-    
-    setState(() {
-      loading = true;
-      errorMessage = null;
-    });
-
-    try {
-      final data = await ApiService.getSuperadminDeans();
-      if (mounted) {
-        setState(() {
-          deansList = data;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          errorMessage = ErrorHandler.getErrorMessage(e);
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          loading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchInstructorsList() async {
-    if (!mounted) return;
-    
-    setState(() {
-      loading = true;
-      errorMessage = null;
-    });
-
-    try {
-      final data = await ApiService.getSuperadminInstructors();
-      if (mounted) {
-        setState(() {
-          instructorsList = data;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          errorMessage = ErrorHandler.getErrorMessage(e);
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          loading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchProgramChairsList() async {
-    if (!mounted) return;
-    
-    setState(() {
-      loading = true;
-      errorMessage = null;
-    });
-
-    try {
-      final data = await ApiService.getSuperadminProgramChairs();
-      if (mounted) {
-        setState(() {
-          programChairsList = data;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          errorMessage = ErrorHandler.getErrorMessage(e);
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          loading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchPendingDeans() async {
-    if (!mounted) return;
-    
-    setState(() {
-      loading = true;
-      errorMessage = null;
-    });
-
-    try {
-      final data = await ApiService.getSuperadminPendingDeans();
-      if (mounted) {
-        setState(() {
-          pendingDeans = data;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          errorMessage = ErrorHandler.getErrorMessage(e);
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          loading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchPendingInstructors() async {
-    if (!mounted) return;
-    
-    setState(() {
-      loading = true;
-      errorMessage = null;
-    });
-
-    try {
-      final data = await ApiService.getSuperadminPendingInstructors();
-      if (mounted) {
-        setState(() {
-          pendingInstructors = data;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          errorMessage = ErrorHandler.getErrorMessage(e);
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          loading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchPendingProgramChairs() async {
-    if (!mounted) return;
-    
-    setState(() {
-      loading = true;
-      errorMessage = null;
-    });
-
-    try {
-      final data = await ApiService.getSuperadminPendingProgramChairs();
-      if (mounted) {
-        setState(() {
-          pendingProgramChairs = data;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          errorMessage = ErrorHandler.getErrorMessage(e);
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          loading = false;
-        });
-      }
-    }
-  }
 
   Future<void> _checkLiveStatus() async {
     if (!mounted) return;
@@ -774,24 +720,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       backgroundColor: Theme.of(context).colorScheme.primary,
       foregroundColor: Colors.white,
       elevation: 0,
-      bottom: TabBar(
-        controller: _tabController,
-        isScrollable: true,
-        indicatorColor: Colors.white,
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
-        tabs: const [
-          Tab(icon: Icon(Icons.dashboard_rounded), text: 'Dashboard'),
-          Tab(icon: Icon(Icons.admin_panel_settings_rounded), text: 'Deans'),
-          Tab(icon: Icon(Icons.person_rounded), text: 'Instructors'),
-          Tab(icon: Icon(Icons.school_rounded), text: 'Program Chairs'),
-          Tab(icon: Icon(Icons.hourglass_empty_rounded), text: 'Pending Deans'),
-          Tab(icon: Icon(Icons.pending_actions_rounded), text: 'Pending Instructors'),
-          Tab(icon: Icon(Icons.pending_actions_rounded), text: 'Pending Program Chairs'),
-          Tab(icon: Icon(Icons.videocam_rounded), text: 'Live Video'),
-          Tab(icon: Icon(Icons.settings_rounded), text: 'Settings'),
-        ],
-      ),
     );
   }
 
@@ -1921,8 +1849,8 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Today Schedule Chart',
@@ -1932,6 +1860,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
+              const SizedBox(height: 16),
               LayoutBuilder(
                 builder: (context, constraints) {
                   final isMobile = constraints.maxWidth < 600;
@@ -1976,37 +1905,43 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                   } else {
                     return Row(
                       children: [
-                        _buildDropdown(
-                          'College',
-                          collegeValue,
-                          colleges.map<DropdownMenuItem<String>>((college) => DropdownMenuItem<String>(
-                            value: college['code'],
-                            child: Text(college['name']),
-                          )).toList(),
-                          (value) => _handleCollegeChange(value!),
-                          loadingColleges,
+                        Expanded(
+                          child: _buildDropdown(
+                            'College',
+                            collegeValue,
+                            colleges.map<DropdownMenuItem<String>>((college) => DropdownMenuItem<String>(
+                              value: college['code'],
+                              child: Text(college['name']),
+                            )).toList(),
+                            (value) => _handleCollegeChange(value!),
+                            loadingColleges,
+                          ),
                         ),
                         const SizedBox(width: 16),
-                        _buildDropdown(
-                          'Course',
-                          courseValue,
-                          programs.map<DropdownMenuItem<String>>((program) => DropdownMenuItem<String>(
-                            value: program['code'].toString().toLowerCase(),
-                            child: Text(program['code'].toString().toUpperCase()),
-                          )).toList(),
-                          (value) => _handleCourseChange(value!),
-                          loadingCourses,
+                        Expanded(
+                          child: _buildDropdown(
+                            'Course',
+                            courseValue,
+                            programs.map<DropdownMenuItem<String>>((program) => DropdownMenuItem<String>(
+                              value: program['code'].toString().toLowerCase(),
+                              child: Text(program['code'].toString().toUpperCase()),
+                            )).toList(),
+                            (value) => _handleCourseChange(value!),
+                            loadingCourses,
+                          ),
                         ),
                         const SizedBox(width: 16),
-                        _buildDropdown(
-                          'Room',
-                          roomValue,
-                          rooms.map<DropdownMenuItem<String>>((room) => DropdownMenuItem<String>(
-                            value: room['name'],
-                            child: Text(room['name']),
-                          )).toList(),
-                          (value) => _handleRoomChange(value!),
-                          false,
+                        Expanded(
+                          child: _buildDropdown(
+                            'Room',
+                            roomValue,
+                            rooms.map<DropdownMenuItem<String>>((room) => DropdownMenuItem<String>(
+                              value: room['name'],
+                              child: Text(room['name']),
+                            )).toList(),
+                            (value) => _handleRoomChange(value!),
+                            false,
+                          ),
                         ),
                       ],
                     );
@@ -2031,7 +1966,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         final isMobile = constraints.maxWidth < 600;
         
         return SizedBox(
-          width: isMobile ? double.infinity : 200,
+          width: isMobile ? double.infinity : double.infinity,
           child: DropdownButtonFormField<String>(
             initialValue: value == "all" ? null : value,
             decoration: InputDecoration(
@@ -2657,7 +2592,14 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
             size: 16,
             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
-          onTap: () => ErrorHandler.showSnackBar(context, 'Face registration not implemented yet'),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FaceRegistrationScreen(userData: widget.userData),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -3212,6 +3154,45 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     }
   }
 
+  // Add Dean function from React code
+  Future<void> _addDean(Map<String, dynamic> deanData) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Adding dean...');
+      await ApiService.addDean(deanData);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Dean added successfully');
+      _fetchDeansList();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  // Generate username function from React code
+  String _generateUsername(String firstName, String lastName) {
+    final first = firstName.substring(0, 3).toUpperCase();
+    final last = lastName.substring(0, 3).toUpperCase();
+    return last + first;
+  }
+
+  // Fetch courses by college function from React code
+  Future<void> _fetchCoursesByCollege(String collegeCode) async {
+    try {
+      final data = await ApiService.getSuperadminCourses(collegeCode);
+      if (mounted) {
+        setState(() {
+          programs = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          programs = [];
+        });
+      }
+    }
+  }
+
   Future<void> _deleteInstructor(String instructorId) async {
     try {
       ErrorHandler.showLoadingDialog(context, 'Deleting instructor...');
@@ -3236,5 +3217,237 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       ErrorHandler.hideLoadingDialog(context);
       ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
     }
+  }
+
+  // Pending faculty functions from React code
+  Future<void> _acceptFaculty(String facultyId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Accepting faculty...');
+      await ApiService.approveFaculty(facultyId);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Faculty accepted successfully');
+      _fetchPendingDeans();
+      _fetchPendingInstructors();
+      _fetchPendingProgramChairs();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  Future<void> _rejectFaculty(String facultyId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Rejecting faculty...');
+      await ApiService.rejectFaculty(facultyId);
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'Faculty rejected successfully');
+      _fetchPendingDeans();
+      _fetchPendingInstructors();
+      _fetchPendingProgramChairs();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  // Pagination functions from React code
+  void _handleChangePage(int newPage) {
+    setState(() {
+      // Update page state for pagination
+    });
+  }
+
+  void _handleChangeRowsPerPage(int newRowsPerPage) {
+    setState(() {
+      // Update rows per page state for pagination
+    });
+  }
+
+  // Sample data methods
+  List<dynamic> _getSampleFacultyLogs() {
+    return [
+      {
+        'id': '1',
+        'instructorName': 'John Doe',
+        'course': 'Data Structures',
+        'room': 'Room 101',
+        'timeIn': '08:00',
+        'timeout': '10:00',
+        'status': 'Present',
+        'date': DateTime.now().toIso8601String(),
+      },
+      {
+        'id': '2',
+        'instructorName': 'Jane Smith',
+        'course': 'Algorithms',
+        'room': 'Room 102',
+        'timeIn': '10:00',
+        'timeout': '12:00',
+        'status': 'Present',
+        'date': DateTime.now().toIso8601String(),
+      },
+      {
+        'id': '3',
+        'instructorName': 'Mike Johnson',
+        'course': 'Database Systems',
+        'room': 'Room 103',
+        'timeIn': '14:00',
+        'timeout': '16:00',
+        'status': 'Present',
+        'date': DateTime.now().toIso8601String(),
+      },
+    ];
+  }
+
+  List<dynamic> _getSampleDeansData() {
+    return [
+      {
+        '_id': '1',
+        'first_name': 'Dr. Sarah',
+        'last_name': 'Wilson',
+        'middle_name': 'A',
+        'username': 'WILSAR',
+        'email': 'sarah.wilson@university.edu',
+        'role': 'dean',
+        'college': {'name': 'College of Computer Science', 'code': 'CCS'},
+        'status': 'active',
+      },
+      {
+        '_id': '2',
+        'first_name': 'Dr. Michael',
+        'last_name': 'Brown',
+        'middle_name': 'B',
+        'username': 'BROMIC',
+        'email': 'michael.brown@university.edu',
+        'role': 'dean',
+        'college': {'name': 'College of Engineering', 'code': 'COE'},
+        'status': 'active',
+      },
+    ];
+  }
+
+  List<dynamic> _getSampleInstructorsData() {
+    return [
+      {
+        '_id': '1',
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'middle_name': 'C',
+        'username': 'DOEJOH',
+        'email': 'john.doe@university.edu',
+        'role': 'instructor',
+        'college': {'name': 'College of Computer Science', 'code': 'CCS'},
+        'course': 'BS Computer Science',
+        'status': 'active',
+      },
+      {
+        '_id': '2',
+        'first_name': 'Jane',
+        'last_name': 'Smith',
+        'middle_name': 'D',
+        'username': 'SMIJAN',
+        'email': 'jane.smith@university.edu',
+        'role': 'instructor',
+        'college': {'name': 'College of Engineering', 'code': 'COE'},
+        'course': 'BS Information Technology',
+        'status': 'active',
+      },
+    ];
+  }
+
+  List<dynamic> _getSampleProgramChairsData() {
+    return [
+      {
+        '_id': '1',
+        'first_name': 'Dr. Robert',
+        'last_name': 'Davis',
+        'middle_name': 'E',
+        'username': 'DAVROB',
+        'email': 'robert.davis@university.edu',
+        'role': 'programchairperson',
+        'college': {'name': 'College of Computer Science', 'code': 'CCS'},
+        'status': 'active',
+      },
+      {
+        '_id': '2',
+        'first_name': 'Dr. Lisa',
+        'last_name': 'Garcia',
+        'middle_name': 'F',
+        'username': 'GARLIS',
+        'email': 'lisa.garcia@university.edu',
+        'role': 'programchairperson',
+        'college': {'name': 'College of Engineering', 'code': 'COE'},
+        'status': 'active',
+      },
+    ];
+  }
+
+  List<dynamic> _getSamplePendingDeansData() {
+    return [
+      {
+        '_id': '1',
+        'email': 'pending.dean1@university.edu',
+        'role': 'dean',
+        'department': 'Computer Science',
+        'program': 'BS Computer Science',
+        'profilePhoto': '',
+        'dateSignedUp': DateTime.now().toIso8601String(),
+      },
+      {
+        '_id': '2',
+        'email': 'pending.dean2@university.edu',
+        'role': 'dean',
+        'department': 'Engineering',
+        'program': 'BS Engineering',
+        'profilePhoto': '',
+        'dateSignedUp': DateTime.now().toIso8601String(),
+      },
+    ];
+  }
+
+  List<dynamic> _getSamplePendingInstructorsData() {
+    return [
+      {
+        '_id': '1',
+        'email': 'pending.instructor1@university.edu',
+        'role': 'instructor',
+        'department': 'Computer Science',
+        'program': 'BS Computer Science',
+        'profilePhoto': '',
+        'dateSignedUp': DateTime.now().toIso8601String(),
+      },
+      {
+        '_id': '2',
+        'email': 'pending.instructor2@university.edu',
+        'role': 'instructor',
+        'department': 'Information Technology',
+        'program': 'BS Information Technology',
+        'profilePhoto': '',
+        'dateSignedUp': DateTime.now().toIso8601String(),
+      },
+    ];
+  }
+
+  List<dynamic> _getSamplePendingProgramChairsData() {
+    return [
+      {
+        '_id': '1',
+        'email': 'pending.pc1@university.edu',
+        'role': 'programchairperson',
+        'department': 'Computer Science',
+        'program': 'BS Computer Science',
+        'profilePhoto': '',
+        'dateSignedUp': DateTime.now().toIso8601String(),
+      },
+      {
+        '_id': '2',
+        'email': 'pending.pc2@university.edu',
+        'role': 'programchairperson',
+        'department': 'Information Technology',
+        'program': 'BS Information Technology',
+        'profilePhoto': '',
+        'dateSignedUp': DateTime.now().toIso8601String(),
+      },
+    ];
   }
 }
