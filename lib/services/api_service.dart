@@ -364,9 +364,28 @@ class ApiService {
         method: 'GET',
         endpoint: '/debug-users',
       );
+      // Debug: Print the response structure
+      print('Debug users response: $response');
+      
       // Filter users by role 'dean'
       final users = response['users'] as List<dynamic>;
-      return users.where((user) => user['role'] == 'dean').toList();
+      print('Total users found: ${users.length}');
+      
+      // Debug: Print first user structure
+      if (users.isNotEmpty) {
+        print('First user structure: ${users.first}');
+      }
+      
+      // Try different possible role field names
+      final deans = users.where((user) => 
+        user['role'] == 'dean' || 
+        user['userRole'] == 'dean' || 
+        user['type'] == 'dean' ||
+        user['username'] == 'dean' ||
+        user['email']?.toString().contains('dean') == true
+      ).toList();
+      print('Deans found: ${deans.length}');
+      return deans;
     } catch (e) {
       print('Error fetching deans: $e');
       return [];
@@ -381,7 +400,15 @@ class ApiService {
       );
       // Filter users by role 'instructor'
       final users = response['users'] as List<dynamic>;
-      return users.where((user) => user['role'] == 'instructor').toList();
+      final instructors = users.where((user) => 
+        user['role'] == 'instructor' || 
+        user['userRole'] == 'instructor' || 
+        user['type'] == 'instructor' ||
+        user['username'] == 'instructor' ||
+        user['email']?.toString().contains('instructor') == true
+      ).toList();
+      print('Instructors found: ${instructors.length}');
+      return instructors;
     } catch (e) {
       print('Error fetching instructors: $e');
       return [];
@@ -396,7 +423,16 @@ class ApiService {
       );
       // Filter users by role 'programChairperson'
       final users = response['users'] as List<dynamic>;
-      return users.where((user) => user['role'] == 'programChairperson').toList();
+      final programChairs = users.where((user) => 
+        user['role'] == 'programChairperson' || 
+        user['userRole'] == 'programChairperson' || 
+        user['type'] == 'programChairperson' ||
+        user['username'] == 'programchair' ||
+        user['email']?.toString().contains('program') == true ||
+        user['email']?.toString().contains('chair') == true
+      ).toList();
+      print('Program chairs found: ${programChairs.length}');
+      return programChairs;
     } catch (e) {
       print('Error fetching program chairs: $e');
       return [];
