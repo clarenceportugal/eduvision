@@ -596,7 +596,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         // Camera will be initialized when user starts registration
       }
     } catch (e) {
-      print('Error checking permission status: $e');
+      // 
     }
   }
 
@@ -1969,9 +1969,9 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     // Stop current image stream to avoid conflicts
     try {
       await _cameraController!.stopImageStream();
-      print('✅ Stopped main widget image stream before full-screen navigation');
+      // 
     } catch (e) {
-      print('ℹ️ No image stream to stop: $e');
+      // 
     }
 
     // Navigate to full screen registration mode
@@ -2034,7 +2034,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                   '✅ Restarted face detection after returning from full-screen',
                 );
               } catch (e) {
-                print('ℹ️ Face detection already running: $e');
+                // 
               }
             }
           });
@@ -2141,7 +2141,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       await _requestCameraPermission();
 
       if (!_hasCameraPermission) {
-        print('Camera permission not granted');
+        // 
         return;
       }
 
@@ -2153,7 +2153,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         return;
       }
 
-      print('Found ${_cameras!.length} cameras');
+      // 
 
       // Use front camera for face registration
       final frontCamera = _cameras!.firstWhere(
@@ -2161,7 +2161,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         orElse: () => _cameras!.first,
       );
 
-      print('Using camera: ${frontCamera.name}');
+      // 
 
       // Use MAXIMUM quality settings for crystal clear camera like native app
       _cameraController = CameraController(
@@ -2207,31 +2207,31 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
             '🔥 Camera quality: MAXIMUM - same as phone\'s native camera app',
           );
         } catch (e) {
-          print('Advanced quality settings: $e');
+          // 
         }
 
         // Log camera specifications for quality verification
-        print('📊 CAMERA SPECS:');
-        print('   - Resolution: ${_cameraController!.value.previewSize}');
-        print('   - Format: BGRA8888 (32-bit color)');
-        print('   - Focus: Auto with continuous tracking');
-        print('   - Exposure: Auto with scene optimization');
-        print('   - Quality: MAXIMUM AVAILABLE');
+        // 
+        // 
+        // 
+        // 
+        // 
+        // 
       } catch (e) {
-        print('Camera setup: $e');
+        // 
       }
 
-      print('✅ Camera initialized successfully!');
-      print('Camera value: ${_cameraController!.value.isInitialized}');
-      print('Preview size: ${_cameraController!.value.previewSize}');
+      // 
+      // 
+      // 
 
       // Test face detector
-      print('🧪 Testing face detector...');
+      // 
       try {
         await _faceDetector.processImage(InputImage.fromFilePath(''));
-        print('✅ Face detector is working!');
+        // 
       } catch (e) {
-        print('✅ Face detector initialized (expected error: $e)');
+        // 
       }
 
       // Start face detection with longer delay to ensure camera is fully ready
@@ -2244,7 +2244,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
             '✅ Face detection started after camera initialization confirmation',
           );
         } else {
-          print('❌ Camera not ready after delay, retrying...');
+          // 
           // Retry after another delay
           Future.delayed(const Duration(milliseconds: 1000), () {
             if (mounted &&
@@ -2262,7 +2262,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         });
       }
     } catch (e) {
-      print('Camera initialization error: $e');
+      // 
       _showError(
         'Failed to initialize camera. Please check your device settings and try again.',
       );
@@ -2309,7 +2309,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         }
       }
     } catch (e) {
-      print('Permission error: $e');
+      // 
       _showError(
         'Failed to request camera permission. Please check your device settings.',
       );
@@ -2398,11 +2398,11 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
   // Start DEBUG face detection with logging
   void _startFaceDetection() {
     if (_cameraController == null) {
-      print('❌ Camera controller is null!');
+      // 
       return;
     }
 
-    print('🚀 Starting face detection stream...');
+    // 
 
     try {
       _cameraController!.startImageStream((CameraImage image) {
@@ -2410,13 +2410,13 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         _isDetecting = true;
 
         _processImageWithNativeFeatures(image).catchError((error) {
-          print('Error in image processing: $error');
+          // 
           _isDetecting = false;
         });
       });
-      print('✅ Face detection stream started successfully!');
+      // 
     } catch (e) {
-      print('💥 Failed to start image stream: $e');
+      // 
     }
   }
 
@@ -2429,12 +2429,12 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
 
       final inputImage = _convertCameraImageOptimized(image);
       if (inputImage == null) {
-        print('❌ Failed to convert camera image!');
+        // 
         _isDetecting = false;
         return;
       }
 
-      print('🔍 Running ULTRA ADVANCED face detection...');
+      // 
 
       // Primary face detection with multiple orientation attempts
       List<Face> allFaces = [];
@@ -2460,13 +2460,13 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
 
           final faces = await _faceDetector.processImage(rotatedImage);
           allFaces.addAll(faces);
-          print('📐 Rotation ${rotation.name}: Found ${faces.length} faces');
+          // 
         } catch (e) {
-          print('⚠️ Rotation ${rotation.name} failed: $e');
+          // 
         }
       }
 
-      print('🔍 Total faces found across all rotations: ${allFaces.length}');
+      // 
 
       // Advanced face quality filtering and scoring
       List<Face> qualityFaces = _filterAndScoreFaces(
@@ -2478,8 +2478,8 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       // Apply stability checking
       Face? finalFace = _applyStabilityFilter(qualityFaces);
 
-      print('👥 Final quality faces after filtering: ${qualityFaces.length}');
-      print('🎯 Selected stable face: ${finalFace != null ? "YES" : "NO"}');
+      // 
+      // 
 
       if (mounted) {
         setState(() {
@@ -2487,26 +2487,26 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
           _detectedFace = _applySmoothingToFace(finalFace);
 
           if (_detectedFace != null) {
-            print('✅ ULTRA HIGH QUALITY FACE DETECTED!');
+            // 
             print(
               '   Size: ${_detectedFace!.boundingBox.width}x${_detectedFace!.boundingBox.height}',
             );
             print(
               '   Confidence: ${(_currentConfidence * 100).toStringAsFixed(1)}%',
             );
-            print('   Stability: $_stableFaceCount/$_requiredStability');
+            // 
 
             // Update native camera focus on detected face
             _updateNativeCameraForFace();
 
             _checkStepCompletion();
           } else {
-            print('❌ NO STABLE QUALITY FACE DETECTED in this frame');
+            // 
           }
         });
       }
     } catch (e) {
-      print('💥 Face detection ERROR: $e');
+      // 
     } finally {
       _isDetecting = false;
     }
@@ -2604,7 +2604,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       // Only keep faces with minimum score
       if (score >= 35.0) {
         scoredFaces.add(MapEntry(face, score));
-        print('✅ Quality face scored: ${score.toStringAsFixed(1)} points');
+        // 
       } else {
         print(
           '❌ Face rejected: ${score.toStringAsFixed(1)} points (minimum 35.0 required)',
@@ -2639,15 +2639,15 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     // Check if this face is similar to previous detection
     if (_previousFace != null) {
       final similarity = _calculateFaceSimilarity(currentFace, _previousFace!);
-      print('🔍 Face similarity: ${(similarity * 100).toStringAsFixed(1)}%');
+      // 
 
       if (similarity > 0.75) {
         // 75% similarity threshold
         _stableFaceCount++;
-        print('📈 Stable face count: $_stableFaceCount');
+        // 
       } else {
         _stableFaceCount = 1; // Reset but count current face
-        print('🔄 Face similarity too low, resetting stability count');
+        // 
       }
     } else {
       _stableFaceCount = 1;
@@ -2723,7 +2723,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
 
     // For now, return the latest face with improved confidence
     // In a real implementation, you'd create a new Face object with smoothed coordinates
-    print('📊 Smoothed face detection applied over $count frames');
+    // 
 
     return latestFace;
   }
@@ -2749,7 +2749,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       }
     } catch (e) {
       // Native features may not be available on all devices
-      print('Native camera adjustment not available: $e');
+      // 
     }
   }
 
@@ -2759,7 +2759,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       print(
         '🖼️ Converting image: ${image.width}x${image.height}, planes: ${image.planes.length}',
       );
-      print('Format raw: ${image.format.raw}, group: ${image.format.group}');
+      // 
 
       final WriteBuffer allBytes = WriteBuffer();
       for (final Plane plane in image.planes) {
@@ -2769,7 +2769,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         );
       }
       final bytes = allBytes.done().buffer.asUint8List();
-      print('Total bytes: ${bytes.length}');
+      // 
 
       // Check if image has actual data (not all zeros)
       final nonZeroBytes = bytes.where((b) => b != 0).length;
@@ -2778,7 +2778,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       );
 
       if (nonZeroBytes < bytes.length * 0.1) {
-        print('⚠️ WARNING: Image seems mostly empty!');
+        // 
       }
 
       final Size imageSize = Size(
@@ -2801,7 +2801,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       final InputImageFormat inputImageFormat =
           InputImageFormatValue.fromRawValue(image.format.raw) ??
           InputImageFormat.nv21;
-      print('Input format: $inputImageFormat');
+      // 
 
       final inputImage = InputImage.fromBytes(
         bytes: bytes,
@@ -2813,11 +2813,11 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         ),
       );
 
-      print('✅ Successfully converted camera image to InputImage');
+      // 
       return inputImage;
     } catch (e) {
-      print('💥 Image conversion FAILED: $e');
-      print('Stack trace: ${StackTrace.current}');
+      // 
+      // 
       return null;
     }
   }
@@ -2849,7 +2849,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
 
     // First check if face angle is correct for the current step
     if (!_isFaceAngleCorrectForStep(_detectedFace!)) {
-      print('❌ Face angle not correct for step ${_currentStep + 1}');
+      // 
       return;
     }
 
@@ -2913,7 +2913,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         );
 
         if (_completedSteps.length == _registrationSteps.length) {
-          print('🎉 ALL STEPS COMPLETED! Calling _completeRegistration()');
+          // 
           _allStepsCompleted = true;
           _completeRegistration();
         } else {
@@ -2924,7 +2924,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
                 _currentStep++;
                 _captureEnabled = true;
               });
-              print('✅ Moved to step ${_currentStep + 1}');
+              // 
             }
           });
         }
@@ -2942,7 +2942,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
   // STRICT pose detection for step completion
   bool _isLookingStraight() {
     if (_detectedFace == null) {
-      print('No face for straight check');
+      // 
       return false;
     }
 
@@ -2953,7 +2953,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     if (headEulerAngleX == null ||
         headEulerAngleY == null ||
         headEulerAngleZ == null) {
-      print('Head angles not available, assuming straight');
+      // 
       return true; // If angles not available, assume straight
     }
 
@@ -2977,7 +2977,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     }
     // Use the same strict criteria as the angle validation
     final result = headEulerAngleX <= -12.0 && headEulerAngleX >= -28.0;
-    print('Up check: X=${headEulerAngleX.toStringAsFixed(1)} -> $result');
+    // 
     return result;
   }
 
@@ -2987,7 +2987,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     if (headEulerAngleX == null) return true;
     // Use the same strict criteria as the angle validation
     final result = headEulerAngleX >= 12.0 && headEulerAngleX <= 28.0;
-    print('Down check: X=${headEulerAngleX.toStringAsFixed(1)} -> $result');
+    // 
     return result;
   }
 
@@ -2997,7 +2997,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     if (headEulerAngleY == null) return true;
     // Use the same strict criteria as the angle validation
     final result = headEulerAngleY <= -15.0 && headEulerAngleY >= -35.0;
-    print('Left check: Y=${headEulerAngleY.toStringAsFixed(1)} -> $result');
+    // 
     return result;
   }
 
@@ -3007,13 +3007,13 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     if (headEulerAngleY == null) return true;
     // Use the same strict criteria as the angle validation
     final result = headEulerAngleY >= 15.0 && headEulerAngleY <= 35.0;
-    print('Right check: Y=${headEulerAngleY.toStringAsFixed(1)} -> $result');
+    // 
     return result;
   }
 
   bool _isBlinking() {
     if (_detectedFace == null) {
-      print('👁️ Blink check: NO FACE DETECTED');
+      // 
       _resetBlinkDetection();
       return false;
     }
@@ -3027,7 +3027,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     if (headEulerAngleX.abs() > 12.0 ||
         headEulerAngleY.abs() > 12.0 ||
         headEulerAngleZ.abs() > 8.0) {
-      print('👁️ Face not straight enough for blink detection');
+      // 
       return false;
     }
 
@@ -3036,29 +3036,29 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     final rightEye = _detectedFace!.landmarks[FaceLandmarkType.rightEye];
 
     if (leftEye != null && rightEye != null) {
-      print('👁️ Blink check: Eye landmarks available - checking blink...');
+      // 
       // Calculate eye openness based on face height vs eye positions
       final faceHeight = _detectedFace!.boundingBox.height;
       final eyeDistance = (leftEye.position.y - rightEye.position.y).abs();
       final eyeRatio = eyeDistance / faceHeight;
 
-      print('👁️ Eye ratio: ${eyeRatio.toStringAsFixed(4)} (threshold: 0.02)');
+      // 
 
       // If eyes appear closed (low ratio)
       if (eyeRatio < 0.02) {
         _blinkFrameCount++;
         _eyesOpenFrameCount = 0;
-        print('👁️ Eyes CLOSED frame $_blinkFrameCount/$_blinkRequiredFrames');
+        // 
 
         if (_blinkFrameCount >= _blinkRequiredFrames && !_blinkDetected) {
           _blinkDetected = true;
-          print('✅ BLINK DETECTED SUCCESSFULLY!');
+          // 
           return true;
         }
       } else {
         // Eyes are open
         _eyesOpenFrameCount++;
-        print('👁️ Eyes OPEN ($_eyesOpenFrameCount frames)');
+        // 
         if (_eyesOpenFrameCount > 3) {
           _blinkFrameCount = 0; // Reset if eyes have been open
           print(
@@ -3145,7 +3145,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
 
   bool _isSmiling() {
     if (_detectedFace == null) {
-      print('😊 Smile check: NO FACE DETECTED');
+      // 
       return false;
     }
 
@@ -3158,7 +3158,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     if (headEulerAngleX.abs() > 12.0 ||
         headEulerAngleY.abs() > 12.0 ||
         headEulerAngleZ.abs() > 8.0) {
-      print('😊 Face not straight enough for smile detection');
+      // 
       return false;
     }
 
@@ -3170,21 +3170,21 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       );
 
       if (smilingProbability > 0.7) {
-        print('😊 SMILE DETECTED! Auto capturing...');
+        // 
         return true;
       } else {
-        print('😊 Not smiling enough - keep smiling!');
+        // 
         return false;
       }
     } else {
-      print('😊 Smile detection not available - waiting for classification...');
+      // 
       return false;
     }
   }
 
   bool _isNeutralExpression() {
     if (_detectedFace == null) {
-      print('😐 Neutral check: NO FACE DETECTED');
+      // 
       return false;
     }
 
@@ -3197,7 +3197,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
     if (headEulerAngleX.abs() > 10.0 ||
         headEulerAngleY.abs() > 10.0 ||
         headEulerAngleZ.abs() > 6.0) {
-      print('😐 Face not straight enough for neutral expression detection');
+      // 
       return false;
     }
 
@@ -3210,14 +3210,14 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
 
       // Neutral expression means not smiling too much
       if (smilingProbability < 0.3) {
-        print('😐 NEUTRAL EXPRESSION DETECTED! Auto capturing...');
+        // 
         return true;
       } else {
-        print('😐 Expression not neutral - relax your face');
+        // 
         return false;
       }
     } else {
-      print('😐 Expression detection not available - assuming neutral');
+      // 
       return true; // Assume neutral if detection not available
     }
   }
@@ -3253,7 +3253,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
       // Upload to Cloudinary immediately after capture and wait for completion
       bool uploadSuccessful = false;
       if (widget.userData['_id'] != null) {
-        print('☁️ Starting Cloudinary upload (Regular Mode)...');
+        // 
 
         // Show upload progress indicator
         if (mounted) {
@@ -3297,7 +3297,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
           return false;
         }
       } else {
-        print('❌ No user ID found for upload (Regular Mode)');
+        // 
         if (mounted) {
           setState(() {
             _feedbackMessage = 'No user ID found for upload';
@@ -3309,7 +3309,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
 
       // Only proceed to TFLite analysis if upload was successful
       if (!uploadSuccessful) {
-        print('❌ Stopping capture process - upload failed');
+        // 
         return false;
       }
 
@@ -3346,7 +3346,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         );
       }
     } catch (e) {
-      print('❌ Native capture error: $e');
+      // 
       Logger.error('❌ Error during photo capture: $e');
     } finally {
       if (mounted) {
@@ -3387,7 +3387,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         );
       }
     } catch (e) {
-      print('Native optimization failed: $e');
+      // 
     }
   }
 
@@ -3843,13 +3843,13 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
           widget.userData['_id'],
         );
         if (result['success']) {
-          print('✅ Previous face images cleared successfully');
+          // 
         } else {
           print('⚠️ Failed to clear previous images: ${result['message']}');
         }
       }
     } catch (e) {
-      print('❌ Error clearing previous face images: $e');
+      // 
     }
   }
 
@@ -3925,7 +3925,7 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
         Logger.info(
           '✅ Generated 512D face embedding for step ${_currentStep + 1}',
         );
-        print('📊 Embedding dimensions: ${embedding.length}');
+        // 
       } else {
         Logger.warning(
           '⚠️ Failed to generate face embedding for step ${_currentStep + 1}',
@@ -4760,20 +4760,20 @@ class _FaceRegistrationScreenState extends State<FaceRegistrationScreen>
 
   // Test confirmation dialog method
   void _testConfirmationDialog() {
-    print('🧪 Testing confirmation dialog...');
+    // 
     _showRegistrationConfirmationDialog();
   }
 
   // Debug method to check completion status
   void _debugCheckCompletion() {
-    print('🔍 DEBUG: Checking completion status...');
-    print('🔍 Current step: $_currentStep');
-    print('🔍 Total steps: ${_registrationSteps.length}');
-    print('🔍 Completed steps: ${_completedSteps.length}');
+    // 
+    // 
+    // 
+    // 
     print(
       '🔍 All steps completed: ${_completedSteps.length == _registrationSteps.length}',
     );
-    print('🔍 Completed step indices: ${_completedSteps.keys.toList()}');
+    // 
 
     // Show debug info in a dialog
     showDialog(
@@ -4900,16 +4900,16 @@ class _FaceRegistrationFullScreenState
     _cloudinaryUrls.clear();
     _capturedData.clear();
 
-    print('🔄 FULLSCREEN RESET: Starting fresh face registration');
-    print('🔄 Current step: ${_currentStep + 1}/${_registrationSteps.length}');
-    print('🔄 Capture enabled: $_captureEnabled');
-    print('🔄 Completed steps cleared: ${_completedSteps.length}');
+    // 
+    // 
+    // 
+    // 
 
     // Add delay to ensure camera is fully ready before starting detection
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) {
         _startFaceDetection();
-        print('✅ Full-screen face detection started with initialization delay');
+        // 
       }
     });
   }
@@ -4922,12 +4922,12 @@ class _FaceRegistrationFullScreenState
           _currentStep++;
           _captureEnabled = true;
           _faceDetectedFrames = 0;
-          print('📈 Moving to step ${_currentStep + 1}');
+          // 
         });
       } else if (mounted) {
         setState(() {
           _allStepsCompleted = true;
-          print('🎉 ALL STEPS COMPLETED!');
+          // 
           print(
             '📊 Registration Summary: ${_capturedPhotos.length} photos captured, ${_cloudinaryUrls.length} uploads successful',
           );
@@ -5254,7 +5254,7 @@ class _FaceRegistrationFullScreenState
         );
 
         if (response.statusCode == 200) {
-          print('✅ Previous face images cleared from backend');
+          // 
         } else {
           print(
             '⚠️ Failed to clear previous face images: ${response.statusCode}',
@@ -5262,7 +5262,7 @@ class _FaceRegistrationFullScreenState
         }
       }
     } catch (e) {
-      print('❌ Error clearing previous face images: $e');
+      // 
     }
   }
 
@@ -5374,7 +5374,7 @@ class _FaceRegistrationFullScreenState
                     _currentStep = 0;
                     _captureEnabled = true;
                     _faceDetectedFrames = 0;
-                    print('🔄 RESET: Starting over from step 1');
+                    // 
                   });
                 },
                 icon: Icon(Icons.refresh, color: Colors.white, size: 24),
@@ -5419,11 +5419,11 @@ class _FaceRegistrationFullScreenState
                                   if (!_completedSteps.contains(_currentStep)) {
                                     final success = await _captureStepPhoto();
                                     if (success) {
-                                      print('✅ Manual capture completed!');
+                                      // 
                                       _completedSteps.add(_currentStep);
                                       _moveToNextStep();
                                     } else {
-                                      print('❌ Manual capture failed!');
+                                      // 
                                       setState(() {
                                         _captureEnabled = true;
                                       });
@@ -5547,12 +5547,12 @@ class _FaceRegistrationFullScreenState
 
         _isDetecting = true;
         _processImageWithNativeFeatures(image).catchError((error) {
-          print('⚠️ Error in fullscreen image processing: $error');
+          // 
           _isDetecting = false;
         });
       });
     } catch (e) {
-      print('❌ Error starting camera image stream: $e');
+      // 
       _isDetecting = false;
     }
   }
@@ -5564,16 +5564,16 @@ class _FaceRegistrationFullScreenState
       await widget.cameraController.setExposureMode(ExposureMode.auto);
       await widget.cameraController.setFocusPoint(null);
       await widget.cameraController.setExposurePoint(null);
-      print('Full-screen native camera features enabled');
+      // 
     } catch (e) {
-      print('Native features not available: $e');
+      // 
     }
   }
 
   // NATIVE AUTO-CAPTURE in full-screen mode
   Future<bool> _captureStepPhoto() async {
-    print('🎬 _captureStepPhoto called for step ${_currentStep + 1}');
-    print('🎬 captureEnabled: $_captureEnabled, isCapturing: $_isCapturing');
+    // 
+    // 
 
     if (!_captureEnabled || _isCapturing) {
       print(
@@ -5582,7 +5582,7 @@ class _FaceRegistrationFullScreenState
       return false;
     }
 
-    print('📸 Starting photo capture for step ${_currentStep + 1}...');
+    // 
 
     setState(() {
       _isCapturing = true;
@@ -5597,19 +5597,19 @@ class _FaceRegistrationFullScreenState
       final XFile photo = await widget.cameraController.takePicture();
       final photoFile = File(photo.path);
       _capturedPhotos.add(photo.path);
-      print('📸 PHOTO CAPTURED! Step ${_currentStep + 1}: ${photo.path}');
+      // 
 
       // COMPREHENSIVE UPLOAD VERIFICATION
-      print('🔍 Verifying file exists: ${photoFile.path}');
-      print('🔍 File size: ${await photoFile.length()} bytes');
+      // 
+      // 
       print('🔍 User ID: ${widget.userData['_id']}');
 
       if (widget.userData['_id'] != null) {
-        print('☁️ Starting Cloudinary upload...');
-        print('📤 Upload details:');
+        // 
+        // 
         print('   - User ID: ${widget.userData['_id']}');
-        print('   - File path: ${photoFile.path}');
-        print('   - Step: ${_currentStep + 1}');
+        // 
+        // 
 
         final uploadResult = await CloudinaryService.uploadFaceImage(
           userId: widget.userData['_id'],
@@ -5620,15 +5620,15 @@ class _FaceRegistrationFullScreenState
           stepNumber: _currentStep + 1,
         );
 
-        print('📋 Upload result: $uploadResult');
+        // 
 
         if (uploadResult['success']) {
           final imageUrl = uploadResult['data']['image_url'];
           final cloudinaryId = uploadResult['data']['cloudinary_id'];
 
-          print('🎉 UPLOAD SUCCESS!');
-          print('   📸 Image URL: $imageUrl');
-          print('   🆔 Cloudinary ID: $cloudinaryId');
+          // 
+          // 
+          // 
 
           // Verify image is accessible
           bool imageAccessible = false;
@@ -5641,7 +5641,7 @@ class _FaceRegistrationFullScreenState
               '🔍 Image accessibility check: ${imageAccessible ? "✅" : "❌"}',
             );
           } catch (e) {
-            print('❌ Image accessibility check failed: $e');
+            // 
           }
 
           // Store comprehensive data with verification
@@ -5662,33 +5662,33 @@ class _FaceRegistrationFullScreenState
           };
 
           _cloudinaryUrls.add(imageUrl);
-          print('💾 Data stored for step ${_currentStep + 1}');
-          print('💾 Total captured steps: ${_capturedData.length}');
+          // 
+          // 
 
           // Save to persistent storage
           await _saveRegistrationData();
 
-          print('✅ Upload verified - photo stored in Cloudinary');
+          // 
           print(
             '✅ Step ${_currentStep + 1} completed and verified successfully!',
           );
         } else {
-          print('💥 UPLOAD FAILED!');
+          // 
           print('   ❌ Error: ${uploadResult['message']}');
-          print('   🔍 Full result: $uploadResult');
+          // 
 
           // Log upload error and don't proceed
-          print('💥 Upload failed - preventing step progression');
+          // 
 
           // Return early to prevent step progression
           return false;
         }
       } else {
-        print('❌ CRITICAL ERROR: No user ID found for upload!');
-        print('   🔍 UserData keys: ${widget.userData.keys.toList()}');
+        // 
+        // 
 
         // Log error and don't proceed
-        print('💥 No user ID found - preventing step progression');
+        // 
 
         // Return early to prevent step progression
         return false;
@@ -5705,7 +5705,7 @@ class _FaceRegistrationFullScreenState
 
       return true; // Success
     } catch (e) {
-      print('Error capturing with native features: $e');
+      // 
       return false; // Failure
     } finally {
       if (mounted) {
@@ -5735,18 +5735,18 @@ class _FaceRegistrationFullScreenState
         await Future.delayed(const Duration(milliseconds: 100));
       }
     } catch (e) {
-      print('Native optimization failed: $e');
+      // 
     }
   }
 
   // DEBUG face detection for full-screen mode
   Future<void> _processImageWithNativeFeatures(CameraImage image) async {
     try {
-      print('🖼️ Fullscreen processing: ${image.width}x${image.height}');
+      // 
 
       final inputImage = _convertCameraImage(image);
       if (inputImage == null) {
-        print('❌ Failed to convert image in fullscreen!');
+        // 
         _isDetecting = false;
         return;
       }
@@ -5754,20 +5754,20 @@ class _FaceRegistrationFullScreenState
       final List<Face> faces = await widget.faceDetector.processImage(
         inputImage,
       );
-      print('👥 Fullscreen found ${faces.length} faces');
+      // 
 
       if (mounted) {
         setState(() {
           _detectedFace = faces.isNotEmpty ? faces.first : null;
 
           if (_detectedFace != null) {
-            print('✅ FULLSCREEN FACE DETECTED!');
+            // 
             _checkStepCompletion();
           }
         });
       }
     } catch (e) {
-      print('💥 Fullscreen face detection ERROR: $e');
+      // 
     } finally {
       _isDetecting = false;
     }
@@ -5798,7 +5798,7 @@ class _FaceRegistrationFullScreenState
   // DEBUG camera image conversion for full-screen
   InputImage? _convertCameraImage(CameraImage image) {
     try {
-      print('🔄 Fullscreen converting: ${image.format.group}');
+      // 
 
       final WriteBuffer allBytes = WriteBuffer();
       for (final Plane plane in image.planes) {
@@ -5834,7 +5834,7 @@ class _FaceRegistrationFullScreenState
         ),
       );
     } catch (e) {
-      print('💥 Fullscreen conversion error: $e');
+      // 
       return null;
     }
   }
@@ -5855,47 +5855,47 @@ class _FaceRegistrationFullScreenState
   // Check if current step is completed
   void _checkStepCompletion() {
     if (_detectedFace == null) {
-      print('❌ No face detected for step completion check');
+      // 
       return;
     }
 
-    print('🔍 Checking step ${_currentStep + 1} completion...');
+    // 
     bool stepCompleted = false;
 
     switch (_currentStep) {
       case 0:
-        print('📋 Step 1: Look straight ahead');
+        // 
         stepCompleted = _isLookingStraight();
         break;
       case 1:
-        print('📋 Step 2: Look up');
+        // 
         stepCompleted = _isLookingUp();
         break;
       case 2:
-        print('📋 Step 3: Look down');
+        // 
         stepCompleted = _isLookingDown();
         break;
       case 3:
-        print('📋 Step 4: Look left');
+        // 
         stepCompleted = _isLookingLeft();
         break;
       case 4:
-        print('📋 Step 5: Look right');
+        // 
         stepCompleted = _isLookingRight();
         break;
       case 5:
-        print('📋 Step 6: Blink eyes');
+        // 
         stepCompleted = _isBlinking();
         break;
       case 6:
-        print('📋 Step 7: Smile');
+        // 
         stepCompleted = _isSmiling();
         break;
     }
 
-    print('📊 Step completion result: $stepCompleted');
-    print('📊 Already completed: ${_completedSteps.contains(_currentStep)}');
-    print('📊 Capture enabled: $_captureEnabled');
+    // 
+    // 
+    // 
 
     // AUTOMATIC CAPTURE when angle is correct
     if (!_completedSteps.contains(_currentStep) &&
@@ -5911,9 +5911,9 @@ class _FaceRegistrationFullScreenState
         print(
           '✅ PERFECT ANGLE DETECTED! Auto-capturing Step ${_currentStep + 1}',
         );
-        print('🔍 Current step: $_currentStep');
-        print('🔍 Total steps: ${_registrationSteps.length}');
-        print('🔍 Completed steps: ${_completedSteps.length}');
+        // 
+        // 
+        // 
 
         // Disable further captures
         _captureEnabled = false;
@@ -5945,7 +5945,7 @@ class _FaceRegistrationFullScreenState
               }
             })
             .catchError((error) {
-              print('❌ Step ${_currentStep + 1} auto-capture failed: $error');
+              // 
 
               // Re-enable capture for retry
               setState(() {
@@ -5956,7 +5956,7 @@ class _FaceRegistrationFullScreenState
       }
     } else if (_detectedFace != null && !stepCompleted) {
       _faceDetectedFrames = 0;
-      print('📐 Face detected but angle needs adjustment');
+      // 
     } else if (_detectedFace != null && stepCompleted) {
       print(
         '✅ Face detected with correct angle - Ready for capture (auto or manual)',
@@ -5977,11 +5977,11 @@ class _FaceRegistrationFullScreenState
 
       // Only print if status changed
       if (_lastDebugStatus.toString() != currentStatus.toString()) {
-        print('🔍 DEBUG STATUS:');
-        print('   - Face detected: ✅');
-        print('   - Step completed: ${stepCompleted ? "✅" : "❌"}');
-        print('   - High quality: ✅ (bypassed for testing)');
-        print('   - Face frames: $_faceDetectedFrames/3');
+        // 
+        // 
+        // 
+        // 
+        // 
         print('   - Face size: ${currentStatus['faceSize']}');
         print('   - Head angles: ${currentStatus['headAngles']}');
         _lastDebugStatus = currentStatus;
@@ -6006,47 +6006,47 @@ class _FaceRegistrationFullScreenState
         headEulerAngleY!.abs() < 45 &&
         headEulerAngleZ!.abs() < 50;
 
-    print('🔍 Looking straight: $isStable');
+    // 
     return isStable;
   }
 
   bool _isLookingUp() {
     if (_detectedFace == null) return false;
     final headEulerAngleX = _detectedFace!.headEulerAngleX;
-    print('🔍 Up check - X: $headEulerAngleX (need < -2)');
+    // 
     bool isUp =
         headEulerAngleX! < -2; // Super relaxed - just tilt head slightly up
-    print('🔍 Looking up: $isUp');
+    // 
     return isUp;
   }
 
   bool _isLookingDown() {
     if (_detectedFace == null) return false;
     final headEulerAngleX = _detectedFace!.headEulerAngleX;
-    print('🔍 Down check - X: $headEulerAngleX (need > 2)');
+    // 
     bool isDown =
         headEulerAngleX! > 2; // Super relaxed - just tilt head slightly down
-    print('🔍 Looking down: $isDown');
+    // 
     return isDown;
   }
 
   bool _isLookingLeft() {
     if (_detectedFace == null) return false;
     final headEulerAngleY = _detectedFace!.headEulerAngleY;
-    print('🔍 Left check - Y: $headEulerAngleY (need < -5)');
+    // 
     bool isLeft =
         headEulerAngleY! < -5; // Super relaxed - just turn head slightly left
-    print('🔍 Looking left: $isLeft');
+    // 
     return isLeft;
   }
 
   bool _isLookingRight() {
     if (_detectedFace == null) return false;
     final headEulerAngleY = _detectedFace!.headEulerAngleY;
-    print('🔍 Right check - Y: $headEulerAngleY (need > 5)');
+    // 
     bool isRight =
         headEulerAngleY! > 5; // Super relaxed - just turn head slightly right
-    print('🔍 Looking right: $isRight');
+    // 
     return isRight;
   }
 
@@ -6104,7 +6104,7 @@ class _FaceRegistrationFullScreenState
 
   bool _isSmiling() {
     if (_detectedFace == null) {
-      print('😊 Fullscreen Smile check: NO FACE DETECTED');
+      // 
       return false;
     }
 
@@ -6117,10 +6117,10 @@ class _FaceRegistrationFullScreenState
 
       if (smilingProbability > 0.1) {
         // Super lenient - just 10% smile
-        print('😊 FULLSCREEN SMILE DETECTED! Auto capturing...');
+        // 
         return true;
       } else {
-        print('😊 Fullscreen Not smiling enough - keep smiling!');
+        // 
         return false;
       }
     } else {
@@ -6341,9 +6341,9 @@ class _FaceRegistrationFullScreenState
       final dataJson = jsonEncode(_capturedData);
       await prefs.setString('face_registration_$userId', dataJson);
 
-      print('💾 Registration data saved to persistent storage');
+      // 
     } catch (e) {
-      print('❌ Error saving registration data: $e');
+      // 
     }
   }
 
@@ -6357,15 +6357,15 @@ class _FaceRegistrationFullScreenState
       _cloudinaryUrls.clear();
       _capturedPhotos.clear();
 
-      print('🗑️ All registration data cleared');
+      // 
     } catch (e) {
-      print('❌ Failed to clear registration data: $e');
+      // 
     }
   }
 
   void _printRegistrationSummary() {
-    print('📊 REGISTRATION DATA SUMMARY:');
-    print('   📸 Total steps captured: ${_capturedData.length}');
+    // 
+    // 
 
     _capturedData.forEach((step, data) {
       print('   Step ${data['step_number']}: ${data['step_name']}');

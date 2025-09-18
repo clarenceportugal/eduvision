@@ -5,11 +5,11 @@ class DatabaseVerification {
   static Future<Map<String, dynamic>> verifyAllConnections() async {
     final results = <String, dynamic>{};
     
-    print('🔍 Starting comprehensive database verification...');
+    // 
     
     try {
       // Test 1: Superadmin User Counts
-      print('📊 Testing Superadmin User Counts API...');
+      // 
       final userCountsResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/user-counts'),
         headers: {'Accept': 'application/json'},
@@ -23,7 +23,7 @@ class DatabaseVerification {
       };
       
       // Test 2: Colleges API
-      print('🏫 Testing Colleges API...');
+      // 
       final collegesResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/colleges'),
         headers: {'Accept': 'application/json'},
@@ -37,7 +37,7 @@ class DatabaseVerification {
       };
       
       // Test 3: Dean List API
-      print('👨‍💼 Testing Dean List API...');
+      // 
       final deanListResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/dean'),
         headers: {'Accept': 'application/json'},
@@ -51,7 +51,7 @@ class DatabaseVerification {
       };
       
       // Test 4: Instructor List API
-      print('👨‍🏫 Testing Instructor List API...');
+      // 
       final instructorListResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/instructorinfo-only'),
         headers: {'Accept': 'application/json'},
@@ -65,7 +65,7 @@ class DatabaseVerification {
       };
       
       // Test 5: Program Chair List API
-      print('👩‍💼 Testing Program Chair List API...');
+      // 
       final programChairListResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/programchairinfo-only'),
         headers: {'Accept': 'application/json'},
@@ -79,7 +79,7 @@ class DatabaseVerification {
       };
       
       // Test 6: Schedules API
-      print('📅 Testing Schedules API...');
+      // 
       final schedulesResponse = await http.post(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/all-schedules/today'),
         headers: {
@@ -97,7 +97,7 @@ class DatabaseVerification {
       };
       
       // Test 7: Faculty Logs API
-      print('📝 Testing Faculty Logs API...');
+      // 
       final facultyLogsResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/logs/all-faculties/today?courseName=ALL'),
         headers: {'Accept': 'application/json'},
@@ -111,7 +111,7 @@ class DatabaseVerification {
       };
       
       // Test 8: Rooms API
-      print('🏠 Testing Rooms API...');
+      // 
       final roomsResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/all-rooms/college?CollegeName=ALL'),
         headers: {'Accept': 'application/json'},
@@ -125,7 +125,7 @@ class DatabaseVerification {
       };
       
       // Test 9: Pending Faculty API
-      print('⏳ Testing Pending Faculty API...');
+      // 
       final pendingFacultyResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/initial-staff?collegeName=ALL'),
         headers: {'Accept': 'application/json'},
@@ -139,7 +139,7 @@ class DatabaseVerification {
       };
       
       // Test 10: Faculty Management API (Add/Delete)
-      print('➕ Testing Faculty Management API...');
+      // 
       final facultyManagementResponse = await http.post(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/faculty'),
         headers: {
@@ -173,9 +173,9 @@ class DatabaseVerification {
   }
   
   static void printVerificationResults(Map<String, dynamic> results) {
-    print('\n🔍 === DATABASE VERIFICATION RESULTS ===');
-    print('📅 Timestamp: ${DateTime.now().toIso8601String()}');
-    print('');
+    // 
+    // 
+    // 
     
     int successCount = 0;
     int totalCount = 0;
@@ -193,27 +193,27 @@ class DatabaseVerification {
       
       if (success) {
         successCount++;
-        print('✅ $key: SUCCESS (${status}) - Data: ${data != null ? '${data.length} items' : 'No data'}');
+        print('✅ $key: SUCCESS ($status) - Data: ${data != null ? '${data.length} items' : 'No data'}');
       } else {
-        print('❌ $key: FAILED (${status}) - ${data != null ? 'Error in data' : 'No response data'}');
+        print('❌ $key: FAILED ($status) - ${data != null ? 'Error in data' : 'No response data'}');
       }
     });
     
-    print('');
-    print('📊 SUMMARY:');
-    print('   ✅ Successful: $successCount/$totalCount');
-    print('   ❌ Failed: ${totalCount - successCount}/$totalCount');
-    print('   📈 Success Rate: ${((successCount / totalCount) * 100).toStringAsFixed(1)}%');
+    // 
+    // 
+    // 
+    // 
+    // 
     
     if (successCount == totalCount) {
-      print('🎉 ALL DATABASE CONNECTIONS ARE WORKING PERFECTLY!');
+      // 
     } else if (successCount > totalCount * 0.8) {
-      print('⚠️  Most connections are working, but some issues detected.');
+      // 
     } else {
-      print('🚨 Multiple database connection issues detected!');
+      // 
     }
     
-    print('==========================================\n');
+    // 
   }
   
   static Future<bool> isDatabaseHealthy() async {
@@ -230,7 +230,7 @@ class DatabaseVerification {
       
       return successCount >= totalCount * 0.8; // 80% success rate threshold
     } catch (e) {
-      print('❌ Database health check failed: $e');
+      // 
       return false;
     }
   }

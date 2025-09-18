@@ -227,7 +227,7 @@ class _SuperadminMainState extends State<SuperadminMain> {
   void _handleNavigation(String path) {
     // This would typically use Navigator or a routing solution
     // For now, we'll just print the path
-    print('Navigate to: $path');
+    // 
     
     // You can implement actual navigation here based on your routing setup
     // Example:

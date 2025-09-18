@@ -7,7 +7,7 @@ class ApiTest {
     
     try {
       // Test 1: Schedules API
-      print('Testing Schedules API...');
+      // 
       final shortCourseName = courseName.replaceAll(RegExp(r'^bs', caseSensitive: false), '').toUpperCase();
       final schedulesResponse = await http.post(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/all-schedules/today'),
@@ -25,7 +25,7 @@ class ApiTest {
       };
       
       // Test 2: Instructor Count API
-      print('Testing Instructor Count API...');
+      // 
       final instructorCountResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/count/instructors?course=$courseName'),
         headers: {'Accept': 'application/json'},
@@ -38,7 +38,7 @@ class ApiTest {
       };
       
       // Test 3: Schedules Count Today API
-      print('Testing Schedules Count Today API...');
+      // 
       final schedulesCountResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/schedules-count/today?course=$courseName'),
         headers: {'Accept': 'application/json'},
@@ -51,7 +51,7 @@ class ApiTest {
       };
       
       // Test 4: Faculty Logs API
-      print('Testing Faculty Logs API...');
+      // 
       final facultyLogsResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/logs/all-faculties/today?courseName=$courseName'),
         headers: {'Accept': 'application/json'},
@@ -64,7 +64,7 @@ class ApiTest {
       };
       
       // Test 5: Faculty List API
-      print('Testing Faculty List API...');
+      // 
       final facultyListResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/faculty?course=$courseName'),
         headers: {'Accept': 'application/json'},
@@ -77,7 +77,7 @@ class ApiTest {
       };
       
       // Test 6: Pending Faculty API
-      print('Testing Pending Faculty API...');
+      // 
       final pendingFacultyResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/initial-faculty?courseName=$courseName'),
         headers: {'Accept': 'application/json'},
@@ -90,7 +90,7 @@ class ApiTest {
       };
       
       // Test 7: Daily Report API
-      print('Testing Daily Report API...');
+      // 
       final dailyReportResponse = await http.post(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/show-daily-report'),
         headers: {
@@ -118,7 +118,7 @@ class ApiTest {
     
     try {
       // Test 1: User Counts API
-      print('Testing User Counts API...');
+      // 
       final userCountsResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/user-counts'),
         headers: {'Accept': 'application/json'},
@@ -131,7 +131,7 @@ class ApiTest {
       };
       
       // Test 2: Colleges API
-      print('Testing Colleges API...');
+      // 
       final collegesResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/colleges'),
         headers: {'Accept': 'application/json'},
@@ -144,7 +144,7 @@ class ApiTest {
       };
       
       // Test 3: Rooms API
-      print('Testing Rooms API...');
+      // 
       final roomsResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/all-rooms/college?CollegeName=$collegeName'),
         headers: {'Accept': 'application/json'},
@@ -157,7 +157,7 @@ class ApiTest {
       };
       
       // Test 4: Schedules API
-      print('Testing Schedules API...');
+      // 
       final schedulesResponse = await http.post(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/all-schedules/today'),
         headers: {
@@ -174,7 +174,7 @@ class ApiTest {
       };
       
       // Test 5: Faculty Logs API
-      print('Testing Faculty Logs API...');
+      // 
       final facultyLogsResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/logs/all-faculties/today?courseName=ALL'),
         headers: {'Accept': 'application/json'},
@@ -187,7 +187,7 @@ class ApiTest {
       };
       
       // Test 6: Dean List API
-      print('Testing Dean List API...');
+      // 
       final deanListResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/dean'),
         headers: {'Accept': 'application/json'},
@@ -200,7 +200,7 @@ class ApiTest {
       };
       
       // Test 7: Instructor List API
-      print('Testing Instructor List API...');
+      // 
       final instructorListResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/instructorinfo-only'),
         headers: {'Accept': 'application/json'},
@@ -213,7 +213,7 @@ class ApiTest {
       };
       
       // Test 8: Program Chair List API
-      print('Testing Program Chair List API...');
+      // 
       final programChairListResponse = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/programchairinfo-only'),
         headers: {'Accept': 'application/json'},
@@ -233,11 +233,11 @@ class ApiTest {
   }
   
   static void printTestResults(Map<String, dynamic> results) {
-    print('\n=== API CONNECTION TEST RESULTS ===');
+    // 
     
     results.forEach((key, value) {
       if (key == 'error') {
-        print('❌ ERROR: $value');
+        // 
         return;
       }
       
@@ -246,17 +246,17 @@ class ApiTest {
       final data = value['data'];
       
       if (success) {
-        print('✅ $key: SUCCESS (Status: $status)');
+        // 
         if (data is List) {
-          print('   Data count: ${data.length}');
+          // 
         } else if (data is Map) {
-          print('   Data keys: ${data.keys.toList()}');
+          // 
         }
       } else {
-        print('❌ $key: FAILED (Status: $status)');
+        // 
       }
     });
     
-    print('=====================================\n');
+    // 
   }
 }

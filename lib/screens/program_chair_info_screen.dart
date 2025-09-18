@@ -113,15 +113,15 @@ class _ProgramChairInfoScreenState extends State<ProgramChairInfoScreen>
     if (!mounted) return;
     
     try {
-      print('Fetching program chair info...');
+      // 
       
       final response = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/programchairinfo-only'),
         headers: {'Accept': 'application/json'},
       ).timeout(const Duration(seconds: 15));
 
-      print('Program Chair Info API Response Status: ${response.statusCode}');
-      print('Program Chair Info API Response Body: ${response.body}');
+      // 
+      // 
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -139,16 +139,16 @@ class _ProgramChairInfoScreenState extends State<ProgramChairInfoScreen>
             
             colleges = [
               {'_id': 'all', 'code': 'All', 'name': 'All Colleges'},
-              ...collegeMap.values.toList(),
+              ...collegeMap.values,
             ];
           });
-          print('Successfully loaded ${programChairInfo.length} program chairs');
+          // 
         }
       } else {
-        print('Failed to fetch program chair info: ${response.statusCode}');
+        // 
       }
     } catch (e) {
-      print('Error fetching program chair info: $e');
+      // 
       if (mounted) {
         setState(() {
           error = 'Failed to fetch program chair info';
@@ -258,7 +258,7 @@ class _ProgramChairInfoScreenState extends State<ProgramChairInfoScreen>
             ),
             onChanged: (value) {
               // Implement search functionality
-              print('Search: $value');
+              // 
             },
           ),
         ),
@@ -266,7 +266,7 @@ class _ProgramChairInfoScreenState extends State<ProgramChairInfoScreen>
         ElevatedButton.icon(
           onPressed: () {
             // Handle add program chairperson
-            print('Add Program Chairperson clicked');
+            // 
           },
           icon: const Icon(Icons.add_rounded),
           label: const Text('Add Program Chairperson'),

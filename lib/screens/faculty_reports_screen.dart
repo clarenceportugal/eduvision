@@ -81,7 +81,7 @@ class _FacultyReportsScreenState extends State<FacultyReportsScreen>
         courseName = prefs.getString('course') ?? '';
       });
     } catch (e) {
-      print('Error loading user data: $e');
+      // 
     }
   }
 
@@ -130,7 +130,7 @@ class _FacultyReportsScreenState extends State<FacultyReportsScreen>
     try {
       _showLoadingDialog('Generating Report', 'Please wait while we generate your report...');
 
-      print('Generating report for course: $courseName');
+      // 
 
       final response = await http.post(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/generate-monthly-report'),
@@ -141,8 +141,8 @@ class _FacultyReportsScreenState extends State<FacultyReportsScreen>
         body: jsonEncode({'CourseName': courseName}),
       ).timeout(const Duration(seconds: 30));
 
-      print('Generate Report API Response Status: ${response.statusCode}');
-      print('Generate Report API Response Headers: ${response.headers}');
+      // 
+      // 
 
       Navigator.of(context).pop(); // Close loading dialog
 
@@ -152,19 +152,19 @@ class _FacultyReportsScreenState extends State<FacultyReportsScreen>
         final file = File('${directory.path}/DailyAttendanceReport_${DateTime.now().millisecondsSinceEpoch}.docx');
         await file.writeAsBytes(response.bodyBytes);
         
-        print('Report saved to: ${file.path}');
+        // 
         
         _showSuccessDialog(
           'Report Generated',
           'Daily attendance report has been downloaded successfully!\nSaved to: ${file.path}',
         );
       } else {
-        print('Failed to generate report: ${response.statusCode}');
+        // 
         _showErrorDialog('Error', 'Failed to generate report. Please try again.');
       }
     } catch (error) {
       Navigator.of(context).pop(); // Close loading dialog
-      print('Error generating report: $error');
+      // 
       _showErrorDialog('Error', 'Failed to generate report: $error');
     }
   }

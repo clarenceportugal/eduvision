@@ -165,10 +165,10 @@ class _LiveVideoScreenState extends State<LiveVideoScreen>
             color: const Color(0xFF333333),
           ),
         ),
-        Container(
+        SizedBox(
           width: 200,
           child: DropdownButtonFormField<String>(
-            value: selectedLab,
+            initialValue: selectedLab,
             decoration: InputDecoration(
               labelText: 'Select Lab',
               border: OutlineInputBorder(

@@ -41,7 +41,7 @@ class _DataManagementScreenState extends State<DataManagementScreen> {
         });
       }
     } catch (e) {
-      print('Error loading registration data: $e');
+      // 
       setState(() {
         _isLoading = false;
       });

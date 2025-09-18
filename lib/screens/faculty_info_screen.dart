@@ -79,14 +79,14 @@ class _FacultyInfoScreenState extends State<FacultyInfoScreen>
         collegeName = prefs.getString('college') ?? '';
       });
     } catch (e) {
-      print('Error loading user data: $e');
+      // 
     }
   }
 
   Future<void> _fetchFacultyList() async {
     setState(() => loading = true);
     try {
-      print('Fetching faculty list for course: $courseName');
+      // 
       
       final response = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/faculty?course=$courseName'),
@@ -96,21 +96,21 @@ class _FacultyInfoScreenState extends State<FacultyInfoScreen>
         },
       ).timeout(const Duration(seconds: 15));
 
-      print('Faculty List API Response Status: ${response.statusCode}');
-      print('Faculty List API Response Body: ${response.body}');
+      // 
+      // 
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
           facultyList = data is List ? data : [];
         });
-        print('Successfully loaded ${facultyList.length} faculty members');
+        // 
       } else {
-        print('Failed to fetch faculty list: ${response.statusCode}');
+        // 
         _showErrorDialog('Error', 'Failed to load faculty list. Please try again.');
       }
     } catch (error) {
-      print('Error fetching faculty list: $error');
+      // 
       _showErrorDialog('Error', 'Failed to load faculty list: $error');
     } finally {
       setState(() => loading = false);
@@ -177,8 +177,8 @@ class _FacultyInfoScreenState extends State<FacultyInfoScreen>
         body: jsonEncode(newFaculty),
       ).timeout(const Duration(seconds: 15));
 
-      print('Add Faculty API Response Status: ${response.statusCode}');
-      print('Add Faculty API Response Body: ${response.body}');
+      // 
+      // 
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final newFacultyData = jsonDecode(response.body);
@@ -192,7 +192,7 @@ class _FacultyInfoScreenState extends State<FacultyInfoScreen>
         _showErrorDialog('Error', errorData['message'] ?? 'Failed to add faculty account.');
       }
     } catch (error) {
-      print('Error adding faculty: $error');
+      // 
       _showErrorDialog('Error', 'Failed to add faculty account: $error');
     }
   }
@@ -205,7 +205,7 @@ class _FacultyInfoScreenState extends State<FacultyInfoScreen>
 
     if (confirmed == true) {
       try {
-        print('Deleting faculty with ID: $id');
+        // 
         
         final response = await http.delete(
           Uri.parse('https://eduvision-dura.onrender.com/api/auth/faculty/$id'),
@@ -214,8 +214,8 @@ class _FacultyInfoScreenState extends State<FacultyInfoScreen>
           },
         ).timeout(const Duration(seconds: 15));
 
-        print('Delete Faculty API Response Status: ${response.statusCode}');
-        print('Delete Faculty API Response Body: ${response.body}');
+        // 
+        // 
 
         if (response.statusCode == 200 || response.statusCode == 204) {
           setState(() {
@@ -226,7 +226,7 @@ class _FacultyInfoScreenState extends State<FacultyInfoScreen>
           _showErrorDialog('Error', 'Failed to delete faculty account.');
         }
       } catch (error) {
-        print('Error deleting faculty: $error');
+        // 
         _showErrorDialog('Error', 'Something went wrong! Unable to delete the account: $error');
       }
     }

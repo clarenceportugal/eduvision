@@ -28,19 +28,19 @@ class _TestCaptureScreenState extends State<TestCaptureScreen> {
   }
 
   Future<void> _initializeCamera() async {
-    print('🎥 Initializing camera for test...');
+    // 
     
     // Request camera permission
     final permission = await Permission.camera.request();
     if (permission != PermissionStatus.granted) {
-      print('❌ Camera permission denied');
+      // 
       return;
     }
 
     try {
       _cameras = await availableCameras();
       if (_cameras!.isEmpty) {
-        print('❌ No cameras available');
+        // 
         return;
       }
 
@@ -64,20 +64,20 @@ class _TestCaptureScreenState extends State<TestCaptureScreen> {
         });
       }
       
-      print('✅ Camera initialized successfully');
+      // 
     } catch (e) {
-      print('❌ Camera initialization failed: $e');
+      // 
     }
   }
 
   Future<void> _testCapture() async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
-      print('❌ Camera not ready');
+      // 
       return;
     }
 
     if (_isCapturing) {
-      print('❌ Already capturing');
+      // 
       return;
     }
 
@@ -86,11 +86,11 @@ class _TestCaptureScreenState extends State<TestCaptureScreen> {
     });
 
     try {
-      print('📸 Taking test photo...');
+      // 
       
       // Take the picture
       final XFile photo = await _cameraController!.takePicture();
-      print('✅ Photo taken: ${photo.path}');
+      // 
       
       setState(() {
         _lastCapturedPath = photo.path;
@@ -98,7 +98,7 @@ class _TestCaptureScreenState extends State<TestCaptureScreen> {
 
       // Test upload to Cloudinary
       if (widget.userData['_id'] != null) {
-        print('☁️ Testing Cloudinary upload...');
+        // 
         
         final uploadResult = await CloudinaryService.uploadFaceImage(
           userId: widget.userData['_id'],
@@ -107,7 +107,7 @@ class _TestCaptureScreenState extends State<TestCaptureScreen> {
         );
         
         if (uploadResult['success']) {
-          print('✅ Upload successful!');
+          // 
           setState(() {
             _lastUploadUrl = uploadResult['data']['image_url'];
           });
@@ -117,7 +117,7 @@ class _TestCaptureScreenState extends State<TestCaptureScreen> {
       }
       
     } catch (e) {
-      print('❌ Capture failed: $e');
+      // 
     } finally {
       setState(() {
         _isCapturing = false;

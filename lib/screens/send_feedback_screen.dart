@@ -484,7 +484,7 @@ class _SendFeedbackScreenState extends State<SendFeedbackScreen> {
         'platform': 'Flutter',
       };
 
-      print('Feedback submitted: $feedbackData');
+      // 
 
       // Show success message
       if (mounted) {

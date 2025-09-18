@@ -136,7 +136,7 @@ class FaceEmbeddingService {
       return embedding;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('❌ Error generating embedding from camera image: $e');
+        // Debug: 
       }
       return null;
     }
@@ -158,7 +158,7 @@ class FaceEmbeddingService {
     final height = bottom - top;
     
     if (kDebugMode) {
-      debugPrint('🖼️ Cropping face: ${width}x$height from ${fullImage.width}x${fullImage.height}');
+      // Debug: 
     }
     
     return img.copyCrop(fullImage, left, top, width, height);
@@ -193,7 +193,7 @@ class FaceEmbeddingService {
     }
     
     if (kDebugMode) {
-      debugPrint('📊 Preprocessed image to ${inputSize}x${inputSize}x3 normalized input');
+      // Debug: 
     }
     return input;
   }
@@ -298,7 +298,7 @@ class FaceEmbeddingService {
   bool areFacesMatching(List<double> embedding1, List<double> embedding2) {
     final similarity = calculateSimilarity(embedding1, embedding2);
     if (kDebugMode) {
-      debugPrint('🔍 Face similarity: ${(similarity * 100).toStringAsFixed(1)}% (threshold: ${(similarityThreshold * 100).toStringAsFixed(1)}%)');
+      // Debug: 
     }
     return similarity >= similarityThreshold;
   }
@@ -317,12 +317,12 @@ class FaceEmbeddingService {
       await prefs.setString('face_embedding_hash_$userId', hash);
       
       if (kDebugMode) {
-        debugPrint('✅ Saved face embedding for user: $userId');
+        // Debug: 
       }
       return true;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('❌ Error saving face embedding: $e');
+        // Debug: 
       }
       return false;
     }
@@ -337,7 +337,7 @@ class FaceEmbeddingService {
       
       if (embeddingString == null || savedHash == null) {
         if (kDebugMode) {
-          debugPrint('ℹ️ No face embedding found for user: $userId');
+          // Debug: 
         }
         return null;
       }
@@ -348,7 +348,7 @@ class FaceEmbeddingService {
       
       if (savedHash != computedHash) {
         if (kDebugMode) {
-          debugPrint('⚠️ Face embedding integrity check failed for user: $userId');
+          // Debug: 
         }
         return null;
       }
@@ -357,18 +357,18 @@ class FaceEmbeddingService {
       
       if (embedding.length != embeddingSize) {
         if (kDebugMode) {
-          debugPrint('⚠️ Invalid embedding size for user: $userId');
+          // Debug: 
         }
         return null;
       }
       
       if (kDebugMode) {
-        debugPrint('✅ Loaded face embedding for user: $userId');
+        // Debug: 
       }
       return embedding;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('❌ Error loading face embedding: $e');
+        // Debug: 
       }
       return null;
     }
@@ -382,12 +382,12 @@ class FaceEmbeddingService {
       await prefs.remove('face_embedding_hash_$userId');
       
       if (kDebugMode) {
-        debugPrint('✅ Deleted face embedding for user: $userId');
+        // Debug: 
       }
       return true;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('❌ Error deleting face embedding: $e');
+        // Debug: 
       }
       return false;
     }
@@ -400,7 +400,7 @@ class FaceEmbeddingService {
       final registeredEmbedding = await loadFaceEmbedding(userId);
       if (registeredEmbedding == null) {
         if (kDebugMode) {
-          debugPrint('❌ No registered face embedding found for user: $userId');
+          // Debug: 
         }
         return false;
       }
@@ -409,7 +409,7 @@ class FaceEmbeddingService {
       final currentEmbedding = await generateEmbedding(faceImageFile, detectedFace);
       if (currentEmbedding == null) {
         if (kDebugMode) {
-          debugPrint('❌ Failed to generate embedding from current face');
+          // Debug: 
         }
         return false;
       }
@@ -423,7 +423,7 @@ class FaceEmbeddingService {
       return isMatch;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('❌ Error in face verification: $e');
+        // Debug: 
       }
       return false;
     }
@@ -460,7 +460,7 @@ class FaceEmbeddingService {
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('❌ Error converting CameraImage: $e');
+        // Debug: 
       }
       return null;
     }

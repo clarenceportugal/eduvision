@@ -110,15 +110,15 @@ class _InstructorInfoScreenState extends State<InstructorInfoScreen>
     if (!mounted) return;
     
     try {
-      print('Fetching instructor info...');
+      // 
       
       final response = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/instructorinfo-only'),
         headers: {'Accept': 'application/json'},
       ).timeout(const Duration(seconds: 15));
 
-      print('Instructor Info API Response Status: ${response.statusCode}');
-      print('Instructor Info API Response Body: ${response.body}');
+      // 
+      // 
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -126,13 +126,13 @@ class _InstructorInfoScreenState extends State<InstructorInfoScreen>
           setState(() {
             instructorInfo = data is List ? data.cast<Map<String, dynamic>>() : [];
           });
-          print('Successfully loaded ${instructorInfo.length} instructors');
+          // 
         }
       } else {
-        print('Failed to fetch instructor info: ${response.statusCode}');
+        // 
       }
     } catch (e) {
-      print('Error fetching instructor info: $e');
+      // 
       if (mounted) {
         setState(() {
           error = 'Failed to fetch instructor info';
@@ -237,7 +237,7 @@ class _InstructorInfoScreenState extends State<InstructorInfoScreen>
             ),
             onChanged: (value) {
               // Implement search functionality
-              print('Search: $value');
+              // 
             },
           ),
         ),
@@ -245,7 +245,7 @@ class _InstructorInfoScreenState extends State<InstructorInfoScreen>
         ElevatedButton.icon(
           onPressed: () {
             // Handle add instructor
-            print('Add Instructor clicked');
+            // 
           },
           icon: const Icon(Icons.add_rounded),
           label: const Text('Add Instructor'),

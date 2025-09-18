@@ -15,12 +15,12 @@ class CloudinaryService {
     int? stepNumber,
   }) async {
     try {
-      print('🔍 CloudinaryService: Starting upload...');
-      print('🔍 User ID: $userId');
-      print('🔍 Image path: ${imageFile.path}');
-      print('🔍 Step Name: $stepName');
-      print('🔍 Step Number: $stepNumber');
-      print('🔍 Server URL: ${ServerConfig.serverUrl}');
+      // 
+      // 
+      // 
+      // 
+      // 
+      // 
 
       String fileName = imageFile.path.split('/').last;
 
@@ -58,8 +58,8 @@ class CloudinaryService {
         ),
       );
 
-      print('🔍 Response status: ${response.statusCode}');
-      print('🔍 Response data: ${response.data}');
+      // 
+      // 
 
       if (response.statusCode == 200) {
         return {'success': true, 'data': response.data};
@@ -70,8 +70,8 @@ class CloudinaryService {
         };
       }
     } catch (e) {
-      print('❌ Cloudinary upload error: $e');
-      print('❌ Error type: ${e.runtimeType}');
+      // 
+      // 
       return {'success': false, 'message': 'Upload failed: ${e.toString()}'};
     }
   }
@@ -121,8 +121,8 @@ class CloudinaryService {
         };
       }
     } catch (e) {
-      print('❌ Cloudinary upload error: $e');
-      print('❌ Error type: ${e.runtimeType}');
+      // 
+      // 
       return {'success': false, 'message': 'Upload failed: ${e.toString()}'};
     }
   }
@@ -202,7 +202,7 @@ class CloudinaryService {
         };
       }
     } catch (e) {
-      print('❌ Complete registration error: $e');
+      // 
       return {
         'success': false,
         'message': 'Error completing registration: ${e.toString()}',

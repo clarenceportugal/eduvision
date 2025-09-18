@@ -12,12 +12,9 @@ import 'screens/data_management_screen.dart';
 import 'screens/privacy_settings_screen.dart';
 import 'screens/help_center_screen.dart';
 import 'screens/send_feedback_screen.dart';
-import 'screens/superadmin_dashboard_screen.dart';
-import 'screens/dean_dashboard_screen.dart';
-import 'screens/program_chair_dashboard_screen.dart';
-import 'screens/superadmin_settings_screen.dart';
-import 'screens/dean_settings_screen.dart';
-import 'screens/program_chairperson_settings_screen.dart';
+import 'screens/superadmin/superadmin_dashboard_screen.dart';
+import 'screens/dean/dean_dashboard_screen.dart';
+import 'screens/program_chair/program_chair_dashboard_screen.dart';
 import 'test_capture_screen.dart';
 import 'widgets/animated_wave_background.dart';
 import 'utils/logger.dart';
@@ -899,12 +896,25 @@ class _LoginScreenState extends State<LoginScreen>
 
           // Navigate to main app screen after a short delay
           Future.delayed(const Duration(seconds: 2), () {
+            if (mounted) {
+              try {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (_) => MainNavigationScreen(userData: userData),
               ),
             );
+              } catch (e) {
+                print('Navigation error: $e');
+                // Show error message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Navigation error: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
           });
         }
       } else {
@@ -2026,61 +2036,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildInstructorSection(
-    BuildContext context,
-    String title,
-    IconData icon,
-    Color color,
-    Widget content,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [color.withValues(alpha: 0.08), color.withValues(alpha: 0.03)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: color, size: 24),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                title,
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          content,
-        ],
-      ),
-    );
-  }
 
   Widget _buildClassScheduleContent(BuildContext context) {
     final classes = [
@@ -3376,49 +3331,82 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   void initState() {
     super.initState();
+    try {
     _screens = _buildScreensBasedOnRole();
+    } catch (e) {
+      // Handle initialization error
+      _screens = [
+        Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error, size: 64, color: Colors.red),
+                SizedBox(height: 16),
+                Text('Error initializing dashboard: $e'),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => LoginScreen()),
+                    );
+                  },
+                  child: Text('Back to Login'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ];
+    }
   }
 
   List<Widget> _buildScreensBasedOnRole() {
     final String userRole =
         widget.userData['role']?.toString().toLowerCase() ?? 'instructor';
 
+    // Debug logging removed - issue fixed
+
     Widget dashboardScreen;
 
+    try {
     switch (userRole) {
       case 'superadmin':
-        dashboardScreen = SuperadminDashboardScreen(userData: widget.userData);
+          dashboardScreen = SuperadminDashboardScreen(userData: widget.userData);
         break;
       case 'dean':
         dashboardScreen = DeanDashboardScreen(userData: widget.userData);
         break;
       case 'programchairperson':
       case 'program chairperson':
-        dashboardScreen = ProgramChairDashboardScreen(
-          userData: widget.userData,
-        );
+        dashboardScreen = ProgramChairDashboardScreen(userData: widget.userData);
         break;
       case 'instructor':
       case 'instructors':
       default:
         dashboardScreen = DashboardScreen(userData: widget.userData);
         break;
+      }
+    } catch (e) {
+      print('Error creating dashboard for role $userRole: $e');
+      // Fallback to instructor dashboard
+      dashboardScreen = DashboardScreen(userData: widget.userData);
     }
 
     Widget settingsScreen;
 
     switch (userRole) {
       case 'superadmin':
-        settingsScreen = SuperAdminSettingsScreen(userData: widget.userData);
+        settingsScreen = SizedBox.shrink(); // Settings integrated into dashboard
         break;
       case 'dean':
-        settingsScreen = DeanSettingsScreen(userData: widget.userData);
+          // Settings now integrated into DeanDashboardScreen
+          settingsScreen = const SizedBox.shrink();
         break;
       case 'programchairperson':
       case 'program chairperson':
-        settingsScreen = ProgramChairpersonSettingsScreen(
-          userData: widget.userData,
-        );
+        settingsScreen = SizedBox.shrink(); // Settings integrated into dashboard
         break;
       case 'instructor':
       case 'instructors':
@@ -3449,92 +3437,86 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
-      bottomNavigationBar: Container(
+  Widget _buildBottomNavigationBar() {
+    return Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).colorScheme.surface,
-              Theme.of(
-                context,
-              ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
-            ],
-          ),
+        color: Theme.of(context).colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
             ),
           ],
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) {
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildBottomNavItem(Icons.dashboard_rounded, 'Dashboard', 0),
+              _buildBottomNavItem(Icons.settings_rounded, 'Settings', 1),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavItem(IconData icon, String label, int index) {
+    final isSelected = _currentIndex == index;
+    
+    return GestureDetector(
+      onTap: () {
             setState(() {
               _currentIndex = index;
             });
           },
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          unselectedItemColor: Theme.of(
-            context,
-          ).colorScheme.onSurface.withValues(alpha: 0.6),
-          selectedLabelStyle: GoogleFonts.inter(
-            fontWeight: FontWeight.w600,
-            fontSize: 12,
-          ),
-          unselectedLabelStyle: GoogleFonts.inter(
-            fontWeight: FontWeight.w500,
-            fontSize: 12,
-          ),
-          items: [
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: _currentIndex == 0
+          color: isSelected 
                       ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  _currentIndex == 0
-                      ? Icons.dashboard_rounded
-                      : Icons.dashboard_outlined,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isSelected 
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                   size: 24,
                 ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected 
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
-              label: _getDashboardLabel(),
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: _currentIndex == 1
-                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  _currentIndex == 1
-                      ? Icons.settings_rounded
-                      : Icons.settings_outlined,
-                  size: 24,
-                ),
-              ),
-              label: 'Settings',
             ),
           ],
         ),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String userRole = widget.userData['role']?.toString().toLowerCase() ?? 'instructor';
+    
+    return Scaffold(
+      body: IndexedStack(index: _currentIndex, children: _screens),
+      bottomNavigationBar: (userRole == 'instructor' || userRole == 'instructors') 
+          ? _buildBottomNavigationBar() 
+          : null, // MainLayout widgets handle their own navigation for other roles
     );
   }
 }
@@ -3820,7 +3802,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           ),
           IconButton(
             onPressed: () async {
-              final result = await Navigator.push(
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => EditProfileScreen(
@@ -5035,7 +5017,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () async {
-                  final result = await Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => EditProfileScreen(
@@ -5799,9 +5781,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen>
                       ),
                       // Day columns
                       ...days.asMap().entries.map((dayEntry) {
-                        final dayIndex = dayEntry.key;
-                        final day = dayEntry.value;
-                        final classData = scheduleData[day]?[timeSlot];
+                        final classData = scheduleData[dayEntry.value]?[timeSlot];
 
                         return Expanded(
                           child: Container(
@@ -6701,9 +6681,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                       ),
                       // Day cells
                       ...days.asMap().entries.map((dayEntry) {
-                        final dayIndex = dayEntry.key;
-                        final day = dayEntry.value;
-                        final attendance = attendanceData[weekIndex]?[dayIndex];
+                        final attendance = attendanceData[weekIndex]?[dayEntry.key];
 
                         return Expanded(
                           child: Container(
@@ -6959,7 +6937,6 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     final block = attendance['block'] as String;
     final time = attendance['time'] as String;
     final date = attendance['date'] as DateTime;
-    final formattedDate = attendance['formattedDate'] as String;
 
     showDialog(
       context: context,

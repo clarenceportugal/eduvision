@@ -179,7 +179,7 @@ class ProgramChairMain extends StatelessWidget {
         child: InkWell(
           onTap: () {
             // Handle navigation
-            print('Navigate to: $path');
+            // 
           },
           borderRadius: BorderRadius.circular(10),
           child: Container(

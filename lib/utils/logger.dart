@@ -9,19 +9,19 @@ class Logger {
 
   static void error(String message) {
     if (kDebugMode) {
-      debugPrint('ERROR: $message');
+      // Debug: 
     }
   }
 
   static void info(String message) {
     if (kDebugMode) {
-      debugPrint('INFO: $message');
+      // Debug: 
     }
   }
 
   static void warning(String message) {
     if (kDebugMode) {
-      debugPrint('WARNING: $message');
+      // Debug: 
     }
   }
 }

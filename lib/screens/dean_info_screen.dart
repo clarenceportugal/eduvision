@@ -137,15 +137,15 @@ class _DeanInfoScreenState extends State<DeanInfoScreen>
     if (!mounted) return;
     
     try {
-      print('Fetching colleges...');
+      // 
       
       final response = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/all-colleges'),
         headers: {'Accept': 'application/json'},
       ).timeout(const Duration(seconds: 15));
 
-      print('Colleges API Response Status: ${response.statusCode}');
-      print('Colleges API Response Body: ${response.body}');
+      // 
+      // 
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -153,13 +153,13 @@ class _DeanInfoScreenState extends State<DeanInfoScreen>
           setState(() {
             colleges = data is List ? data.cast<Map<String, dynamic>>() : [];
           });
-          print('Successfully loaded ${colleges.length} colleges');
+          // 
         }
       } else {
-        print('Failed to fetch colleges: ${response.statusCode}');
+        // 
       }
     } catch (error) {
-      print('Error fetching colleges: $error');
+      // 
     }
   }
 
@@ -167,15 +167,15 @@ class _DeanInfoScreenState extends State<DeanInfoScreen>
     if (!mounted) return;
     
     try {
-      print('Fetching deans...');
+      // 
       
       final response = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/dean'),
         headers: {'Accept': 'application/json'},
       ).timeout(const Duration(seconds: 15));
 
-      print('Deans API Response Status: ${response.statusCode}');
-      print('Deans API Response Body: ${response.body}');
+      // 
+      // 
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -183,13 +183,13 @@ class _DeanInfoScreenState extends State<DeanInfoScreen>
           setState(() {
             deans = data is List ? data.cast<Map<String, dynamic>>() : [];
           });
-          print('Successfully loaded ${deans.length} deans');
+          // 
         }
       } else {
-        print('Failed to fetch deans: ${response.statusCode}');
+        // 
       }
     } catch (e) {
-      print('Error fetching deans: $e');
+      // 
       if (mounted) {
         setState(() {
           error = 'Failed to fetch deans';
@@ -207,15 +207,15 @@ class _DeanInfoScreenState extends State<DeanInfoScreen>
 
     if (confirmed == true) {
       try {
-        print('Deleting dean: $id');
+        // 
         
         final response = await http.delete(
           Uri.parse('https://eduvision-dura.onrender.com/api/superadmin/faculty/$id'),
           headers: {'Accept': 'application/json'},
         ).timeout(const Duration(seconds: 15));
 
-        print('Delete Dean API Response Status: ${response.statusCode}');
-        print('Delete Dean API Response Body: ${response.body}');
+        // 
+        // 
 
         if (response.statusCode == 200) {
           if (mounted) {
@@ -229,7 +229,7 @@ class _DeanInfoScreenState extends State<DeanInfoScreen>
           _showErrorDialog('Error', errorData['message'] ?? 'An error occurred while deleting the dean.');
         }
     } catch (e) {
-      print('Error deleting dean: $e');
+      // 
       _showErrorDialog('Error', 'An error occurred while deleting the dean.');
     }
     }
@@ -336,7 +336,7 @@ class _DeanInfoScreenState extends State<DeanInfoScreen>
             ),
             onChanged: (value) {
               // Implement search functionality
-              print('Search: $value');
+              // 
             },
           ),
         ),

@@ -208,7 +208,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen>
         setState(() {
           _detectedFace = faces.isNotEmpty ? faces.first : null;
           if (_detectedFace != null) {
-            print('🔍 Face detected at: ${_detectedFace!.boundingBox}');
+            // 
           }
         });
       }

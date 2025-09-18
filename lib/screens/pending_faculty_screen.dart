@@ -75,14 +75,14 @@ class _PendingFacultyScreenState extends State<PendingFacultyScreen>
         courseName = prefs.getString('course') ?? '';
       });
     } catch (e) {
-      print('Error loading user data: $e');
+      // 
     }
   }
 
   Future<void> _fetchFacultyList() async {
     setState(() => loading = true);
     try {
-      print('Fetching pending faculty for course: $courseName');
+      // 
       
       final response = await http.get(
         Uri.parse('https://eduvision-dura.onrender.com/api/auth/initial-faculty?courseName=$courseName'),
@@ -91,21 +91,21 @@ class _PendingFacultyScreenState extends State<PendingFacultyScreen>
         },
       ).timeout(const Duration(seconds: 15));
 
-      print('Pending Faculty API Response Status: ${response.statusCode}');
-      print('Pending Faculty API Response Body: ${response.body}');
+      // 
+      // 
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
           facultyList = data is List ? data : [];
         });
-        print('Successfully loaded ${facultyList.length} pending faculty members');
+        // 
       } else {
-        print('Failed to fetch pending faculty: ${response.statusCode}');
+        // 
         _showErrorDialog('Error', 'Failed to load pending faculty list. Please try again.');
       }
     } catch (error) {
-      print('Error fetching pending faculty list: $error');
+      // 
       _showErrorDialog('Error', 'Failed to load pending faculty list: $error');
     } finally {
       setState(() => loading = false);
@@ -124,7 +124,7 @@ class _PendingFacultyScreenState extends State<PendingFacultyScreen>
       try {
         _showLoadingDialog('Processing...', 'Accepting faculty member...');
         
-        print('Approving faculty with ID: $facultyId');
+        // 
         
         final response = await http.put(
           Uri.parse('https://eduvision-dura.onrender.com/api/auth/approve-faculty/$facultyId'),
@@ -133,8 +133,8 @@ class _PendingFacultyScreenState extends State<PendingFacultyScreen>
           },
         ).timeout(const Duration(seconds: 15));
 
-        print('Approve Faculty API Response Status: ${response.statusCode}');
-        print('Approve Faculty API Response Body: ${response.body}');
+        // 
+        // 
 
         Navigator.of(context).pop(); // Close loading dialog
 
@@ -154,7 +154,7 @@ class _PendingFacultyScreenState extends State<PendingFacultyScreen>
         }
       } catch (error) {
         Navigator.of(context).pop(); // Close loading dialog
-        print('Error approving faculty: $error');
+        // 
         _showErrorDialog('Error', 'Failed to approve faculty: $error');
       }
     }
@@ -172,7 +172,7 @@ class _PendingFacultyScreenState extends State<PendingFacultyScreen>
       try {
         _showLoadingDialog('Processing...', 'Rejecting faculty member...');
         
-        print('Rejecting faculty with ID: $facultyId');
+        // 
         
         final response = await http.put(
           Uri.parse('https://eduvision-dura.onrender.com/api/auth/reject-faculty/$facultyId'),
@@ -181,8 +181,8 @@ class _PendingFacultyScreenState extends State<PendingFacultyScreen>
           },
         ).timeout(const Duration(seconds: 15));
 
-        print('Reject Faculty API Response Status: ${response.statusCode}');
-        print('Reject Faculty API Response Body: ${response.body}');
+        // 
+        // 
 
         Navigator.of(context).pop(); // Close loading dialog
 
@@ -202,7 +202,7 @@ class _PendingFacultyScreenState extends State<PendingFacultyScreen>
         }
       } catch (error) {
         Navigator.of(context).pop(); // Close loading dialog
-        print('Error rejecting faculty: $error');
+        // 
         _showErrorDialog('Error', 'Failed to reject faculty: $error');
       }
     }
