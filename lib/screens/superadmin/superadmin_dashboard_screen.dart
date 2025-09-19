@@ -952,13 +952,66 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       );
     }
 
-    return ListView.builder(
+    // Group users by role
+    final Map<String, List<dynamic>> groupedUsers = {
+      'Deans': [],
+      'Instructors': [],
+      'Program Chairs': [],
+      'Superadmins': [],
+      'Others': [],
+    };
+
+    for (final user in allUsersList) {
+      String role = _getUserRole(user);
+      if (groupedUsers.containsKey(role)) {
+        groupedUsers[role]!.add(user);
+      } else {
+        groupedUsers['Others']!.add(user);
+      }
+    }
+
+    return ListView(
       padding: const EdgeInsets.all(16),
-      itemCount: allUsersList.length,
-      itemBuilder: (context, index) {
-        final user = allUsersList[index];
-        return _buildUserCard(user, index);
-      },
+      children: [
+        // Deans Section
+        if (groupedUsers['Deans']!.isNotEmpty) ...[
+          _buildRoleSectionHeader('Deans', Icons.admin_panel_settings_rounded, groupedUsers['Deans']!.length),
+          const SizedBox(height: 8),
+          ...groupedUsers['Deans']!.map((user) => _buildUserCard(user, 0)).toList(),
+          const SizedBox(height: 24),
+        ],
+        
+        // Instructors Section
+        if (groupedUsers['Instructors']!.isNotEmpty) ...[
+          _buildRoleSectionHeader('Instructors', Icons.person_rounded, groupedUsers['Instructors']!.length),
+          const SizedBox(height: 8),
+          ...groupedUsers['Instructors']!.map((user) => _buildUserCard(user, 0)).toList(),
+          const SizedBox(height: 24),
+        ],
+        
+        // Program Chairs Section
+        if (groupedUsers['Program Chairs']!.isNotEmpty) ...[
+          _buildRoleSectionHeader('Program Chairs', Icons.school_rounded, groupedUsers['Program Chairs']!.length),
+          const SizedBox(height: 8),
+          ...groupedUsers['Program Chairs']!.map((user) => _buildUserCard(user, 0)).toList(),
+          const SizedBox(height: 24),
+        ],
+        
+        // Superadmins Section
+        if (groupedUsers['Superadmins']!.isNotEmpty) ...[
+          _buildRoleSectionHeader('Superadmins', Icons.admin_panel_settings_rounded, groupedUsers['Superadmins']!.length),
+          const SizedBox(height: 8),
+          ...groupedUsers['Superadmins']!.map((user) => _buildUserCard(user, 0)).toList(),
+          const SizedBox(height: 24),
+        ],
+        
+        // Others Section
+        if (groupedUsers['Others']!.isNotEmpty) ...[
+          _buildRoleSectionHeader('Others', Icons.help_rounded, groupedUsers['Others']!.length),
+          const SizedBox(height: 8),
+          ...groupedUsers['Others']!.map((user) => _buildUserCard(user, 0)).toList(),
+        ],
+      ],
     );
   }
 
@@ -1076,26 +1129,82 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     );
   }
 
-  Widget _buildUserCard(Map<String, dynamic> user, int index) {
-    // Determine user role and icon
-    String role = 'Unknown';
-    IconData roleIcon = Icons.person_rounded;
-    
+  String _getUserRole(Map<String, dynamic> user) {
     if (user['role'] == 'dean' || user['userRole'] == 'dean' || user['type'] == 'dean' || 
         user['username'] == 'dean' || user['email']?.toString().contains('dean') == true) {
-      role = 'Dean';
-      roleIcon = Icons.admin_panel_settings_rounded;
+      return 'Deans';
     } else if (user['role'] == 'instructor' || user['userRole'] == 'instructor' || user['type'] == 'instructor' || 
                user['username'] == 'instructor' || user['email']?.toString().contains('instructor') == true) {
-      role = 'Instructor';
-      roleIcon = Icons.person_rounded;
+      return 'Instructors';
     } else if (user['role'] == 'programChairperson' || user['userRole'] == 'programChairperson' || user['type'] == 'programChairperson' || 
                user['username'] == 'programchair' || user['email']?.toString().contains('program') == true || 
                user['email']?.toString().contains('chair') == true) {
-      role = 'Program Chair';
-      roleIcon = Icons.school_rounded;
+      return 'Program Chairs';
     } else if (user['role'] == 'superadmin' || user['userRole'] == 'superadmin' || user['type'] == 'superadmin') {
-      role = 'Superadmin';
+      return 'Superadmins';
+    }
+    return 'Others';
+  }
+
+  Widget _buildRoleSectionHeader(String title, IconData icon, int count) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: Theme.of(context).colorScheme.primary,
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              count.toString(),
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUserCard(Map<String, dynamic> user, int index) {
+    // Determine user role and icon
+    String role = _getUserRole(user);
+    IconData roleIcon = Icons.person_rounded;
+    
+    if (role == 'Deans') {
+      roleIcon = Icons.admin_panel_settings_rounded;
+    } else if (role == 'Instructors') {
+      roleIcon = Icons.person_rounded;
+    } else if (role == 'Program Chairs') {
+      roleIcon = Icons.school_rounded;
+    } else if (role == 'Superadmins') {
       roleIcon = Icons.admin_panel_settings_rounded;
     }
 
@@ -1160,7 +1269,10 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        role,
+                        role == 'Deans' ? 'Dean' : 
+                        role == 'Instructors' ? 'Instructor' :
+                        role == 'Program Chairs' ? 'Program Chair' :
+                        role == 'Superadmins' ? 'Superadmin' : 'Unknown',
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
