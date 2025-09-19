@@ -397,6 +397,27 @@ app.get('/api/debug-users', async (req, res) => {
   }
 });
 
+// Superadmin endpoint to get all users for dashboard
+app.get('/api/superadmin/all-users', async (req, res) => {
+  try {
+    const users = await db.collection(COLLECTION_NAME).find({}).toArray();
+    
+    res.json({
+      success: true,
+      count: users.length,
+      users: users,
+      message: 'All users fetched successfully for superadmin dashboard'
+    });
+    
+  } catch (error) {
+    console.error('Superadmin all users error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch users for superadmin dashboard'
+    });
+  }
+});
+
 // Face image upload endpoint - supports multiple angles
 app.post('/api/upload-face', upload.single('face_image'), async (req, res) => {
   try {

@@ -535,7 +535,7 @@ class ApiService {
     try {
       final response = await _makeRequest(
       method: 'GET',
-        endpoint: '/debug-users',
+        endpoint: '/superadmin/all-users',
       );
       // Debug: Print the response structure
       print('Debug users response: $response');
