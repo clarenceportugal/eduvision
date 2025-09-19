@@ -55,13 +55,15 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   bool loadingColleges = false;
 
   // New state variables for consolidated screens
-  List<dynamic> allUsersList = [];
   List<dynamic> deansList = [];
   List<dynamic> instructorsList = [];
   List<dynamic> programChairsList = [];
   List<dynamic> pendingDeans = [];
   List<dynamic> pendingInstructors = [];
   List<dynamic> pendingProgramChairs = [];
+  List<dynamic> allUsersList = [];
+  bool allUsersLoading = false;
+  String? allUsersErrorMessage;
   bool isLive = false;
   String? streamUrl;
   String? streamKey;
@@ -80,7 +82,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 10, vsync: this);
+    _tabController = TabController(length: 10, vsync: this); // Updated length for new tab
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
         setState(() {
@@ -166,7 +168,9 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         _fetchRooms(),
         _fetchSchedules(),
         _fetchAllFacultiesLogs(),
-        _fetchAllUsers(), // This will populate all user lists
+        _fetchDeansList(),
+        _fetchInstructorsList(),
+        _fetchProgramChairsList(),
         _fetchPendingDeans(),
         _fetchPendingInstructors(),
         _fetchPendingProgramChairs(),
@@ -291,51 +295,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     }
   }
 
-  Future<void> _fetchAllUsers() async {
-    if (!mounted) return;
-    
-    try {
-      final data = await ApiService.getAllUsers();
-      if (mounted) {
-        setState(() {
-          allUsersList = data;
-          // Also populate the individual lists for backward compatibility
-          deansList = data.where((user) => 
-            user['role'] == 'dean' || 
-            user['userRole'] == 'dean' || 
-            user['type'] == 'dean' ||
-            user['username'] == 'dean' ||
-            user['email']?.toString().contains('dean') == true
-          ).toList();
-          instructorsList = data.where((user) => 
-            user['role'] == 'instructor' || 
-            user['userRole'] == 'instructor' || 
-            user['type'] == 'instructor' ||
-            user['username'] == 'instructor' ||
-            user['email']?.toString().contains('instructor') == true
-          ).toList();
-          programChairsList = data.where((user) => 
-            user['role'] == 'programChairperson' || 
-            user['userRole'] == 'programChairperson' || 
-            user['type'] == 'programChairperson' ||
-            user['username'] == 'programchair' ||
-            user['email']?.toString().contains('program') == true ||
-            user['email']?.toString().contains('chair') == true
-          ).toList();
-        });
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          allUsersList = [];
-          deansList = [];
-          instructorsList = [];
-          programChairsList = [];
-        });
-      }
-    }
-  }
-
   Future<void> _fetchDeansList() async {
     if (!mounted) return;
     
@@ -388,6 +347,33 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       if (mounted) {
         setState(() {
           programChairsList = [];
+        });
+      }
+    }
+  }
+
+  Future<void> _loadAllUsers() async {
+    if (!mounted) return;
+    
+    setState(() {
+      allUsersLoading = true;
+      allUsersErrorMessage = null;
+    });
+    
+    try {
+      final data = await ApiService.getAllUsers();
+      if (mounted) {
+        setState(() {
+          allUsersList = data;
+          allUsersLoading = false;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          allUsersList = [];
+          allUsersLoading = false;
+          allUsersErrorMessage = 'Failed to load users: ${error.toString()}';
         });
       }
     }
@@ -539,10 +525,13 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       case 6: // Pending Program Chairs
         await _fetchPendingProgramChairs();
         break;
-      case 7: // Live Video
+      case 7: // All Users
+        await _loadAllUsers();
+        break;
+      case 8: // Live Video
         await _checkLiveStatus();
         break;
-      case 8: // Settings
+      case 9: // Settings
         await _loadUserData();
         break;
     }
@@ -738,13 +727,13 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         controller: _tabController,
         children: [
           _buildDashboardTab(),
-          _buildAllUsersTab(),
           _buildDeansTab(),
           _buildInstructorsTab(),
           _buildProgramChairsTab(),
           _buildPendingDeansTab(),
           _buildPendingInstructorsTab(),
           _buildPendingProgramChairsTab(),
+          _buildAllUsersTab(),
           _buildLiveVideoTab(),
           _buildSettingsTab(),
         ],
@@ -788,13 +777,13 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         tabs: const [
           Tab(icon: Icon(Icons.dashboard_rounded), text: 'Dashboard'),
-          Tab(icon: Icon(Icons.people_rounded), text: 'All Users'),
           Tab(icon: Icon(Icons.admin_panel_settings_rounded), text: 'Deans'),
           Tab(icon: Icon(Icons.person_rounded), text: 'Instructors'),
           Tab(icon: Icon(Icons.school_rounded), text: 'Program Chairs'),
           Tab(icon: Icon(Icons.hourglass_empty_rounded), text: 'Pending Deans'),
           Tab(icon: Icon(Icons.pending_actions_rounded), text: 'Pending Instructors'),
           Tab(icon: Icon(Icons.pending_actions_rounded), text: 'Pending Program Chairs'),
+          Tab(icon: Icon(Icons.people_rounded), text: 'All Users'),
           Tab(icon: Icon(Icons.videocam_rounded), text: 'Live Video'),
           Tab(icon: Icon(Icons.settings_rounded), text: 'Settings'),
         ],
@@ -841,17 +830,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
             ),
         ],
       ),
-    );
-  }
-
-  Widget _buildAllUsersTab() {
-    return RefreshIndicator(
-      onRefresh: _fetchAllUsers,
-      child: errorMessage != null
-          ? ErrorHandler.buildErrorWidget(errorMessage!, onRetry: _fetchAllUsers)
-          : loading
-              ? const LoadingWidget(message: 'Loading all users...')
-              : _buildAllUsersList(),
     );
   }
 
@@ -932,6 +910,17 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     );
   }
 
+  Widget _buildAllUsersTab() {
+    return RefreshIndicator(
+      onRefresh: _loadAllUsers,
+      child: allUsersErrorMessage != null
+          ? ErrorHandler.buildErrorWidget(allUsersErrorMessage!, onRetry: _loadAllUsers)
+          : allUsersLoading
+              ? const LoadingWidget(message: 'Loading all users...')
+              : _buildAllUsersList(),
+    );
+  }
+
   Widget _buildSettingsTab() {
     return RefreshIndicator(
       onRefresh: _loadUserData,
@@ -940,78 +929,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
           : settingsLoading
               ? const LoadingWidget(message: 'Loading settings...')
               : _buildSettingsContent(),
-    );
-  }
-
-  Widget _buildAllUsersList() {
-    if (allUsersList.isEmpty) {
-      return const EmptyStateWidget(
-        icon: Icons.people_rounded,
-        title: 'No Users Found',
-        subtitle: 'There are no users in the system yet.',
-      );
-    }
-
-    // Group users by role
-    final Map<String, List<dynamic>> groupedUsers = {
-      'Deans': [],
-      'Instructors': [],
-      'Program Chairs': [],
-      'Superadmins': [],
-      'Others': [],
-    };
-
-    for (final user in allUsersList) {
-      String role = _getUserRole(user);
-      if (groupedUsers.containsKey(role)) {
-        groupedUsers[role]!.add(user);
-      } else {
-        groupedUsers['Others']!.add(user);
-      }
-    }
-
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // Deans Section
-        if (groupedUsers['Deans']!.isNotEmpty) ...[
-          _buildRoleSectionHeader('Deans', Icons.admin_panel_settings_rounded, groupedUsers['Deans']!.length),
-          const SizedBox(height: 8),
-          ...groupedUsers['Deans']!.map((user) => _buildUserCard(user, 0)).toList(),
-          const SizedBox(height: 24),
-        ],
-        
-        // Instructors Section
-        if (groupedUsers['Instructors']!.isNotEmpty) ...[
-          _buildRoleSectionHeader('Instructors', Icons.person_rounded, groupedUsers['Instructors']!.length),
-          const SizedBox(height: 8),
-          ...groupedUsers['Instructors']!.map((user) => _buildUserCard(user, 0)).toList(),
-          const SizedBox(height: 24),
-        ],
-        
-        // Program Chairs Section
-        if (groupedUsers['Program Chairs']!.isNotEmpty) ...[
-          _buildRoleSectionHeader('Program Chairs', Icons.school_rounded, groupedUsers['Program Chairs']!.length),
-          const SizedBox(height: 8),
-          ...groupedUsers['Program Chairs']!.map((user) => _buildUserCard(user, 0)).toList(),
-          const SizedBox(height: 24),
-        ],
-        
-        // Superadmins Section
-        if (groupedUsers['Superadmins']!.isNotEmpty) ...[
-          _buildRoleSectionHeader('Superadmins', Icons.admin_panel_settings_rounded, groupedUsers['Superadmins']!.length),
-          const SizedBox(height: 8),
-          ...groupedUsers['Superadmins']!.map((user) => _buildUserCard(user, 0)).toList(),
-          const SizedBox(height: 24),
-        ],
-        
-        // Others Section
-        if (groupedUsers['Others']!.isNotEmpty) ...[
-          _buildRoleSectionHeader('Others', Icons.help_rounded, groupedUsers['Others']!.length),
-          const SizedBox(height: 8),
-          ...groupedUsers['Others']!.map((user) => _buildUserCard(user, 0)).toList(),
-        ],
-      ],
     );
   }
 
@@ -1072,6 +989,25 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     );
   }
 
+  Widget _buildAllUsersList() {
+    if (allUsersList.isEmpty) {
+      return const EmptyStateWidget(
+        icon: Icons.people_rounded,
+        title: 'No Users Found',
+        subtitle: 'There are no users in the system yet.',
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: allUsersList.length,
+      itemBuilder: (context, index) {
+        final user = allUsersList[index];
+        return _buildUserCard(user, index);
+      },
+    );
+  }
+
   Widget _buildPendingDeansList() {
     if (pendingDeans.isEmpty) {
       return const EmptyStateWidget(
@@ -1126,210 +1062,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         final programChair = pendingProgramChairs[index];
         return _buildPendingProgramChairCard(programChair, index);
       },
-    );
-  }
-
-  String _getUserRole(Map<String, dynamic> user) {
-    if (user['role'] == 'dean' || user['userRole'] == 'dean' || user['type'] == 'dean' || 
-        user['username'] == 'dean' || user['email']?.toString().contains('dean') == true) {
-      return 'Deans';
-    } else if (user['role'] == 'instructor' || user['userRole'] == 'instructor' || user['type'] == 'instructor' || 
-               user['username'] == 'instructor' || user['email']?.toString().contains('instructor') == true) {
-      return 'Instructors';
-    } else if (user['role'] == 'programChairperson' || user['userRole'] == 'programChairperson' || user['type'] == 'programChairperson' || 
-               user['username'] == 'programchair' || user['email']?.toString().contains('program') == true || 
-               user['email']?.toString().contains('chair') == true) {
-      return 'Program Chairs';
-    } else if (user['role'] == 'superadmin' || user['userRole'] == 'superadmin' || user['type'] == 'superadmin') {
-      return 'Superadmins';
-    }
-    return 'Others';
-  }
-
-  Widget _buildRoleSectionHeader(String title, IconData icon, int count) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            color: Theme.of(context).colorScheme.primary,
-            size: 20,
-          ),
-          const SizedBox(width: 12),
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              count.toString(),
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUserCard(Map<String, dynamic> user, int index) {
-    // Determine user role and icon
-    String role = _getUserRole(user);
-    IconData roleIcon = Icons.person_rounded;
-    
-    if (role == 'Deans') {
-      roleIcon = Icons.admin_panel_settings_rounded;
-    } else if (role == 'Instructors') {
-      roleIcon = Icons.person_rounded;
-    } else if (role == 'Program Chairs') {
-      roleIcon = Icons.school_rounded;
-    } else if (role == 'Superadmins') {
-      roleIcon = Icons.admin_panel_settings_rounded;
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              roleIcon,
-              color: Theme.of(context).colorScheme.primary,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${user['firstName'] ?? user['name'] ?? 'Unknown'} ${user['lastName'] ?? ''}',
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                Text(
-                  user['email'] ?? 'No email',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        role == 'Deans' ? 'Dean' : 
-                        role == 'Instructors' ? 'Instructor' :
-                        role == 'Program Chairs' ? 'Program Chair' :
-                        role == 'Superadmins' ? 'Superadmin' : 'Unknown',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'College: ${user['college'] ?? 'Not specified'}',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              switch (value) {
-                case 'edit':
-                  // TODO: Implement edit functionality
-                  ErrorHandler.showSnackBar(context, 'Edit functionality not implemented yet');
-                  break;
-                case 'delete':
-                  _showDeleteUserDialog(user);
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'edit',
-                child: Row(
-                  children: [
-                    Icon(Icons.edit_rounded, size: 18),
-                    SizedBox(width: 8),
-                    Text('Edit'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'delete',
-                child: Row(
-                  children: [
-                    Icon(Icons.delete_rounded, size: 18, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text('Delete', style: TextStyle(color: Colors.red)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 
@@ -1615,6 +1347,178 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
               }
             },
             itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit_rounded),
+                    SizedBox(width: 8),
+                    Text('Edit'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete_rounded, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Delete', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUserCard(Map<String, dynamic> user, int index) {
+    // Determine icon and color based on role
+    IconData icon;
+    Color iconColor;
+    
+    switch (user['role']?.toString().toLowerCase()) {
+      case 'dean':
+        icon = Icons.admin_panel_settings_rounded;
+        iconColor = Theme.of(context).colorScheme.primary;
+        break;
+      case 'instructor':
+        icon = Icons.person_rounded;
+        iconColor = Colors.blue.shade600;
+        break;
+      case 'programchairperson':
+      case 'program_chair':
+        icon = Icons.school_rounded;
+        iconColor = Colors.green.shade600;
+        break;
+      default:
+        icon = Icons.person_rounded;
+        iconColor = Colors.grey.shade600;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}',
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                Text(
+                  user['email'] ?? 'No email',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: iconColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        user['role']?.toString().toUpperCase() ?? 'UNKNOWN',
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: iconColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: user['status'] == 'pending' 
+                            ? Colors.orange.withValues(alpha: 0.1)
+                            : Colors.green.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        user['status']?.toString().toUpperCase() ?? 'ACTIVE',
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: user['status'] == 'pending' 
+                              ? Colors.orange.shade600
+                              : Colors.green.shade600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              switch (value) {
+                case 'view':
+                  // TODO: Implement view details functionality
+                  ErrorHandler.showSnackBar(context, 'View details functionality not implemented yet');
+                  break;
+                case 'edit':
+                  // TODO: Implement edit functionality
+                  ErrorHandler.showSnackBar(context, 'Edit functionality not implemented yet');
+                  break;
+                case 'delete':
+                  _showDeleteUserDialog(user);
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'view',
+                child: Row(
+                  children: [
+                    Icon(Icons.visibility_rounded),
+                    SizedBox(width: 8),
+                    Text('View Details'),
+                  ],
+                ),
+              ),
               const PopupMenuItem(
                 value: 'edit',
                 child: Row(
@@ -3368,15 +3272,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     );
   }
 
-  void _showDeleteUserDialog(Map<String, dynamic> user) {
-    ErrorHandler.showConfirmDialog(
-      context,
-      'Delete User',
-      'Are you sure you want to delete ${user['firstName'] ?? user['name'] ?? 'this user'}? This action cannot be undone.',
-      () => _deleteUser(user['_id'] ?? user['id']),
-    );
-  }
-
   void _showDeleteDeanDialog(Map<String, dynamic> dean) {
     ErrorHandler.showConfirmDialog(
       context,
@@ -3401,6 +3296,15 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       'Delete Program Chair',
       'Are you sure you want to delete ${programChair['firstName']} ${programChair['lastName']}? This action cannot be undone.',
       () => _deleteProgramChair(programChair['id']),
+    );
+  }
+
+  void _showDeleteUserDialog(Map<String, dynamic> user) {
+    ErrorHandler.showConfirmDialog(
+      context,
+      'Delete User',
+      'Are you sure you want to delete ${user['firstName']} ${user['lastName']}? This action cannot be undone.',
+      () => _deleteUser(user['id']),
     );
   }
 
@@ -3483,21 +3387,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     }
   }
 
-  Future<void> _deleteUser(String userId) async {
-    try {
-      ErrorHandler.showLoadingDialog(context, 'Deleting user...');
-      // For now, we'll just refresh the list since we don't have a specific delete user API
-      // In a real implementation, you would call ApiService.deleteUser(userId)
-      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showSuccessDialog(context, 'User deleted successfully');
-      _fetchAllUsers(); // Refresh the all users list
-    } catch (e) {
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
-    }
-  }
-
   Future<void> _deleteDean(String deanId) async {
     try {
       ErrorHandler.showLoadingDialog(context, 'Deleting dean...');
@@ -3519,6 +3408,19 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       ErrorHandler.hideLoadingDialog(context);
       ErrorHandler.showSuccessDialog(context, 'Dean added successfully');
       _fetchDeansList();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  Future<void> _deleteUser(String userId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Deleting user...');
+      // For now, just refresh the all users list since we don't have a specific delete user API
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'User deleted successfully');
+      _loadAllUsers();
     } catch (e) {
       ErrorHandler.hideLoadingDialog(context);
       ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));

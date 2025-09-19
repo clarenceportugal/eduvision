@@ -181,10 +181,10 @@ class ApiService {
 
   static Future<List<dynamic>> getDeanFacultyList(String collegeName) async {
     try {
-      return await _makeListRequest(
-        method: 'GET',
-        endpoint: '/dean/faculty-list?collegeName=$collegeName',
-      );
+    return await _makeListRequest(
+      method: 'GET',
+      endpoint: '/dean/faculty-list?collegeName=$collegeName',
+    );
     } catch (e) {
       // Return empty list if endpoint doesn't exist
       print('Faculty list endpoint not available, returning empty list');
@@ -194,10 +194,10 @@ class ApiService {
 
   static Future<List<dynamic>> getDeanFacultyReports(String collegeName, String courseName) async {
     try {
-      return await _makeListRequest(
-        method: 'GET',
-        endpoint: '/dean/faculty-reports?collegeName=$collegeName&courseName=$courseName',
-      );
+    return await _makeListRequest(
+      method: 'GET',
+      endpoint: '/dean/faculty-reports?collegeName=$collegeName&courseName=$courseName',
+    );
     } catch (e) {
       // Return empty list if endpoint doesn't exist
       print('Faculty reports endpoint not available, returning empty list');
@@ -207,15 +207,15 @@ class ApiService {
 
   static Future<Uint8List> downloadDeanFacultyReport(String collegeName, String courseName) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/dean/faculty-reports/download?collegeName=$collegeName&courseName=$courseName'),
-        headers: {'Accept': 'application/octet-stream'},
-      ).timeout(timeout);
-      
-      if (response.statusCode == 200) {
-        return response.bodyBytes;
-      } else {
-        throw Exception('Failed to download report: ${response.statusCode}');
+    final response = await http.get(
+      Uri.parse('$baseUrl/dean/faculty-reports/download?collegeName=$collegeName&courseName=$courseName'),
+      headers: {'Accept': 'application/octet-stream'},
+    ).timeout(timeout);
+    
+    if (response.statusCode == 200) {
+      return response.bodyBytes;
+    } else {
+      throw Exception('Failed to download report: ${response.statusCode}');
       }
     } catch (e) {
       // Return empty bytes if endpoint doesn't exist
@@ -358,34 +358,10 @@ class ApiService {
     );
   }
 
-  static Future<List<dynamic>> getAllUsers() async {
-    try {
-      final response = await _makeRequest(
-        method: 'GET',
-        endpoint: '/debug-users',
-      );
-      // Debug: Print the response structure
-      print('Debug users response: $response');
-      
-      final users = response['users'] as List<dynamic>;
-      print('Total users found: ${users.length}');
-      
-      // Debug: Print first user structure
-      if (users.isNotEmpty) {
-        print('First user structure: ${users.first}');
-      }
-      
-      return users;
-    } catch (e) {
-      print('Error fetching all users: $e');
-      return [];
-    }
-  }
-
   static Future<List<dynamic>> getSuperadminDeans() async {
     try {
       final response = await _makeRequest(
-        method: 'GET',
+      method: 'GET',
         endpoint: '/debug-users',
       );
       // Debug: Print the response structure
@@ -408,8 +384,23 @@ class ApiService {
         user['username'] == 'dean' ||
         user['email']?.toString().contains('dean') == true
       ).toList();
-      print('Deans found: ${deans.length}');
-      return deans;
+      
+      // Normalize the data structure for consistent display
+      final normalizedDeans = deans.map((user) {
+        return {
+          'id': user['_id'] ?? user['id'] ?? '',
+          'firstName': user['firstName'] ?? user['first_name'] ?? user['name']?.split(' ').first ?? 'Unknown',
+          'lastName': user['lastName'] ?? user['last_name'] ?? user['name']?.split(' ').last ?? 'User',
+          'email': user['email'] ?? 'No email',
+          'username': user['username'] ?? 'No username',
+          'role': user['role'] ?? user['userRole'] ?? user['type'] ?? 'Unknown',
+          'status': user['status'] ?? 'active',
+          'studentId': user['studentId'] ?? user['student_id'] ?? 'N/A',
+        };
+      }).toList();
+      
+      print('Deans found: ${normalizedDeans.length}');
+      return normalizedDeans;
     } catch (e) {
       print('Error fetching deans: $e');
       return [];
@@ -419,7 +410,7 @@ class ApiService {
   static Future<List<dynamic>> getSuperadminInstructors() async {
     try {
       final response = await _makeRequest(
-        method: 'GET',
+      method: 'GET',
         endpoint: '/debug-users',
       );
       // Filter users by role 'instructor'
@@ -431,8 +422,23 @@ class ApiService {
         user['username'] == 'instructor' ||
         user['email']?.toString().contains('instructor') == true
       ).toList();
-      print('Instructors found: ${instructors.length}');
-      return instructors;
+      
+      // Normalize the data structure for consistent display
+      final normalizedInstructors = instructors.map((user) {
+        return {
+          'id': user['_id'] ?? user['id'] ?? '',
+          'firstName': user['firstName'] ?? user['first_name'] ?? user['name']?.split(' ').first ?? 'Unknown',
+          'lastName': user['lastName'] ?? user['last_name'] ?? user['name']?.split(' ').last ?? 'User',
+          'email': user['email'] ?? 'No email',
+          'username': user['username'] ?? 'No username',
+          'role': user['role'] ?? user['userRole'] ?? user['type'] ?? 'Unknown',
+          'status': user['status'] ?? 'active',
+          'studentId': user['studentId'] ?? user['student_id'] ?? 'N/A',
+        };
+      }).toList();
+      
+      print('Instructors found: ${normalizedInstructors.length}');
+      return normalizedInstructors;
     } catch (e) {
       print('Error fetching instructors: $e');
       return [];
@@ -442,7 +448,7 @@ class ApiService {
   static Future<List<dynamic>> getSuperadminProgramChairs() async {
     try {
       final response = await _makeRequest(
-        method: 'GET',
+      method: 'GET',
         endpoint: '/debug-users',
       );
       // Filter users by role 'programChairperson'
@@ -455,8 +461,23 @@ class ApiService {
         user['email']?.toString().contains('program') == true ||
         user['email']?.toString().contains('chair') == true
       ).toList();
-      print('Program chairs found: ${programChairs.length}');
-      return programChairs;
+      
+      // Normalize the data structure for consistent display
+      final normalizedProgramChairs = programChairs.map((user) {
+        return {
+          'id': user['_id'] ?? user['id'] ?? '',
+          'firstName': user['firstName'] ?? user['first_name'] ?? user['name']?.split(' ').first ?? 'Unknown',
+          'lastName': user['lastName'] ?? user['last_name'] ?? user['name']?.split(' ').last ?? 'User',
+          'email': user['email'] ?? 'No email',
+          'username': user['username'] ?? 'No username',
+          'role': user['role'] ?? user['userRole'] ?? user['type'] ?? 'Unknown',
+          'status': user['status'] ?? 'active',
+          'studentId': user['studentId'] ?? user['student_id'] ?? 'N/A',
+        };
+      }).toList();
+      
+      print('Program chairs found: ${normalizedProgramChairs.length}');
+      return normalizedProgramChairs;
     } catch (e) {
       print('Error fetching program chairs: $e');
       return [];
@@ -466,12 +487,32 @@ class ApiService {
   static Future<List<dynamic>> getSuperadminPendingDeans() async {
     try {
       final response = await _makeRequest(
-        method: 'GET',
+      method: 'GET',
         endpoint: '/debug-users',
       );
       // Filter users by role 'dean' and status 'pending'
       final users = response['users'] as List<dynamic>;
-      return users.where((user) => user['role'] == 'dean' && user['status'] == 'pending').toList();
+      final pendingDeans = users.where((user) => 
+        (user['role'] == 'dean' || user['userRole'] == 'dean' || user['type'] == 'dean') && 
+        user['status'] == 'pending'
+      ).toList();
+      
+      // Normalize the data structure for consistent display
+      final normalizedPendingDeans = pendingDeans.map((user) {
+        return {
+          'id': user['_id'] ?? user['id'] ?? '',
+          'firstName': user['firstName'] ?? user['first_name'] ?? user['name']?.split(' ').first ?? 'Unknown',
+          'lastName': user['lastName'] ?? user['last_name'] ?? user['name']?.split(' ').last ?? 'User',
+          'email': user['email'] ?? 'No email',
+          'username': user['username'] ?? 'No username',
+          'role': user['role'] ?? user['userRole'] ?? user['type'] ?? 'Unknown',
+          'status': user['status'] ?? 'pending',
+          'studentId': user['studentId'] ?? user['student_id'] ?? 'N/A',
+        };
+      }).toList();
+      
+      print('Pending deans found: ${normalizedPendingDeans.length}');
+      return normalizedPendingDeans;
     } catch (e) {
       print('Error fetching pending deans: $e');
       return [];
@@ -486,9 +527,67 @@ class ApiService {
       );
       // Filter users by role 'instructor' and status 'pending'
       final users = response['users'] as List<dynamic>;
-      return users.where((user) => user['role'] == 'instructor' && user['status'] == 'pending').toList();
+      final pendingInstructors = users.where((user) => 
+        (user['role'] == 'instructor' || user['userRole'] == 'instructor' || user['type'] == 'instructor') && 
+        user['status'] == 'pending'
+      ).toList();
+      
+      // Normalize the data structure for consistent display
+      final normalizedPendingInstructors = pendingInstructors.map((user) {
+        return {
+          'id': user['_id'] ?? user['id'] ?? '',
+          'firstName': user['firstName'] ?? user['first_name'] ?? user['name']?.split(' ').first ?? 'Unknown',
+          'lastName': user['lastName'] ?? user['last_name'] ?? user['name']?.split(' ').last ?? 'User',
+          'email': user['email'] ?? 'No email',
+          'username': user['username'] ?? 'No username',
+          'role': user['role'] ?? user['userRole'] ?? user['type'] ?? 'Unknown',
+          'status': user['status'] ?? 'pending',
+          'studentId': user['studentId'] ?? user['student_id'] ?? 'N/A',
+        };
+      }).toList();
+      
+      print('Pending instructors found: ${normalizedPendingInstructors.length}');
+      return normalizedPendingInstructors;
     } catch (e) {
       print('Error fetching pending instructors: $e');
+      return [];
+    }
+  }
+
+  static Future<List<dynamic>> getAllUsers() async {
+    try {
+      final response = await _makeRequest(
+      method: 'GET',
+        endpoint: '/debug-users',
+      );
+      // Debug: Print the response structure
+      print('Debug users response: $response');
+      
+      final users = response['users'] as List<dynamic>;
+      print('Total users found: ${users.length}');
+      
+      // Debug: Print first user structure
+      if (users.isNotEmpty) {
+        print('First user structure: ${users.first}');
+      }
+      
+      // Normalize the data structure for consistent display
+      final normalizedUsers = users.map((user) {
+        return {
+          'id': user['_id'] ?? user['id'] ?? '',
+          'firstName': user['firstName'] ?? user['first_name'] ?? user['name']?.split(' ').first ?? 'Unknown',
+          'lastName': user['lastName'] ?? user['last_name'] ?? user['name']?.split(' ').last ?? 'User',
+          'email': user['email'] ?? 'No email',
+          'username': user['username'] ?? 'No username',
+          'role': user['role'] ?? user['userRole'] ?? user['type'] ?? 'Unknown',
+          'status': user['status'] ?? 'active',
+          'studentId': user['studentId'] ?? user['student_id'] ?? 'N/A',
+        };
+      }).toList();
+      
+      return normalizedUsers;
+    } catch (e) {
+      print('Error fetching all users: $e');
       return [];
     }
   }
@@ -496,12 +595,32 @@ class ApiService {
   static Future<List<dynamic>> getSuperadminPendingProgramChairs() async {
     try {
       final response = await _makeRequest(
-        method: 'GET',
+      method: 'GET',
         endpoint: '/debug-users',
       );
       // Filter users by role 'programChairperson' and status 'pending'
       final users = response['users'] as List<dynamic>;
-      return users.where((user) => user['role'] == 'programChairperson' && user['status'] == 'pending').toList();
+      final pendingProgramChairs = users.where((user) => 
+        (user['role'] == 'programChairperson' || user['userRole'] == 'programChairperson' || user['type'] == 'programChairperson') && 
+        user['status'] == 'pending'
+      ).toList();
+      
+      // Normalize the data structure for consistent display
+      final normalizedPendingProgramChairs = pendingProgramChairs.map((user) {
+        return {
+          'id': user['_id'] ?? user['id'] ?? '',
+          'firstName': user['firstName'] ?? user['first_name'] ?? user['name']?.split(' ').first ?? 'Unknown',
+          'lastName': user['lastName'] ?? user['last_name'] ?? user['name']?.split(' ').last ?? 'User',
+          'email': user['email'] ?? 'No email',
+          'username': user['username'] ?? 'No username',
+          'role': user['role'] ?? user['userRole'] ?? user['type'] ?? 'Unknown',
+          'status': user['status'] ?? 'pending',
+          'studentId': user['studentId'] ?? user['student_id'] ?? 'N/A',
+        };
+      }).toList();
+      
+      print('Pending program chairs found: ${normalizedPendingProgramChairs.length}');
+      return normalizedPendingProgramChairs;
     } catch (e) {
       print('Error fetching pending program chairs: $e');
       return [];
