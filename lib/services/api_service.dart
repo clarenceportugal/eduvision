@@ -376,14 +376,26 @@ class ApiService {
         print('First user structure: ${users.first}');
       }
       
-      // Try different possible role field names
-      final deans = users.where((user) => 
-        user['role'] == 'dean' || 
-        user['userRole'] == 'dean' || 
-        user['type'] == 'dean' ||
-        user['username'] == 'dean' ||
-        user['email']?.toString().contains('dean') == true
-      ).toList();
+      // Try different possible role field names and variations
+      final deans = users.where((user) {
+        final role = user['role']?.toString().toLowerCase() ?? '';
+        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
+        final type = user['type']?.toString().toLowerCase() ?? '';
+        final username = user['username']?.toString().toLowerCase() ?? '';
+        final email = user['email']?.toString().toLowerCase() ?? '';
+        final name = user['name']?.toString().toLowerCase() ?? '';
+        
+        return role.contains('dean') || 
+               userRole.contains('dean') || 
+               type.contains('dean') ||
+               username.contains('dean') ||
+               email.contains('dean') ||
+               name.contains('dean') ||
+               role == 'dean' ||
+               userRole == 'dean' ||
+               type == 'dean' ||
+               username == 'dean';
+      }).toList();
       
       // Normalize the data structure for consistent display
       final normalizedDeans = deans.map((user) {
@@ -415,13 +427,31 @@ class ApiService {
       );
       // Filter users by role 'instructor'
       final users = response['users'] as List<dynamic>;
-      final instructors = users.where((user) => 
-        user['role'] == 'instructor' || 
-        user['userRole'] == 'instructor' || 
-        user['type'] == 'instructor' ||
-        user['username'] == 'instructor' ||
-        user['email']?.toString().contains('instructor') == true
-      ).toList();
+      final instructors = users.where((user) {
+        final role = user['role']?.toString().toLowerCase() ?? '';
+        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
+        final type = user['type']?.toString().toLowerCase() ?? '';
+        final username = user['username']?.toString().toLowerCase() ?? '';
+        final email = user['email']?.toString().toLowerCase() ?? '';
+        final name = user['name']?.toString().toLowerCase() ?? '';
+        
+        return role.contains('instructor') || 
+               userRole.contains('instructor') || 
+               type.contains('instructor') ||
+               username.contains('instructor') ||
+               email.contains('instructor') ||
+               name.contains('instructor') ||
+               role == 'instructor' ||
+               userRole == 'instructor' ||
+               type == 'instructor' ||
+               username == 'instructor' ||
+               role.contains('teacher') ||
+               userRole.contains('teacher') ||
+               type.contains('teacher') ||
+               username.contains('teacher') ||
+               email.contains('teacher') ||
+               name.contains('teacher');
+      }).toList();
       
       // Normalize the data structure for consistent display
       final normalizedInstructors = instructors.map((user) {
@@ -453,14 +483,36 @@ class ApiService {
       );
       // Filter users by role 'programChairperson'
       final users = response['users'] as List<dynamic>;
-      final programChairs = users.where((user) => 
-        user['role'] == 'programChairperson' || 
-        user['userRole'] == 'programChairperson' || 
-        user['type'] == 'programChairperson' ||
-        user['username'] == 'programchair' ||
-        user['email']?.toString().contains('program') == true ||
-        user['email']?.toString().contains('chair') == true
-      ).toList();
+      final programChairs = users.where((user) {
+        final role = user['role']?.toString().toLowerCase() ?? '';
+        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
+        final type = user['type']?.toString().toLowerCase() ?? '';
+        final username = user['username']?.toString().toLowerCase() ?? '';
+        final email = user['email']?.toString().toLowerCase() ?? '';
+        final name = user['name']?.toString().toLowerCase() ?? '';
+        
+        return role.contains('programchairperson') || 
+               userRole.contains('programchairperson') || 
+               type.contains('programchairperson') ||
+               role.contains('program_chair') ||
+               userRole.contains('program_chair') ||
+               type.contains('program_chair') ||
+               role.contains('programchair') ||
+               userRole.contains('programchair') ||
+               type.contains('programchair') ||
+               username.contains('programchair') ||
+               username.contains('program_chair') ||
+               email.contains('program') ||
+               email.contains('chair') ||
+               name.contains('program') ||
+               name.contains('chair') ||
+               role == 'programchairperson' ||
+               userRole == 'programchairperson' ||
+               type == 'programchairperson' ||
+               role == 'program_chair' ||
+               userRole == 'program_chair' ||
+               type == 'program_chair';
+      }).toList();
       
       // Normalize the data structure for consistent display
       final normalizedProgramChairs = programChairs.map((user) {
@@ -492,10 +544,30 @@ class ApiService {
       );
       // Filter users by role 'dean' and status 'pending'
       final users = response['users'] as List<dynamic>;
-      final pendingDeans = users.where((user) => 
-        (user['role'] == 'dean' || user['userRole'] == 'dean' || user['type'] == 'dean') && 
-        user['status'] == 'pending'
-      ).toList();
+      final pendingDeans = users.where((user) {
+        final role = user['role']?.toString().toLowerCase() ?? '';
+        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
+        final type = user['type']?.toString().toLowerCase() ?? '';
+        final username = user['username']?.toString().toLowerCase() ?? '';
+        final email = user['email']?.toString().toLowerCase() ?? '';
+        final name = user['name']?.toString().toLowerCase() ?? '';
+        final status = user['status']?.toString().toLowerCase() ?? '';
+        
+        final isDean = role.contains('dean') || 
+                      userRole.contains('dean') || 
+                      type.contains('dean') ||
+                      username.contains('dean') ||
+                      email.contains('dean') ||
+                      name.contains('dean') ||
+                      role == 'dean' ||
+                      userRole == 'dean' ||
+                      type == 'dean' ||
+                      username == 'dean';
+        
+        final isPending = status == 'pending' || status == 'waiting' || status == 'approval';
+        
+        return isDean && isPending;
+      }).toList();
       
       // Normalize the data structure for consistent display
       final normalizedPendingDeans = pendingDeans.map((user) {
@@ -527,10 +599,36 @@ class ApiService {
       );
       // Filter users by role 'instructor' and status 'pending'
       final users = response['users'] as List<dynamic>;
-      final pendingInstructors = users.where((user) => 
-        (user['role'] == 'instructor' || user['userRole'] == 'instructor' || user['type'] == 'instructor') && 
-        user['status'] == 'pending'
-      ).toList();
+      final pendingInstructors = users.where((user) {
+        final role = user['role']?.toString().toLowerCase() ?? '';
+        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
+        final type = user['type']?.toString().toLowerCase() ?? '';
+        final username = user['username']?.toString().toLowerCase() ?? '';
+        final email = user['email']?.toString().toLowerCase() ?? '';
+        final name = user['name']?.toString().toLowerCase() ?? '';
+        final status = user['status']?.toString().toLowerCase() ?? '';
+        
+        final isInstructor = role.contains('instructor') || 
+                            userRole.contains('instructor') || 
+                            type.contains('instructor') ||
+                            username.contains('instructor') ||
+                            email.contains('instructor') ||
+                            name.contains('instructor') ||
+                            role == 'instructor' ||
+                            userRole == 'instructor' ||
+                            type == 'instructor' ||
+                            username == 'instructor' ||
+                            role.contains('teacher') ||
+                            userRole.contains('teacher') ||
+                            type.contains('teacher') ||
+                            username.contains('teacher') ||
+                            email.contains('teacher') ||
+                            name.contains('teacher');
+        
+        final isPending = status == 'pending' || status == 'waiting' || status == 'approval';
+        
+        return isInstructor && isPending;
+      }).toList();
       
       // Normalize the data structure for consistent display
       final normalizedPendingInstructors = pendingInstructors.map((user) {
@@ -600,10 +698,41 @@ class ApiService {
       );
       // Filter users by role 'programChairperson' and status 'pending'
       final users = response['users'] as List<dynamic>;
-      final pendingProgramChairs = users.where((user) => 
-        (user['role'] == 'programChairperson' || user['userRole'] == 'programChairperson' || user['type'] == 'programChairperson') && 
-        user['status'] == 'pending'
-      ).toList();
+      final pendingProgramChairs = users.where((user) {
+        final role = user['role']?.toString().toLowerCase() ?? '';
+        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
+        final type = user['type']?.toString().toLowerCase() ?? '';
+        final username = user['username']?.toString().toLowerCase() ?? '';
+        final email = user['email']?.toString().toLowerCase() ?? '';
+        final name = user['name']?.toString().toLowerCase() ?? '';
+        final status = user['status']?.toString().toLowerCase() ?? '';
+        
+        final isProgramChair = role.contains('programchairperson') || 
+                              userRole.contains('programchairperson') || 
+                              type.contains('programchairperson') ||
+                              role.contains('program_chair') ||
+                              userRole.contains('program_chair') ||
+                              type.contains('program_chair') ||
+                              role.contains('programchair') ||
+                              userRole.contains('programchair') ||
+                              type.contains('programchair') ||
+                              username.contains('programchair') ||
+                              username.contains('program_chair') ||
+                              email.contains('program') ||
+                              email.contains('chair') ||
+                              name.contains('program') ||
+                              name.contains('chair') ||
+                              role == 'programchairperson' ||
+                              userRole == 'programchairperson' ||
+                              type == 'programchairperson' ||
+                              role == 'program_chair' ||
+                              userRole == 'program_chair' ||
+                              type == 'program_chair';
+        
+        final isPending = status == 'pending' || status == 'waiting' || status == 'approval';
+        
+        return isProgramChair && isPending;
+      }).toList();
       
       // Normalize the data structure for consistent display
       final normalizedPendingProgramChairs = pendingProgramChairs.map((user) {

@@ -174,6 +174,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         _fetchPendingDeans(),
         _fetchPendingInstructors(),
         _fetchPendingProgramChairs(),
+        _loadAllUsers(), // Load all users for fallback debugging
       ]);
     } catch (e) {
       if (mounted) {
@@ -304,6 +305,16 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         setState(() {
           deansList = data;
         });
+        
+        // If no deans found, try to get all users as fallback for debugging
+        if (data.isEmpty) {
+          print('No deans found, fetching all users for debugging...');
+          final allUsers = await ApiService.getAllUsers();
+          print('All users available: ${allUsers.length}');
+          if (allUsers.isNotEmpty) {
+            print('Sample user structure: ${allUsers.first}');
+          }
+        }
       }
     } catch (error) {
       if (mounted) {
@@ -323,6 +334,16 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         setState(() {
           instructorsList = data;
         });
+        
+        // If no instructors found, try to get all users as fallback for debugging
+        if (data.isEmpty) {
+          print('No instructors found, fetching all users for debugging...');
+          final allUsers = await ApiService.getAllUsers();
+          print('All users available: ${allUsers.length}');
+          if (allUsers.isNotEmpty) {
+            print('Sample user structure: ${allUsers.first}');
+          }
+        }
       }
     } catch (error) {
       if (mounted) {
@@ -342,6 +363,16 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         setState(() {
           programChairsList = data;
         });
+        
+        // If no program chairs found, try to get all users as fallback for debugging
+        if (data.isEmpty) {
+          print('No program chairs found, fetching all users for debugging...');
+          final allUsers = await ApiService.getAllUsers();
+          print('All users available: ${allUsers.length}');
+          if (allUsers.isNotEmpty) {
+            print('Sample user structure: ${allUsers.first}');
+          }
+        }
       }
     } catch (error) {
       if (mounted) {
@@ -934,6 +965,48 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
 
   Widget _buildDeansList() {
     if (deansList.isEmpty) {
+      // If no deans found, show all users as fallback for debugging
+      if (allUsersList.isNotEmpty) {
+        return Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.shade300),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.orange.shade600),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'No deans found with current filtering. Showing all users for debugging:',
+                      style: GoogleFonts.inter(
+                        color: Colors.orange.shade800,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: allUsersList.length,
+                itemBuilder: (context, index) {
+                  final user = allUsersList[index];
+                  return _buildUserCard(user, index);
+                },
+              ),
+            ),
+          ],
+        );
+      }
+      
       return const EmptyStateWidget(
         icon: Icons.admin_panel_settings_rounded,
         title: 'No Deans Found',
@@ -953,6 +1026,48 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
 
   Widget _buildInstructorsList() {
     if (instructorsList.isEmpty) {
+      // If no instructors found, show all users as fallback for debugging
+      if (allUsersList.isNotEmpty) {
+        return Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.shade300),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.blue.shade600),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'No instructors found with current filtering. Showing all users for debugging:',
+                      style: GoogleFonts.inter(
+                        color: Colors.blue.shade800,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: allUsersList.length,
+                itemBuilder: (context, index) {
+                  final user = allUsersList[index];
+                  return _buildUserCard(user, index);
+                },
+              ),
+            ),
+          ],
+        );
+      }
+      
       return const EmptyStateWidget(
         icon: Icons.person_rounded,
         title: 'No Instructors Found',
@@ -972,6 +1087,48 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
 
   Widget _buildProgramChairsList() {
     if (programChairsList.isEmpty) {
+      // If no program chairs found, show all users as fallback for debugging
+      if (allUsersList.isNotEmpty) {
+        return Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.green.shade300),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.green.shade600),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'No program chairs found with current filtering. Showing all users for debugging:',
+                      style: GoogleFonts.inter(
+                        color: Colors.green.shade800,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: allUsersList.length,
+                itemBuilder: (context, index) {
+                  final user = allUsersList[index];
+                  return _buildUserCard(user, index);
+                },
+              ),
+            ),
+          ],
+        );
+      }
+      
       return const EmptyStateWidget(
         icon: Icons.school_rounded,
         title: 'No Program Chairs Found',
