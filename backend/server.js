@@ -381,20 +381,11 @@ app.get('/api/debug-users', async (req, res) => {
   try {
     const users = await db.collection(COLLECTION_NAME).find({}).toArray();
     
-    const userInfo = users.map(user => ({
-      _id: user._id,
-      email: user.email,
-      username: user.username || 'NO_USERNAME',
-      studentId: user.studentId || 'NO_STUDENT_ID',
-      name: user.name || 'NO_NAME',
-      fields: Object.keys(user)
-    }));
-    
     res.json({
       success: true,
       count: users.length,
-      users: userInfo,
-      message: 'If users show NO_USERNAME, then username field does not exist in database'
+      users: users,
+      message: 'All users fetched successfully'
     });
     
   } catch (error) {
