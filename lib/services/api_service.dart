@@ -330,67 +330,18 @@ class ApiService {
       
       for (final user in allUsers) {
         final role = user['role']?.toString().toLowerCase() ?? '';
-        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
-        final type = user['type']?.toString().toLowerCase() ?? '';
-        final username = user['username']?.toString().toLowerCase() ?? '';
-        final email = user['email']?.toString().toLowerCase() ?? '';
-        final name = user['name']?.toString().toLowerCase() ?? '';
         final status = user['status']?.toString().toLowerCase() ?? '';
         
         // Check if user is a dean
-        final isDean = role.contains('dean') || 
-                      userRole.contains('dean') || 
-                      type.contains('dean') ||
-                      username.contains('dean') ||
-                      email.contains('dean') ||
-                      name.contains('dean') ||
-                      role == 'dean' ||
-                      userRole == 'dean' ||
-                      type == 'dean' ||
-                      username == 'dean';
+        final isDean = role == 'dean';
         
         // Check if user is an instructor
-        final isInstructor = role.contains('instructor') || 
-                            userRole.contains('instructor') || 
-                            type.contains('instructor') ||
-                            username.contains('instructor') ||
-                            email.contains('instructor') ||
-                            name.contains('instructor') ||
-                            role == 'instructor' ||
-                            userRole == 'instructor' ||
-                            type == 'instructor' ||
-                            username == 'instructor' ||
-                            role.contains('teacher') ||
-                            userRole.contains('teacher') ||
-                            type.contains('teacher') ||
-                            username.contains('teacher') ||
-                            email.contains('teacher') ||
-                            name.contains('teacher');
+        final isInstructor = role == 'instructor';
         
         // Check if user is a program chair
-        final isProgramChair = role.contains('programchairperson') || 
-                              userRole.contains('programchairperson') || 
-                              type.contains('programchairperson') ||
-                              role.contains('program_chair') ||
-                              userRole.contains('program_chair') ||
-                              type.contains('program_chair') ||
-                              role.contains('programchair') ||
-                              userRole.contains('programchair') ||
-                              type.contains('programchair') ||
-                              username.contains('programchair') ||
-                              username.contains('program_chair') ||
-                              email.contains('program') ||
-                              email.contains('chair') ||
-                              name.contains('program') ||
-                              name.contains('chair') ||
-                              role == 'programchairperson' ||
-                              userRole == 'programchairperson' ||
-                              type == 'programchairperson' ||
-                              role == 'program_chair' ||
-                              userRole == 'program_chair' ||
-                              type == 'program_chair';
+        final isProgramChair = role == 'programchairperson';
         
-        final isPending = status == 'pending' || status == 'waiting' || status == 'approval';
+        final isPending = status == 'pending' || status == 'waiting' || status == 'approval' || status == 'forverification';
         
         // Count by role and status
         if (isDean) {
@@ -479,22 +430,7 @@ class ApiService {
       // Filter for deans locally
       final deans = allUsers.where((user) {
         final role = user['role']?.toString().toLowerCase() ?? '';
-        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
-        final type = user['type']?.toString().toLowerCase() ?? '';
-        final username = user['username']?.toString().toLowerCase() ?? '';
-        final email = user['email']?.toString().toLowerCase() ?? '';
-        final name = user['name']?.toString().toLowerCase() ?? '';
-        
-        return role.contains('dean') || 
-               userRole.contains('dean') || 
-               type.contains('dean') ||
-               username.contains('dean') ||
-               email.contains('dean') ||
-               name.contains('dean') ||
-               role == 'dean' ||
-               userRole == 'dean' ||
-               type == 'dean' ||
-               username == 'dean';
+        return role == 'dean';
       }).toList();
       
       print('Deans found: ${deans.length}');
@@ -514,28 +450,7 @@ class ApiService {
       // Filter for instructors locally
       final instructors = allUsers.where((user) {
         final role = user['role']?.toString().toLowerCase() ?? '';
-        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
-        final type = user['type']?.toString().toLowerCase() ?? '';
-        final username = user['username']?.toString().toLowerCase() ?? '';
-        final email = user['email']?.toString().toLowerCase() ?? '';
-        final name = user['name']?.toString().toLowerCase() ?? '';
-        
-        return role.contains('instructor') || 
-               userRole.contains('instructor') || 
-               type.contains('instructor') ||
-               username.contains('instructor') ||
-               email.contains('instructor') ||
-               name.contains('instructor') ||
-               role == 'instructor' ||
-               userRole == 'instructor' ||
-               type == 'instructor' ||
-               username == 'instructor' ||
-               role.contains('teacher') ||
-               userRole.contains('teacher') ||
-               type.contains('teacher') ||
-               username.contains('teacher') ||
-               email.contains('teacher') ||
-               name.contains('teacher');
+        return role == 'instructor';
       }).toList();
       
       print('Instructors found: ${instructors.length}');
@@ -555,33 +470,7 @@ class ApiService {
       // Filter for program chairs locally
       final programChairs = allUsers.where((user) {
         final role = user['role']?.toString().toLowerCase() ?? '';
-        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
-        final type = user['type']?.toString().toLowerCase() ?? '';
-        final username = user['username']?.toString().toLowerCase() ?? '';
-        final email = user['email']?.toString().toLowerCase() ?? '';
-        final name = user['name']?.toString().toLowerCase() ?? '';
-        
-        return role.contains('programchairperson') || 
-               userRole.contains('programchairperson') || 
-               type.contains('programchairperson') ||
-               role.contains('program_chair') ||
-               userRole.contains('program_chair') ||
-               type.contains('program_chair') ||
-               role.contains('programchair') ||
-               userRole.contains('programchair') ||
-               type.contains('programchair') ||
-               username.contains('programchair') ||
-               username.contains('program_chair') ||
-               email.contains('program') ||
-               email.contains('chair') ||
-               name.contains('program') ||
-               name.contains('chair') ||
-               role == 'programchairperson' ||
-               userRole == 'programchairperson' ||
-               type == 'programchairperson' ||
-               role == 'program_chair' ||
-               userRole == 'program_chair' ||
-               type == 'program_chair';
+        return role == 'programchairperson';
       }).toList();
       
       print('Program chairs found: ${programChairs.length}');
@@ -601,25 +490,10 @@ class ApiService {
       // Filter for pending deans locally
       final pendingDeans = allUsers.where((user) {
         final role = user['role']?.toString().toLowerCase() ?? '';
-        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
-        final type = user['type']?.toString().toLowerCase() ?? '';
-        final username = user['username']?.toString().toLowerCase() ?? '';
-        final email = user['email']?.toString().toLowerCase() ?? '';
-        final name = user['name']?.toString().toLowerCase() ?? '';
         final status = user['status']?.toString().toLowerCase() ?? '';
         
-        final isDean = role.contains('dean') || 
-                      userRole.contains('dean') || 
-                      type.contains('dean') ||
-                      username.contains('dean') ||
-                      email.contains('dean') ||
-                      name.contains('dean') ||
-                      role == 'dean' ||
-                      userRole == 'dean' ||
-                      type == 'dean' ||
-                      username == 'dean';
-        
-        final isPending = status == 'pending' || status == 'waiting' || status == 'approval';
+        final isDean = role == 'dean';
+        final isPending = status == 'pending' || status == 'waiting' || status == 'approval' || status == 'forverification';
         
         return isDean && isPending;
       }).toList();
@@ -641,31 +515,10 @@ class ApiService {
       // Filter for pending instructors locally
       final pendingInstructors = allUsers.where((user) {
         final role = user['role']?.toString().toLowerCase() ?? '';
-        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
-        final type = user['type']?.toString().toLowerCase() ?? '';
-        final username = user['username']?.toString().toLowerCase() ?? '';
-        final email = user['email']?.toString().toLowerCase() ?? '';
-        final name = user['name']?.toString().toLowerCase() ?? '';
         final status = user['status']?.toString().toLowerCase() ?? '';
         
-        final isInstructor = role.contains('instructor') || 
-                            userRole.contains('instructor') || 
-                            type.contains('instructor') ||
-                            username.contains('instructor') ||
-                            email.contains('instructor') ||
-                            name.contains('instructor') ||
-                            role == 'instructor' ||
-                            userRole == 'instructor' ||
-                            type == 'instructor' ||
-                            username == 'instructor' ||
-                            role.contains('teacher') ||
-                            userRole.contains('teacher') ||
-                            type.contains('teacher') ||
-                            username.contains('teacher') ||
-                            email.contains('teacher') ||
-                            name.contains('teacher');
-        
-        final isPending = status == 'pending' || status == 'waiting' || status == 'approval';
+        final isInstructor = role == 'instructor';
+        final isPending = status == 'pending' || status == 'waiting' || status == 'approval' || status == 'forverification';
         
         return isInstructor && isPending;
       }).toList();
@@ -693,21 +546,55 @@ class ApiService {
       // Debug: Print first user structure
       if (users.isNotEmpty) {
         print('First user structure: ${users.first}');
+        print('Sample user roles:');
+        for (int i = 0; i < users.length && i < 5; i++) {
+          final user = users[i];
+          print('User ${i + 1}: role="${user['role']}", status="${user['status']}", name="${user['first_name']} ${user['last_name']}"');
+        }
       }
       
       // Normalize the data structure for consistent display
       final normalizedUsers = users.map((user) {
+        // Handle name fields properly
+        String firstName = 'Unknown';
+        String lastName = 'User';
+        
+        if (user['first_name'] != null && user['first_name'].toString().isNotEmpty) {
+          firstName = user['first_name'].toString();
+        } else if (user['firstName'] != null && user['firstName'].toString().isNotEmpty) {
+          firstName = user['firstName'].toString();
+        } else if (user['name'] != null && user['name'].toString().isNotEmpty) {
+          final nameParts = user['name'].toString().split(' ');
+          firstName = nameParts.isNotEmpty ? nameParts.first : 'Unknown';
+        }
+        
+        if (user['last_name'] != null && user['last_name'].toString().isNotEmpty) {
+          lastName = user['last_name'].toString();
+        } else if (user['lastName'] != null && user['lastName'].toString().isNotEmpty) {
+          lastName = user['lastName'].toString();
+        } else if (user['name'] != null && user['name'].toString().isNotEmpty) {
+          final nameParts = user['name'].toString().split(' ');
+          lastName = nameParts.length > 1 ? nameParts.last : 'User';
+        }
+        
         return {
-          'id': user['_id'] ?? user['id'] ?? '',
-          'firstName': user['firstName'] ?? user['first_name'] ?? user['name']?.split(' ').first ?? 'Unknown',
-          'lastName': user['lastName'] ?? user['last_name'] ?? user['name']?.split(' ').last ?? 'User',
-          'email': user['email'] ?? 'No email',
-          'username': user['username'] ?? 'No username',
-          'role': user['role'] ?? user['userRole'] ?? user['type'] ?? 'Unknown',
-          'status': user['status'] ?? 'active',
-          'studentId': user['studentId'] ?? user['student_id'] ?? 'N/A',
+          'id': user['_id']?.toString() ?? user['id']?.toString() ?? '',
+          'firstName': firstName,
+          'lastName': lastName,
+          'email': user['email']?.toString() ?? 'No email',
+          'username': user['username']?.toString() ?? 'No username',
+          'role': user['role']?.toString() ?? user['userRole']?.toString() ?? user['type']?.toString() ?? 'Unknown',
+          'status': user['status']?.toString() ?? 'active',
+          'studentId': user['studentId']?.toString() ?? user['student_id']?.toString() ?? 'N/A',
         };
       }).toList();
+      
+      // Debug: Print normalized users
+      print('Normalized users sample:');
+      for (int i = 0; i < normalizedUsers.length && i < 3; i++) {
+        final user = normalizedUsers[i];
+        print('Normalized User ${i + 1}: role="${user['role']}", status="${user['status']}", name="${user['firstName']} ${user['lastName']}"');
+      }
       
       return normalizedUsers;
     } catch (e) {
@@ -725,36 +612,10 @@ class ApiService {
       // Filter for pending program chairs locally
       final pendingProgramChairs = allUsers.where((user) {
         final role = user['role']?.toString().toLowerCase() ?? '';
-        final userRole = user['userRole']?.toString().toLowerCase() ?? '';
-        final type = user['type']?.toString().toLowerCase() ?? '';
-        final username = user['username']?.toString().toLowerCase() ?? '';
-        final email = user['email']?.toString().toLowerCase() ?? '';
-        final name = user['name']?.toString().toLowerCase() ?? '';
         final status = user['status']?.toString().toLowerCase() ?? '';
         
-        final isProgramChair = role.contains('programchairperson') || 
-                              userRole.contains('programchairperson') || 
-                              type.contains('programchairperson') ||
-                              role.contains('program_chair') ||
-                              userRole.contains('program_chair') ||
-                              type.contains('program_chair') ||
-                              role.contains('programchair') ||
-                              userRole.contains('programchair') ||
-                              type.contains('programchair') ||
-                              username.contains('programchair') ||
-                              username.contains('program_chair') ||
-                              email.contains('program') ||
-                              email.contains('chair') ||
-                              name.contains('program') ||
-                              name.contains('chair') ||
-                              role == 'programchairperson' ||
-                              userRole == 'programchairperson' ||
-                              type == 'programchairperson' ||
-                              role == 'program_chair' ||
-                              userRole == 'program_chair' ||
-                              type == 'program_chair';
-        
-        final isPending = status == 'pending' || status == 'waiting' || status == 'approval';
+        final isProgramChair = role == 'programchairperson';
+        final isPending = status == 'pending' || status == 'waiting' || status == 'approval' || status == 'forverification';
         
         return isProgramChair && isPending;
       }).toList();
