@@ -379,7 +379,7 @@ app.get('/api/test', (req, res) => {
 // Debug endpoint to list all users and their fields
 app.get('/api/debug-users', async (req, res) => {
   try {
-    const users = await db.collection(COLLECTION_NAME).find({}).limit(5).toArray();
+    const users = await db.collection(COLLECTION_NAME).find({}).toArray();
     
     const userInfo = users.map(user => ({
       _id: user._id,
