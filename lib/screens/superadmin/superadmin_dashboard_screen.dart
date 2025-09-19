@@ -214,14 +214,30 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     if (!mounted) return;
     
     try {
+      print('Fetching user counts...');
       final data = await ApiService.getSuperadminUserCounts();
+      print('User counts received: $data');
       if (mounted) {
         setState(() {
           counts = Map<String, int>.from(data);
         });
+        print('Counts updated in state: $counts');
       }
     } catch (error) {
-      // 
+      print('Error fetching user counts: $error');
+      if (mounted) {
+        setState(() {
+          counts = {
+            'deans': 0,
+            'instructors': 0,
+            'programChairs': 0,
+            'pendingDeans': 0,
+            'pendingInstructors': 0,
+            'pendingProgramChairs': 0,
+            'totalUsers': 0,
+          };
+        });
+      }
     }
   }
 
@@ -2181,6 +2197,16 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         final isTablet = constraints.maxWidth > 600;
         final crossAxisCount = isTablet ? 4 : 2;
         
+        // Show loading state if counts are empty
+        if (counts.isEmpty) {
+          return Container(
+            height: 200,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        
         return GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -2190,32 +2216,53 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
           childAspectRatio: isTablet ? 1.4 : 1.2,
           children: [
             StatCard(
-              title: 'Total Dean',
-              value: counts['dean']?.toString() ?? '0',
+              title: 'Total Deans',
+              value: counts['deans']?.toString() ?? '0',
               icon: Icons.school_rounded,
               iconColor: const Color(0xFF9f7aea),
               backgroundColor: const Color(0xFFf3e8ff),
             ),
             StatCard(
-              title: 'Total Program Chairperson',
-              value: counts['programChairperson']?.toString() ?? '0',
+              title: 'Total Program Chairs',
+              value: counts['programChairs']?.toString() ?? '0',
               icon: Icons.emoji_events_rounded,
               iconColor: const Color(0xFF9f7aea),
               backgroundColor: const Color(0xFFf3e8ff),
             ),
             StatCard(
               title: 'Total Instructors',
-              value: counts['instructor']?.toString() ?? '0',
+              value: counts['instructors']?.toString() ?? '0',
               icon: Icons.people_rounded,
               iconColor: const Color(0xFF38bdf8),
               backgroundColor: const Color(0xFFe0f2fe),
             ),
             StatCard(
-              title: 'Total Superadmin',
-              value: counts['superadmin']?.toString() ?? '0',
+              title: 'Total Users',
+              value: counts['totalUsers']?.toString() ?? '0',
               icon: Icons.admin_panel_settings_rounded,
               iconColor: const Color(0xFFec4899),
               backgroundColor: const Color(0xFFfce7f3),
+            ),
+            StatCard(
+              title: 'Pending Deans',
+              value: counts['pendingDeans']?.toString() ?? '0',
+              icon: Icons.hourglass_empty_rounded,
+              iconColor: const Color(0xFFf59e0b),
+              backgroundColor: const Color(0xFFfef3c7),
+            ),
+            StatCard(
+              title: 'Pending Instructors',
+              value: counts['pendingInstructors']?.toString() ?? '0',
+              icon: Icons.pending_actions_rounded,
+              iconColor: const Color(0xFFf59e0b),
+              backgroundColor: const Color(0xFFfef3c7),
+            ),
+            StatCard(
+              title: 'Pending Program Chairs',
+              value: counts['pendingProgramChairs']?.toString() ?? '0',
+              icon: Icons.pending_actions_rounded,
+              iconColor: const Color(0xFFf59e0b),
+              backgroundColor: const Color(0xFFfef3c7),
             ),
           ],
         );
