@@ -1622,17 +1622,17 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
-                if (user['course'] != null && user['course'] != 'No course')
+                if (user['college'] != null && user['college'] != 'No College')
                   Text(
-                    user['course'] ?? 'No course',
+                    user['college'] ?? 'No College',
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
-                if (user['college'] != null && user['college'] != 'No college')
+                if (user['course'] != null && user['course'] != 'No course')
                   Text(
-                    user['college'] ?? 'No college',
+                    user['course'] ?? 'No course',
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),

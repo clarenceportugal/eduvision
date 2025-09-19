@@ -402,70 +402,11 @@ app.get('/api/superadmin/all-users', async (req, res) => {
   try {
     const users = await db.collection(COLLECTION_NAME).find({}).toArray();
     
-    // Get all course and college data for lookup
-    const courses = await db.collection('courses').find({}).toArray();
-    const colleges = await db.collection('colleges').find({}).toArray();
-    
-    // Create lookup maps
-    const courseMap = {};
-    const collegeMap = {};
-    
-    courses.forEach(course => {
-      courseMap[course._id.toString()] = {
-        code: course.code,
-        name: course.name
-      };
-    });
-    
-    colleges.forEach(college => {
-      collegeMap[college._id.toString()] = {
-        code: college.code,
-        name: college.name
-      };
-    });
-    
-    // Enhance users with course and college names
-    const enhancedUsers = users.map(user => {
-      const enhancedUser = { ...user };
-      
-      // Add course information
-      if (user.course) {
-        const courseId = user.course.toString();
-        if (courseMap[courseId]) {
-          enhancedUser.courseName = courseMap[courseId].name;
-          enhancedUser.courseCode = courseMap[courseId].code;
-        } else {
-          enhancedUser.courseName = 'Unknown Course';
-          enhancedUser.courseCode = 'Unknown';
-        }
-      } else {
-        enhancedUser.courseName = 'No Course';
-        enhancedUser.courseCode = 'N/A';
-      }
-      
-      // Add college information
-      if (user.college) {
-        const collegeId = user.college.toString();
-        if (collegeMap[collegeId]) {
-          enhancedUser.collegeName = collegeMap[collegeId].name;
-          enhancedUser.collegeCode = collegeMap[collegeId].code;
-        } else {
-          enhancedUser.collegeName = 'Unknown College';
-          enhancedUser.collegeCode = 'Unknown';
-        }
-      } else {
-        enhancedUser.collegeName = 'No College';
-        enhancedUser.collegeCode = 'N/A';
-      }
-      
-      return enhancedUser;
-    });
-    
     res.json({
       success: true,
-      count: enhancedUsers.length,
-      users: enhancedUsers,
-      message: 'All users fetched successfully for superadmin dashboard with course and college information'
+      count: users.length,
+      users: users,
+      message: 'All users fetched successfully for superadmin dashboard'
     });
     
   } catch (error) {
@@ -473,6 +414,27 @@ app.get('/api/superadmin/all-users', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch users for superadmin dashboard'
+    });
+  }
+});
+
+// Get all colleges
+app.get('/api/colleges', async (req, res) => {
+  try {
+    const colleges = await db.collection('colleges').find({}).toArray();
+    
+    res.json({
+      success: true,
+      count: colleges.length,
+      colleges: colleges,
+      message: 'Colleges fetched successfully'
+    });
+    
+  } catch (error) {
+    console.error('Colleges error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch colleges'
     });
   }
 });

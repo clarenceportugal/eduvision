@@ -531,6 +531,19 @@ class ApiService {
     }
   }
 
+  static Future<List<dynamic>> getColleges() async {
+    try {
+      final response = await _makeRequest(
+        method: 'GET',
+        endpoint: '/colleges',
+      );
+      return response['colleges'] as List<dynamic>? ?? [];
+    } catch (e) {
+      print('Error fetching colleges: $e');
+      return [];
+    }
+  }
+
   static Future<List<dynamic>> getAllUsers() async {
     try {
       final response = await _makeRequest(
@@ -551,6 +564,13 @@ class ApiService {
           final user = users[i];
           print('User ${i + 1}: role="${user['role']}", status="${user['status']}", name="${user['first_name']} ${user['last_name']}"');
         }
+      }
+      
+      // Fetch colleges for name mapping
+      final colleges = await getColleges();
+      final collegeMap = <String, String>{};
+      for (final college in colleges) {
+        collegeMap[college['_id']?.toString() ?? ''] = college['name']?.toString() ?? 'Unknown College';
       }
       
       // Normalize the data structure for consistent display
@@ -577,6 +597,13 @@ class ApiService {
           lastName = nameParts.length > 1 ? nameParts.last : 'User';
         }
         
+        // Get college name from ObjectId
+        String collegeName = 'No College';
+        if (user['college'] != null) {
+          final collegeId = user['college']['\$oid']?.toString() ?? user['college'].toString();
+          collegeName = collegeMap[collegeId] ?? 'Unknown College';
+        }
+        
         return {
           'id': user['_id']?.toString() ?? user['id']?.toString() ?? '',
           'firstName': firstName,
@@ -586,10 +613,8 @@ class ApiService {
           'role': user['role']?.toString() ?? user['userRole']?.toString() ?? user['type']?.toString() ?? 'Unknown',
           'status': user['status']?.toString() ?? 'active',
           'studentId': user['studentId']?.toString() ?? user['student_id']?.toString() ?? 'N/A',
-          'course': user['courseName']?.toString() ?? user['course']?.toString() ?? 'No course',
-          'courseCode': user['courseCode']?.toString() ?? 'N/A',
-          'college': user['collegeName']?.toString() ?? user['college']?.toString() ?? 'No college',
-          'collegeCode': user['collegeCode']?.toString() ?? 'N/A',
+          'college': collegeName,
+          'course': user['course']?.toString() ?? 'No course',
         };
       }).toList();
       
@@ -597,7 +622,7 @@ class ApiService {
       print('Normalized users sample:');
       for (int i = 0; i < normalizedUsers.length && i < 3; i++) {
         final user = normalizedUsers[i];
-        print('Normalized User ${i + 1}: role="${user['role']}", status="${user['status']}", name="${user['firstName']} ${user['lastName']}", course="${user['course']}", courseCode="${user['courseCode']}", college="${user['college']}", collegeCode="${user['collegeCode']}"');
+        print('Normalized User ${i + 1}: role="${user['role']}", status="${user['status']}", name="${user['firstName']} ${user['lastName']}", college="${user['college']}"');
       }
       
       return normalizedUsers;
