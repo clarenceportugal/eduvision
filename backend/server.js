@@ -419,7 +419,7 @@ app.get('/api/superadmin/all-users', async (req, res) => {
 });
 
 // Get all colleges
-app.get('/api/colleges', async (req, res) => {
+app.get('/api/superadmin/colleges', async (req, res) => {
   try {
     const colleges = await db.collection('colleges').find({}).toArray();
     
@@ -431,7 +431,7 @@ app.get('/api/colleges', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Colleges error:', error);
+    console.error('Error fetching colleges:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch colleges'

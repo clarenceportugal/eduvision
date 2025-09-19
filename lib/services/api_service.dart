@@ -385,10 +385,31 @@ class ApiService {
   }
 
   static Future<List<dynamic>> getSuperadminColleges() async {
-    return await _makeListRequest(
-      method: 'GET',
-      endpoint: '/superadmin/colleges',
-    );
+    try {
+      final response = await _makeRequest(
+        method: 'GET',
+        endpoint: '/superadmin/colleges',
+      );
+      return response['colleges'] as List<dynamic>;
+    } catch (e) {
+      print('Error fetching colleges: $e');
+      return [];
+    }
+  }
+
+  // Get college name by ObjectId
+  static Future<String> getCollegeNameById(String collegeId) async {
+    try {
+      final colleges = await getSuperadminColleges();
+      final college = colleges.firstWhere(
+        (college) => college['_id']?.toString() == collegeId,
+        orElse: () => null,
+      );
+      return college?['name'] ?? 'Unknown College';
+    } catch (e) {
+      print('Error fetching college name: $e');
+      return 'Unknown College';
+    }
   }
 
   static Future<List<dynamic>> getSuperadminRooms(String collegeName) async {
@@ -531,19 +552,6 @@ class ApiService {
     }
   }
 
-  static Future<List<dynamic>> getColleges() async {
-    try {
-      final response = await _makeRequest(
-        method: 'GET',
-        endpoint: '/colleges',
-      );
-      return response['colleges'] as List<dynamic>? ?? [];
-    } catch (e) {
-      print('Error fetching colleges: $e');
-      return [];
-    }
-  }
-
   static Future<List<dynamic>> getAllUsers() async {
     try {
       final response = await _makeRequest(
@@ -567,10 +575,13 @@ class ApiService {
       }
       
       // Fetch colleges for name mapping
-      final colleges = await getColleges();
+      final colleges = await getSuperadminColleges();
+      print('Colleges fetched: ${colleges.length}');
+      
+      // Create a map for quick college lookup
       final collegeMap = <String, String>{};
       for (final college in colleges) {
-        collegeMap[college['_id']?.toString() ?? ''] = college['name']?.toString() ?? 'Unknown College';
+        collegeMap[college['_id']?.toString() ?? ''] = college['name'] ?? 'Unknown College';
       }
       
       // Normalize the data structure for consistent display
@@ -597,12 +608,9 @@ class ApiService {
           lastName = nameParts.length > 1 ? nameParts.last : 'User';
         }
         
-        // Get college name from ObjectId
-        String collegeName = 'No College';
-        if (user['college'] != null) {
-          final collegeId = user['college']['\$oid']?.toString() ?? user['college'].toString();
-          collegeName = collegeMap[collegeId] ?? 'Unknown College';
-        }
+        // Get college name
+        final collegeId = user['college']?.toString() ?? '';
+        final collegeName = collegeMap[collegeId] ?? 'No College';
         
         return {
           'id': user['_id']?.toString() ?? user['id']?.toString() ?? '',
@@ -614,7 +622,7 @@ class ApiService {
           'status': user['status']?.toString() ?? 'active',
           'studentId': user['studentId']?.toString() ?? user['student_id']?.toString() ?? 'N/A',
           'college': collegeName,
-          'course': user['course']?.toString() ?? 'No course',
+          'collegeId': collegeId,
         };
       }).toList();
       

@@ -1630,14 +1630,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
-                if (user['course'] != null && user['course'] != 'No course')
-                  Text(
-                    user['course'] ?? 'No course',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                  ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
