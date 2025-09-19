@@ -358,6 +358,30 @@ class ApiService {
     );
   }
 
+  static Future<List<dynamic>> getAllUsers() async {
+    try {
+      final response = await _makeRequest(
+        method: 'GET',
+        endpoint: '/debug-users',
+      );
+      // Debug: Print the response structure
+      print('Debug users response: $response');
+      
+      final users = response['users'] as List<dynamic>;
+      print('Total users found: ${users.length}');
+      
+      // Debug: Print first user structure
+      if (users.isNotEmpty) {
+        print('First user structure: ${users.first}');
+      }
+      
+      return users;
+    } catch (e) {
+      print('Error fetching all users: $e');
+      return [];
+    }
+  }
+
   static Future<List<dynamic>> getSuperadminDeans() async {
     try {
       final response = await _makeRequest(

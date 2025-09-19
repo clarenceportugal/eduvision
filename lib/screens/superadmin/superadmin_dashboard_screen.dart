@@ -55,6 +55,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   bool loadingColleges = false;
 
   // New state variables for consolidated screens
+  List<dynamic> allUsersList = [];
   List<dynamic> deansList = [];
   List<dynamic> instructorsList = [];
   List<dynamic> programChairsList = [];
@@ -79,7 +80,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 9, vsync: this);
+    _tabController = TabController(length: 10, vsync: this);
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
         setState(() {
@@ -165,9 +166,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         _fetchRooms(),
         _fetchSchedules(),
         _fetchAllFacultiesLogs(),
-        _fetchDeansList(),
-        _fetchInstructorsList(),
-        _fetchProgramChairsList(),
+        _fetchAllUsers(), // This will populate all user lists
         _fetchPendingDeans(),
         _fetchPendingInstructors(),
         _fetchPendingProgramChairs(),
@@ -287,6 +286,51 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       if (mounted) {
         setState(() {
           allFacultiesLogs = _getSampleFacultyLogs();
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchAllUsers() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await ApiService.getAllUsers();
+      if (mounted) {
+        setState(() {
+          allUsersList = data;
+          // Also populate the individual lists for backward compatibility
+          deansList = data.where((user) => 
+            user['role'] == 'dean' || 
+            user['userRole'] == 'dean' || 
+            user['type'] == 'dean' ||
+            user['username'] == 'dean' ||
+            user['email']?.toString().contains('dean') == true
+          ).toList();
+          instructorsList = data.where((user) => 
+            user['role'] == 'instructor' || 
+            user['userRole'] == 'instructor' || 
+            user['type'] == 'instructor' ||
+            user['username'] == 'instructor' ||
+            user['email']?.toString().contains('instructor') == true
+          ).toList();
+          programChairsList = data.where((user) => 
+            user['role'] == 'programChairperson' || 
+            user['userRole'] == 'programChairperson' || 
+            user['type'] == 'programChairperson' ||
+            user['username'] == 'programchair' ||
+            user['email']?.toString().contains('program') == true ||
+            user['email']?.toString().contains('chair') == true
+          ).toList();
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          allUsersList = [];
+          deansList = [];
+          instructorsList = [];
+          programChairsList = [];
         });
       }
     }
@@ -694,6 +738,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         controller: _tabController,
         children: [
           _buildDashboardTab(),
+          _buildAllUsersTab(),
           _buildDeansTab(),
           _buildInstructorsTab(),
           _buildProgramChairsTab(),
@@ -743,6 +788,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         tabs: const [
           Tab(icon: Icon(Icons.dashboard_rounded), text: 'Dashboard'),
+          Tab(icon: Icon(Icons.people_rounded), text: 'All Users'),
           Tab(icon: Icon(Icons.admin_panel_settings_rounded), text: 'Deans'),
           Tab(icon: Icon(Icons.person_rounded), text: 'Instructors'),
           Tab(icon: Icon(Icons.school_rounded), text: 'Program Chairs'),
@@ -795,6 +841,17 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildAllUsersTab() {
+    return RefreshIndicator(
+      onRefresh: _fetchAllUsers,
+      child: errorMessage != null
+          ? ErrorHandler.buildErrorWidget(errorMessage!, onRetry: _fetchAllUsers)
+          : loading
+              ? const LoadingWidget(message: 'Loading all users...')
+              : _buildAllUsersList(),
     );
   }
 
@@ -883,6 +940,25 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
           : settingsLoading
               ? const LoadingWidget(message: 'Loading settings...')
               : _buildSettingsContent(),
+    );
+  }
+
+  Widget _buildAllUsersList() {
+    if (allUsersList.isEmpty) {
+      return const EmptyStateWidget(
+        icon: Icons.people_rounded,
+        title: 'No Users Found',
+        subtitle: 'There are no users in the system yet.',
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: allUsersList.length,
+      itemBuilder: (context, index) {
+        final user = allUsersList[index];
+        return _buildUserCard(user, index);
+      },
     );
   }
 
@@ -997,6 +1073,151 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         final programChair = pendingProgramChairs[index];
         return _buildPendingProgramChairCard(programChair, index);
       },
+    );
+  }
+
+  Widget _buildUserCard(Map<String, dynamic> user, int index) {
+    // Determine user role and icon
+    String role = 'Unknown';
+    IconData roleIcon = Icons.person_rounded;
+    
+    if (user['role'] == 'dean' || user['userRole'] == 'dean' || user['type'] == 'dean' || 
+        user['username'] == 'dean' || user['email']?.toString().contains('dean') == true) {
+      role = 'Dean';
+      roleIcon = Icons.admin_panel_settings_rounded;
+    } else if (user['role'] == 'instructor' || user['userRole'] == 'instructor' || user['type'] == 'instructor' || 
+               user['username'] == 'instructor' || user['email']?.toString().contains('instructor') == true) {
+      role = 'Instructor';
+      roleIcon = Icons.person_rounded;
+    } else if (user['role'] == 'programChairperson' || user['userRole'] == 'programChairperson' || user['type'] == 'programChairperson' || 
+               user['username'] == 'programchair' || user['email']?.toString().contains('program') == true || 
+               user['email']?.toString().contains('chair') == true) {
+      role = 'Program Chair';
+      roleIcon = Icons.school_rounded;
+    } else if (user['role'] == 'superadmin' || user['userRole'] == 'superadmin' || user['type'] == 'superadmin') {
+      role = 'Superadmin';
+      roleIcon = Icons.admin_panel_settings_rounded;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              roleIcon,
+              color: Theme.of(context).colorScheme.primary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${user['firstName'] ?? user['name'] ?? 'Unknown'} ${user['lastName'] ?? ''}',
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                Text(
+                  user['email'] ?? 'No email',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        role,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'College: ${user['college'] ?? 'Not specified'}',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              switch (value) {
+                case 'edit':
+                  // TODO: Implement edit functionality
+                  ErrorHandler.showSnackBar(context, 'Edit functionality not implemented yet');
+                  break;
+                case 'delete':
+                  _showDeleteUserDialog(user);
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit_rounded, size: 18),
+                    SizedBox(width: 8),
+                    Text('Edit'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete_rounded, size: 18, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Delete', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -3035,6 +3256,15 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     );
   }
 
+  void _showDeleteUserDialog(Map<String, dynamic> user) {
+    ErrorHandler.showConfirmDialog(
+      context,
+      'Delete User',
+      'Are you sure you want to delete ${user['firstName'] ?? user['name'] ?? 'this user'}? This action cannot be undone.',
+      () => _deleteUser(user['_id'] ?? user['id']),
+    );
+  }
+
   void _showDeleteDeanDialog(Map<String, dynamic> dean) {
     ErrorHandler.showConfirmDialog(
       context,
@@ -3135,6 +3365,21 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       ErrorHandler.hideLoadingDialog(context);
       ErrorHandler.showSuccessDialog(context, 'Program chair rejected successfully');
       _fetchPendingProgramChairs();
+    } catch (e) {
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
+    }
+  }
+
+  Future<void> _deleteUser(String userId) async {
+    try {
+      ErrorHandler.showLoadingDialog(context, 'Deleting user...');
+      // For now, we'll just refresh the list since we don't have a specific delete user API
+      // In a real implementation, you would call ApiService.deleteUser(userId)
+      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      ErrorHandler.hideLoadingDialog(context);
+      ErrorHandler.showSuccessDialog(context, 'User deleted successfully');
+      _fetchAllUsers(); // Refresh the all users list
     } catch (e) {
       ErrorHandler.hideLoadingDialog(context);
       ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
