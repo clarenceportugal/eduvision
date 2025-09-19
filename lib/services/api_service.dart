@@ -586,6 +586,10 @@ class ApiService {
           'role': user['role']?.toString() ?? user['userRole']?.toString() ?? user['type']?.toString() ?? 'Unknown',
           'status': user['status']?.toString() ?? 'active',
           'studentId': user['studentId']?.toString() ?? user['student_id']?.toString() ?? 'N/A',
+          'course': user['courseName']?.toString() ?? user['course']?.toString() ?? 'No course',
+          'courseCode': user['courseCode']?.toString() ?? 'N/A',
+          'college': user['collegeName']?.toString() ?? user['college']?.toString() ?? 'No college',
+          'collegeCode': user['collegeCode']?.toString() ?? 'N/A',
         };
       }).toList();
       
@@ -593,7 +597,7 @@ class ApiService {
       print('Normalized users sample:');
       for (int i = 0; i < normalizedUsers.length && i < 3; i++) {
         final user = normalizedUsers[i];
-        print('Normalized User ${i + 1}: role="${user['role']}", status="${user['status']}", name="${user['firstName']} ${user['lastName']}"');
+        print('Normalized User ${i + 1}: role="${user['role']}", status="${user['status']}", name="${user['firstName']} ${user['lastName']}", course="${user['course']}", courseCode="${user['courseCode']}", college="${user['college']}", collegeCode="${user['collegeCode']}"');
       }
       
       return normalizedUsers;

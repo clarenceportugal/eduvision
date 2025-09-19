@@ -1622,41 +1622,63 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
+                if (user['course'] != null && user['course'] != 'No course')
+                  Text(
+                    user['course'] ?? 'No course',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+                if (user['college'] != null && user['college'] != 'No college')
+                  Text(
+                    user['college'] ?? 'No college',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: iconColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        user['role']?.toString().toUpperCase() ?? 'UNKNOWN',
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: iconColor,
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: iconColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          user['role']?.toString().toUpperCase() ?? 'UNKNOWN',
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: iconColor,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: user['status'] == 'pending' 
-                            ? Colors.orange.withValues(alpha: 0.1)
-                            : Colors.green.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        user['status']?.toString().toUpperCase() ?? 'ACTIVE',
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
                           color: user['status'] == 'pending' 
-                              ? Colors.orange.shade600
-                              : Colors.green.shade600,
+                              ? Colors.orange.withValues(alpha: 0.1)
+                              : Colors.green.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          user['status']?.toString().toUpperCase() ?? 'ACTIVE',
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: user['status'] == 'pending' 
+                                ? Colors.orange.shade600
+                                : Colors.green.shade600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),
