@@ -388,7 +388,7 @@ class ApiService {
     try {
       final response = await _makeRequest(
         method: 'GET',
-        endpoint: '/superadmin/colleges',
+        endpoint: '/colleges',
       );
       return response['colleges'] as List<dynamic>;
     } catch (e) {
@@ -581,7 +581,10 @@ class ApiService {
       // Create a map for quick college lookup
       final collegeMap = <String, String>{};
       for (final college in colleges) {
-        collegeMap[college['_id']?.toString() ?? ''] = college['name'] ?? 'Unknown College';
+        final collegeId = college['_id']?.toString() ?? '';
+        final collegeName = college['name'] ?? 'Unknown College';
+        collegeMap[collegeId] = collegeName;
+        print('Mapped college: $collegeId -> $collegeName');
       }
       
       // Normalize the data structure for consistent display
@@ -611,6 +614,7 @@ class ApiService {
         // Get college name
         final collegeId = user['college']?.toString() ?? '';
         final collegeName = collegeMap[collegeId] ?? 'No College';
+        print('User ${user['first_name']} ${user['last_name']}: collegeId="$collegeId", collegeName="$collegeName"');
         
         return {
           'id': user['_id']?.toString() ?? user['id']?.toString() ?? '',
