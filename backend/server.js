@@ -806,7 +806,10 @@ app.listen(port, '0.0.0.0', () => {
 // Superadmin endpoints
 app.get('/api/superadmin/deans', async (req, res) => {
   try {
-    const deans = await db.collection(COLLECTION_NAME).find({ role: 'dean' }).toArray();
+    const deans = await db.collection(COLLECTION_NAME).find({ 
+      role: 'dean',
+      status: { $ne: 'pending' } // Exclude pending deans
+    }).toArray();
     res.json(deans);
   } catch (error) {
     console.error('Error fetching deans:', error);
@@ -816,7 +819,10 @@ app.get('/api/superadmin/deans', async (req, res) => {
 
 app.get('/api/superadmin/instructors', async (req, res) => {
   try {
-    const instructors = await db.collection(COLLECTION_NAME).find({ role: 'instructor' }).toArray();
+    const instructors = await db.collection(COLLECTION_NAME).find({ 
+      role: 'instructor',
+      status: { $ne: 'pending' } // Exclude pending instructors
+    }).toArray();
     res.json(instructors);
   } catch (error) {
     console.error('Error fetching instructors:', error);
@@ -826,7 +832,10 @@ app.get('/api/superadmin/instructors', async (req, res) => {
 
 app.get('/api/superadmin/program-chairs', async (req, res) => {
   try {
-    const programChairs = await db.collection(COLLECTION_NAME).find({ role: 'programChairperson' }).toArray();
+    const programChairs = await db.collection(COLLECTION_NAME).find({ 
+      role: 'programChairperson',
+      status: { $ne: 'pending' } // Exclude pending program chairs
+    }).toArray();
     res.json(programChairs);
   } catch (error) {
     console.error('Error fetching program chairs:', error);
