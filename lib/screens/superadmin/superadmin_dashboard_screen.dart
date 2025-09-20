@@ -770,22 +770,20 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         preferredSize: const Size.fromHeight(kToolbarHeight + 48),
         child: _buildAppBar(),
       ),
-      body: SafeArea(
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-            _buildDashboardTab(),
-            _buildDeansTab(),
-            _buildInstructorsTab(),
-            _buildProgramChairsTab(),
-            _buildPendingDeansTab(),
-            _buildPendingInstructorsTab(),
-            _buildPendingProgramChairsTab(),
-            _buildAllUsersTab(),
-            _buildLiveVideoTab(),
-            _buildSettingsTab(),
-          ],
-        ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildDashboardTab(),
+          _buildDeansTab(),
+          _buildInstructorsTab(),
+          _buildProgramChairsTab(),
+          _buildPendingDeansTab(),
+          _buildPendingInstructorsTab(),
+          _buildPendingProgramChairsTab(),
+          _buildAllUsersTab(),
+          _buildLiveVideoTab(),
+          _buildSettingsTab(),
+        ],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
@@ -821,70 +819,20 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       child: TabBar(
         controller: _tabController,
         isScrollable: true,
-        tabAlignment: TabAlignment.start,
-        indicatorSize: TabBarIndicatorSize.tab,
         indicatorColor: Theme.of(context).colorScheme.primary,
         labelColor: Theme.of(context).colorScheme.primary,
         unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-        labelStyle: GoogleFonts.inter(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
-        unselectedLabelStyle: GoogleFonts.inter(
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-        ),
         tabs: const [
-          Tab(
-            icon: Icon(Icons.dashboard_rounded, size: 20),
-            text: 'Dashboard',
-            height: 60,
-          ),
-          Tab(
-            icon: Icon(Icons.admin_panel_settings_rounded, size: 20),
-            text: 'Deans',
-            height: 60,
-          ),
-          Tab(
-            icon: Icon(Icons.person_rounded, size: 20),
-            text: 'Instructors',
-            height: 60,
-          ),
-          Tab(
-            icon: Icon(Icons.school_rounded, size: 20),
-            text: 'Program Chairs',
-            height: 60,
-          ),
-          Tab(
-            icon: Icon(Icons.hourglass_empty_rounded, size: 20),
-            text: 'Pending Deans',
-            height: 60,
-          ),
-          Tab(
-            icon: Icon(Icons.pending_actions_rounded, size: 20),
-            text: 'Pending Instructors',
-            height: 60,
-          ),
-          Tab(
-            icon: Icon(Icons.pending_actions_rounded, size: 20),
-            text: 'Pending Program Chairs',
-            height: 60,
-          ),
-          Tab(
-            icon: Icon(Icons.people_rounded, size: 20),
-            text: 'All Users',
-            height: 60,
-          ),
-          Tab(
-            icon: Icon(Icons.videocam_rounded, size: 20),
-            text: 'Live Video',
-            height: 60,
-          ),
-          Tab(
-            icon: Icon(Icons.settings_rounded, size: 20),
-            text: 'Settings',
-            height: 60,
-          ),
+          Tab(icon: Icon(Icons.dashboard_rounded), text: 'Dashboard'),
+          Tab(icon: Icon(Icons.admin_panel_settings_rounded), text: 'Deans'),
+          Tab(icon: Icon(Icons.person_rounded), text: 'Instructors'),
+          Tab(icon: Icon(Icons.school_rounded), text: 'Program Chairs'),
+          Tab(icon: Icon(Icons.hourglass_empty_rounded), text: 'Pending Deans'),
+          Tab(icon: Icon(Icons.pending_actions_rounded), text: 'Pending Instructors'),
+          Tab(icon: Icon(Icons.pending_actions_rounded), text: 'Pending Program Chairs'),
+          Tab(icon: Icon(Icons.people_rounded), text: 'All Users'),
+          Tab(icon: Icon(Icons.videocam_rounded), text: 'Live Video'),
+          Tab(icon: Icon(Icons.settings_rounded), text: 'Settings'),
         ],
       ),
     );
@@ -898,10 +846,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         slivers: [
           if (errorMessage != null)
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ErrorHandler.buildErrorWidget(errorMessage!, onRetry: _refreshData),
-              ),
+              child: ErrorHandler.buildErrorWidget(errorMessage!, onRetry: _refreshData),
             )
           else
             SliverToBoxAdapter(
@@ -910,20 +855,20 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                 child: SlideTransition(
                   position: _slideAnimation,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildHeader(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
                         _buildStatisticsCards(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
                         _buildScheduleChart(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
                         _buildSchedulesTable(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
                         _buildTodayActivity(),
-                        const SizedBox(height: 100), // Increased bottom padding for better spacing
+                        const SizedBox(height: 100),
                       ],
                     ),
                   ),
@@ -2192,127 +2137,71 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
 
 
   Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            Theme.of(context).colorScheme.secondary.withValues(alpha: 0.05),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Super Admin Dashboard',
+                style: GoogleFonts.inter(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
+            // Database Health Indicator
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: errorMessage == null ? Colors.green.shade50 : Colors.red.shade50,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: errorMessage == null ? Colors.green.shade300 : Colors.red.shade300,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    errorMessage == null ? Icons.check_circle_rounded : Icons.error_rounded,
+                    size: 16,
+                    color: errorMessage == null ? Colors.green.shade600 : Colors.red.shade600,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    errorMessage == null ? 'DB Connected' : 'DB Issues',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: errorMessage == null ? Colors.green.shade700 : Colors.red.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        const SizedBox(height: 8),
+        Text(
+          'Dashboard / Attendance',
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.admin_panel_settings_rounded,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Super Admin Dashboard',
-                      style: GoogleFonts.inter(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Manage your educational institution',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Database Health Indicator
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: errorMessage == null ? Colors.green.shade50 : Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: errorMessage == null ? Colors.green.shade300 : Colors.red.shade300,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      errorMessage == null ? Icons.check_circle_rounded : Icons.error_rounded,
-                      size: 16,
-                      color: errorMessage == null ? Colors.green.shade600 : Colors.red.shade600,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      errorMessage == null ? 'DB Connected' : 'DB Issues',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: errorMessage == null ? Colors.green.shade700 : Colors.red.shade700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        const SizedBox(height: 16),
+        Text(
+          'Total Users per Role:',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.dashboard_rounded,
-                  size: 16,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Dashboard / Attendance Management',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -2324,30 +2213,21 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         
         // Show loading state if counts are empty
         if (counts.isEmpty) {
-          return Container(
+          return SizedBox(
             height: 200,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-              ),
-            ),
             child: const Center(
               child: CircularProgressIndicator(),
             ),
           );
         }
         
-        return Container(
-          padding: const EdgeInsets.all(4),
-          child: GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: isTablet ? 1.4 : 1.2,
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: isTablet ? 1.4 : 1.2,
           children: [
             StatCard(
               title: 'Total Deans',
@@ -2399,7 +2279,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
               backgroundColor: const Color(0xFFfef3c7),
             ),
           ],
-          ),
         );
       },
     );
