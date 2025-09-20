@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/api_service.dart';
 import '../../models/schedule_model.dart';
 import '../../widgets/common/stat_card.dart';
@@ -8,8 +11,12 @@ import '../../widgets/common/responsive_table.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/common/empty_state_widget.dart';
 import '../../utils/error_handler.dart';
-import '../../main.dart' show LoginScreen;
+import '../../main.dart' show LoginScreen, ThemeProvider;
 import '../face_registration_screen.dart';
+import '../../widgets/add_dean_modal.dart';
+import '../../widgets/add_instructor_modal.dart';
+import '../../widgets/add_program_chair_modal.dart';
+import '../../widgets/edit_user_modal.dart';
 
 class SuperadminDashboardScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -53,6 +60,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   String roomValue = "all";
   bool loadingCourses = false;
   bool loadingColleges = false;
+  bool loadingSchedules = false;
 
   // New state variables for consolidated screens
   List<dynamic> deansList = [];
@@ -72,6 +80,28 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   Map<String, dynamic> userData = {};
   bool settingsLoading = false;
   String? settingsErrorMessage;
+  bool notificationsEnabled = true;
+
+  // Search and filtering state
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String _selectedStatus = 'all';
+  String _selectedRole = 'all';
+  String _selectedCollege = 'all';
+  List<dynamic> _filteredUsers = [];
+  bool _isSearching = false;
+  
+  // Pagination state
+  int _currentPage = 0;
+  int _rowsPerPage = 10;
+  List<int> _rowsPerPageOptions = [5, 10, 25, 50];
+
+  // Modal state
+  bool _showAddDeanModal = false;
+  bool _showAddInstructorModal = false;
+  bool _showAddProgramChairModal = false;
+  bool _showEditUserModal = false;
+  Map<String, dynamic> _selectedUser = {};
 
   // Chart data for timeline visualization
   List<Map<String, dynamic>> chartData = [];
@@ -82,18 +112,38 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 10, vsync: this); // Updated length for new tab
-    _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
-        setState(() {
-          _currentTabIndex = _tabController.index;
-        });
-        _loadTabData();
-      }
-    });
+    _initializeTabController();
     _initializeAnimations();
     _initializeData();
+    _loadNotificationSetting();
     userData = widget.userData;
+  }
+
+  void _initializeTabController() {
+    _tabController = TabController(length: 11, vsync: this); // 11 tabs total
+    print('TabController created with length: ${_tabController.length}');
+    print('Expected tabs: 11, TabBarView children: 11, TabBar tabs: 11');
+    
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        final newIndex = _tabController.index;
+        print('Tab changed to index: $newIndex');
+        
+        // Safety check for valid index
+        if (newIndex >= 0 && newIndex < _tabController.length) {
+        setState(() {
+            _currentTabIndex = newIndex;
+        });
+        _loadTabData();
+          
+          // Trigger animation for tab change
+          _animationController.reset();
+          _animationController.forward();
+        } else {
+          print('Invalid tab index: $newIndex, length: ${_tabController.length}');
+        }
+      }
+    });
   }
 
   Future<void> _initializeData() async {
@@ -135,6 +185,13 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   }
 
   Future<void> _loadUserData() async {
+    if (!mounted) return;
+    
+    setState(() {
+      settingsLoading = true;
+      settingsErrorMessage = null;
+    });
+    
     try {
       final userData = await ApiService.getUserData();
       if (mounted) {
@@ -146,9 +203,38 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     } catch (e) {
       if (mounted) {
         setState(() {
-          errorMessage = 'Failed to load user data: $e';
+          settingsErrorMessage = 'Failed to load user data: $e';
         });
       }
+    } finally {
+      if (mounted) {
+        setState(() {
+          settingsLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadNotificationSetting() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getBool('notifications_enabled');
+      if (mounted) {
+        setState(() {
+          notificationsEnabled = saved ?? true; // Default to true
+        });
+      }
+    } catch (e) {
+      print('Error loading notification setting: $e');
+    }
+  }
+
+  Future<void> _saveNotificationSetting(bool enabled) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('notifications_enabled', enabled);
+    } catch (e) {
+      print('Error saving notification setting: $e');
     }
   }
 
@@ -279,17 +365,40 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   Future<void> _fetchSchedules() async {
     if (!mounted) return;
     
+    setState(() {
+      loadingSchedules = true;
+    });
+    
     try {
-      final shortCourseValue = courseValue.replaceAll(RegExp(r'^bs', caseSensitive: false), '').toUpperCase();
+      print('Fetching schedules...');
+      print('Current courseValue: $courseValue');
+      
+      final shortCourseValue = courseValue == "all" ? "" : courseValue.replaceAll(RegExp(r'^bs', caseSensitive: false), '').toUpperCase();
+      print('Short course value: $shortCourseValue');
+      
       final data = await ApiService.getSuperadminSchedules(shortCourseValue);
+      print('Schedules fetched: ${data.length} items');
+      
       if (mounted) {
         setState(() {
           schedules = data.map((item) => Schedule.fromJson(item)).toList();
           _generateChartData();
         });
+        print('Schedules updated in state: ${schedules.length} items');
       }
     } catch (error) {
-      // 
+      print('Error fetching schedules: $error');
+      if (mounted) {
+        setState(() {
+          schedules = [];
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          loadingSchedules = false;
+        });
+      }
     }
   }
 
@@ -497,8 +606,12 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
           programs = data;
         });
       }
+      
+      // Fetch rooms and schedules for the new college
+      await _fetchRooms();
+      await _fetchSchedules();
     } catch (error) {
-      // 
+      print('Error in college change: $error');
     } finally {
       if (mounted) {
         setState(() => loadingCourses = false);
@@ -575,12 +688,403 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       case 7: // All Users
         await _loadAllUsers();
         break;
-      case 8: // Live Video
+      case 8: // Schedule
+        await _fetchSchedules();
+        break;
+      case 9: // Live Video
         await _checkLiveStatus();
         break;
-      case 9: // Settings
+      case 10: // Settings
+        print('Loading settings tab data...');
         await _loadUserData();
+        print('Settings tab data loaded');
         break;
+    }
+  }
+
+  // Search and filtering methods
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+      _isSearching = query.isNotEmpty;
+      _currentPage = 0; // Reset to first page when searching
+    });
+    _filterUsers();
+  }
+
+  void _filterUsers() {
+    List<dynamic> usersToFilter = [];
+    
+    switch (_currentTabIndex) {
+      case 1: // Deans
+        usersToFilter = deansList;
+        break;
+      case 2: // Instructors
+        usersToFilter = instructorsList;
+        break;
+      case 3: // Program Chairs
+        usersToFilter = programChairsList;
+        break;
+      case 4: // Pending Deans
+        usersToFilter = pendingDeans;
+        break;
+      case 5: // Pending Instructors
+        usersToFilter = pendingInstructors;
+        break;
+      case 6: // Pending Program Chairs
+        usersToFilter = pendingProgramChairs;
+        break;
+      case 7: // All Users
+        usersToFilter = allUsersList;
+        break;
+    }
+
+    setState(() {
+      _filteredUsers = usersToFilter.where((user) {
+        final matchesSearch = _searchQuery.isEmpty ||
+            user['firstName']?.toString().toLowerCase().contains(_searchQuery.toLowerCase()) == true ||
+            user['lastName']?.toString().toLowerCase().contains(_searchQuery.toLowerCase()) == true ||
+            user['email']?.toString().toLowerCase().contains(_searchQuery.toLowerCase()) == true ||
+            user['username']?.toString().toLowerCase().contains(_searchQuery.toLowerCase()) == true;
+
+        final matchesStatus = _selectedStatus == 'all' ||
+            user['status']?.toString().toLowerCase() == _selectedStatus.toLowerCase();
+
+        final matchesRole = _selectedRole == 'all' ||
+            user['role']?.toString().toLowerCase() == _selectedRole.toLowerCase();
+
+        final matchesCollege = _selectedCollege == 'all' ||
+            user['college']?.toString().toLowerCase().contains(_selectedCollege.toLowerCase()) == true;
+
+        return matchesSearch && matchesStatus && matchesRole && matchesCollege;
+      }).toList();
+    });
+  }
+
+  void _onStatusFilterChanged(String status) {
+    setState(() {
+      _selectedStatus = status;
+      _currentPage = 0; // Reset to first page when filtering
+    });
+    _filterUsers();
+  }
+
+  void _onRoleFilterChanged(String role) {
+    setState(() {
+      _selectedRole = role;
+      _currentPage = 0; // Reset to first page when filtering
+    });
+    _filterUsers();
+  }
+
+  void _onCollegeFilterChanged(String college) {
+    setState(() {
+      _selectedCollege = college;
+      _currentPage = 0; // Reset to first page when filtering
+    });
+    _filterUsers();
+  }
+
+  // Pagination methods
+  void _handleChangePage(int newPage) {
+    setState(() {
+      _currentPage = newPage;
+    });
+  }
+
+  void _handleChangeRowsPerPage(int newRowsPerPage) {
+    setState(() {
+      _rowsPerPage = newRowsPerPage;
+      _currentPage = 0; // Reset to first page
+    });
+  }
+
+  List<dynamic> _getPaginatedUsers(List<dynamic> users) {
+    if (users.isEmpty) return [];
+    
+    final startIndex = _currentPage * _rowsPerPage;
+    final endIndex = (startIndex + _rowsPerPage).clamp(0, users.length);
+    
+    // Ensure startIndex is within bounds
+    if (startIndex >= users.length) {
+      return [];
+    }
+    
+    return users.sublist(startIndex, endIndex);
+  }
+
+  Widget _buildPaginationControls(List<dynamic> users) {
+    if (users.isEmpty) return const SizedBox.shrink();
+    
+    // Calculate total pages safely
+    final totalPages = (users.length / _rowsPerPage).ceil();
+    final safeCurrentPage = _currentPage.clamp(0, totalPages - 1);
+    final startIndex = safeCurrentPage * _rowsPerPage;
+    final endIndex = (startIndex + _rowsPerPage).clamp(0, users.length);
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+          ),
+        ),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 600;
+          
+          if (isMobile) {
+            // Mobile layout - stack vertically
+            return Column(
+              children: [
+                Text(
+                  'Showing ${startIndex + 1} to $endIndex of ${users.length} entries',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Rows per page:',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(width: 8),
+                    DropdownButton<int>(
+                      value: _rowsPerPage,
+                      items: _rowsPerPageOptions.map((int value) {
+                        return DropdownMenuItem<int>(
+                          value: value,
+                          child: Text(value.toString()),
+                        );
+                      }).toList(),
+                      onChanged: (int? newValue) {
+                        if (newValue != null) {
+                          _handleChangeRowsPerPage(newValue);
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 16),
+                    IconButton(
+                      onPressed: safeCurrentPage > 0 ? () => _handleChangePage(safeCurrentPage - 1) : null,
+                      icon: const Icon(Icons.chevron_left),
+                    ),
+                    Text('${safeCurrentPage + 1} of $totalPages'),
+                    IconButton(
+                      onPressed: safeCurrentPage < totalPages - 1 
+                          ? () => _handleChangePage(safeCurrentPage + 1) 
+                          : null,
+                      icon: const Icon(Icons.chevron_right),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          } else {
+            // Desktop layout - use flex widgets
+            return Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    'Showing ${startIndex + 1} to $endIndex of ${users.length} entries',
+                    style: Theme.of(context).textTheme.bodySmall,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Rows per page:',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(width: 8),
+                      DropdownButton<int>(
+                        value: _rowsPerPage,
+                        items: _rowsPerPageOptions.map((int value) {
+                          return DropdownMenuItem<int>(
+                            value: value,
+                            child: Text(value.toString()),
+                          );
+                        }).toList(),
+                        onChanged: (int? newValue) {
+                          if (newValue != null) {
+                            _handleChangeRowsPerPage(newValue);
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 16),
+                      IconButton(
+                        onPressed: safeCurrentPage > 0 ? () => _handleChangePage(safeCurrentPage - 1) : null,
+                        icon: const Icon(Icons.chevron_left),
+                      ),
+                      Text('${safeCurrentPage + 1} of $totalPages'),
+                      IconButton(
+                        onPressed: safeCurrentPage < totalPages - 1 
+                            ? () => _handleChangePage(safeCurrentPage + 1) 
+                            : null,
+                        icon: const Icon(Icons.chevron_right),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  // Modal methods
+  void _openAddDeanModal() {
+    setState(() {
+      _showAddDeanModal = true;
+    });
+  }
+
+  void _closeAddDeanModal() {
+    setState(() {
+      _showAddDeanModal = false;
+    });
+  }
+
+  void _openAddInstructorModal() {
+    setState(() {
+      _showAddInstructorModal = true;
+    });
+  }
+
+  void _closeAddInstructorModal() {
+    setState(() {
+      _showAddInstructorModal = false;
+    });
+  }
+
+  void _openAddProgramChairModal() {
+    setState(() {
+      _showAddProgramChairModal = true;
+    });
+  }
+
+  void _closeAddProgramChairModal() {
+    setState(() {
+      _showAddProgramChairModal = false;
+    });
+  }
+
+  void _openEditUserModal(Map<String, dynamic> user) {
+    setState(() {
+      _selectedUser = user;
+      _showEditUserModal = true;
+    });
+  }
+
+  void _closeEditUserModal() {
+    setState(() {
+      _showEditUserModal = false;
+      _selectedUser = {};
+    });
+  }
+
+  // User management methods
+  Future<void> _handleAddDean(Map<String, dynamic> deanData) async {
+    try {
+      await ApiService.addDean(deanData);
+      await _fetchDeansList();
+      await _fetchUserCounts();
+      ErrorHandler.showSnackBar(context, 'Dean added successfully!');
+    } catch (e) {
+      ErrorHandler.showSnackBar(context, 'Failed to add dean: $e');
+    }
+  }
+
+  Future<void> _handleAddInstructor(Map<String, dynamic> instructorData) async {
+    try {
+      await ApiService.addInstructor(instructorData);
+      await _fetchInstructorsList();
+      await _fetchUserCounts();
+      ErrorHandler.showSnackBar(context, 'Instructor added successfully!');
+    } catch (e) {
+      ErrorHandler.showSnackBar(context, 'Failed to add instructor: $e');
+    }
+  }
+
+  Future<void> _handleAddProgramChair(Map<String, dynamic> programChairData) async {
+    try {
+      await ApiService.addProgramChair(programChairData);
+      await _fetchProgramChairsList();
+      await _fetchUserCounts();
+      ErrorHandler.showSnackBar(context, 'Program Chair added successfully!');
+    } catch (e) {
+      ErrorHandler.showSnackBar(context, 'Failed to add program chair: $e');
+    }
+  }
+
+  Future<void> _handleUpdateUser(Map<String, dynamic> userData) async {
+    try {
+      await ApiService.updateUser(_selectedUser['id'], userData);
+      await _loadTabData(); // Refresh current tab data
+      await _fetchUserCounts();
+      ErrorHandler.showSnackBar(context, 'User updated successfully!');
+    } catch (e) {
+      ErrorHandler.showSnackBar(context, 'Failed to update user: $e');
+    }
+  }
+
+  Future<void> _handleDeleteUser(String userId, String userRole) async {
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete this ${userRole.toLowerCase()}? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      switch (userRole.toLowerCase()) {
+        case 'dean':
+          await ApiService.deleteDean(userId);
+          await _fetchDeansList();
+          break;
+        case 'instructor':
+          await ApiService.deleteInstructor(userId);
+          await _fetchInstructorsList();
+          break;
+        case 'programchairperson':
+        case 'program_chair':
+          await ApiService.deleteProgramChair(userId);
+          await _fetchProgramChairsList();
+          break;
+        default:
+          throw Exception('Unknown user role: $userRole');
+      }
+      await _fetchUserCounts();
+      ErrorHandler.showSnackBar(context, 'User deleted successfully!');
+    } catch (e) {
+      ErrorHandler.showSnackBar(context, 'Failed to delete user: $e');
     }
   }
 
@@ -759,6 +1263,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   void dispose() {
     _animationController.dispose();
     _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -770,7 +1275,9 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         preferredSize: const Size.fromHeight(kToolbarHeight + 48),
         child: _buildAppBar(),
       ),
-      body: TabBarView(
+      body: Stack(
+        children: [
+          TabBarView(
         controller: _tabController,
         children: [
           _buildDashboardTab(),
@@ -780,9 +1287,41 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
           _buildPendingDeansTab(),
           _buildPendingInstructorsTab(),
           _buildPendingProgramChairsTab(),
-          _buildAllUsersTab(),
+              _buildAllUsersTab(),
+              _buildScheduleTab(),
           _buildLiveVideoTab(),
           _buildSettingsTab(),
+            ],
+          ),
+          // Add Dean Modal
+          AddDeanModal(
+            isOpen: _showAddDeanModal,
+            onClose: _closeAddDeanModal,
+            onAddDean: _handleAddDean,
+            colleges: colleges,
+          ),
+          // Add Instructor Modal
+          AddInstructorModal(
+            isOpen: _showAddInstructorModal,
+            onClose: _closeAddInstructorModal,
+            onAddInstructor: _handleAddInstructor,
+            colleges: colleges,
+          ),
+          // Add Program Chair Modal
+          AddProgramChairModal(
+            isOpen: _showAddProgramChairModal,
+            onClose: _closeAddProgramChairModal,
+            onAddProgramChair: _handleAddProgramChair,
+            colleges: colleges,
+          ),
+          // Edit User Modal
+          EditUserModal(
+            isOpen: _showEditUserModal,
+            onClose: _closeEditUserModal,
+            onUpdateUser: _handleUpdateUser,
+            user: _selectedUser,
+            colleges: colleges,
+          ),
         ],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
@@ -816,24 +1355,31 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
           ),
         ],
       ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
       child: TabBar(
         controller: _tabController,
         isScrollable: true,
+          tabAlignment: TabAlignment.start,
         indicatorColor: Theme.of(context).colorScheme.primary,
         labelColor: Theme.of(context).colorScheme.primary,
         unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+          labelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
+          unselectedLabelStyle: const TextStyle(fontSize: 11),
         tabs: const [
-          Tab(icon: Icon(Icons.dashboard_rounded), text: 'Dashboard'),
-          Tab(icon: Icon(Icons.admin_panel_settings_rounded), text: 'Deans'),
-          Tab(icon: Icon(Icons.person_rounded), text: 'Instructors'),
-          Tab(icon: Icon(Icons.school_rounded), text: 'Program Chairs'),
-          Tab(icon: Icon(Icons.hourglass_empty_rounded), text: 'Pending Deans'),
-          Tab(icon: Icon(Icons.pending_actions_rounded), text: 'Pending Instructors'),
-          Tab(icon: Icon(Icons.pending_actions_rounded), text: 'Pending Program Chairs'),
-          Tab(icon: Icon(Icons.people_rounded), text: 'All Users'),
-          Tab(icon: Icon(Icons.videocam_rounded), text: 'Live Video'),
-          Tab(icon: Icon(Icons.settings_rounded), text: 'Settings'),
-        ],
+            Tab(icon: Icon(Icons.dashboard_rounded, size: 16), text: 'Dashboard'),
+            Tab(icon: Icon(Icons.admin_panel_settings_rounded, size: 16), text: 'Deans'),
+            Tab(icon: Icon(Icons.person_rounded, size: 16), text: 'Instructors'),
+            Tab(icon: Icon(Icons.school_rounded, size: 16), text: 'Program Chairs'),
+            Tab(icon: Icon(Icons.hourglass_empty_rounded, size: 16), text: 'Pending Deans'),
+            Tab(icon: Icon(Icons.pending_actions_rounded, size: 16), text: 'Pending Instructors'),
+            Tab(icon: Icon(Icons.pending_actions_rounded, size: 16), text: 'Pending Program Chairs'),
+            Tab(icon: Icon(Icons.people_rounded, size: 16), text: 'All Users'),
+            Tab(icon: Icon(Icons.schedule_rounded, size: 16), text: 'Schedule'),
+            Tab(icon: Icon(Icons.videocam_rounded, size: 16), text: 'Live Video'),
+            Tab(icon: Icon(Icons.settings_rounded, size: 16), text: 'Settings'),
+          ],
+        ),
       ),
     );
   }
@@ -968,7 +1514,140 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     );
   }
 
+  Widget _buildScheduleTab() {
+    return RefreshIndicator(
+      onRefresh: () async {
+        await _fetchSchedules();
+        await _fetchColleges();
+        await _fetchRooms();
+      },
+      child: _buildScheduleContent(),
+    );
+  }
+
+  Widget _buildScheduleContent() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Filter controls
+          _buildScheduleFilters(),
+          const SizedBox(height: 24),
+          // Schedule content
+          if (loadingSchedules)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: LoadingWidget(message: 'Loading schedules...'),
+              ),
+            )
+          else if (schedules.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(32.0),
+                child: EmptyStateWidget(
+                  icon: Icons.schedule_rounded,
+                  title: 'No Schedules Found',
+                  subtitle: 'There are no schedules for the selected filters.',
+                ),
+              ),
+            )
+          else ...[
+            // Schedule chart
+            _buildScheduleChart(),
+            const SizedBox(height: 24),
+            // Schedule table
+            _buildSchedulesTable(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScheduleFilters() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Filter Schedules',
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: _buildDropdown(
+                  'College',
+                  collegeValue,
+                  colleges.map<DropdownMenuItem<String>>((college) => DropdownMenuItem<String>(
+                    value: college['code'],
+                    child: Text(
+                      college['name'],
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )).toList(),
+                  (value) => _handleCollegeChange(value!),
+                  loadingColleges,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 1,
+                child: _buildDropdown(
+                  'Course',
+                  courseValue,
+                  programs.map<DropdownMenuItem<String>>((program) => DropdownMenuItem<String>(
+                    value: program['code'].toString().toLowerCase(),
+                    child: Text(
+                      program['code'].toString().toUpperCase(),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )).toList(),
+                  (value) => _handleCourseChange(value!),
+                  loadingCourses,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 1,
+                child: _buildDropdown(
+                  'Room',
+                  roomValue,
+                  rooms.map<DropdownMenuItem<String>>((room) => DropdownMenuItem<String>(
+                    value: room['name'],
+                    child: Text(
+                      room['name'],
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )).toList(),
+                  (value) => _handleRoomChange(value!),
+                  false,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSettingsTab() {
+    print('Building settings tab - loading: $settingsLoading, error: $settingsErrorMessage');
     return RefreshIndicator(
       onRefresh: _loadUserData,
       child: settingsErrorMessage != null
@@ -979,205 +1658,385 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     );
   }
 
-  Widget _buildDeansList() {
-    if (deansList.isEmpty) {
-      // If no deans found, show all users as fallback for debugging
-      if (allUsersList.isNotEmpty) {
-        return Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.orange.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange.shade300),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, color: Colors.orange.shade600),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'No deans found with current filtering. Showing all users for debugging:',
-                      style: GoogleFonts.inter(
-                        color: Colors.orange.shade800,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: allUsersList.length,
-                itemBuilder: (context, index) {
-                  final user = allUsersList[index];
-                  return _buildUserCard(user, index);
-                },
-              ),
-            ),
-          ],
-        );
-      }
-      
-      return const EmptyStateWidget(
-        icon: Icons.admin_panel_settings_rounded,
-        title: 'No Deans Found',
-        subtitle: 'There are no deans in the system yet.',
-      );
-    }
-
-    return ListView.builder(
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
-      itemCount: deansList.length,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        ),
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: _onSearchChanged,
+        decoration: InputDecoration(
+          hintText: 'Search by name, email, or username...',
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    _onSearchChanged('');
+                  },
+                )
+              : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchAndFilterControls() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Search bar
+          TextField(
+            controller: _searchController,
+            onChanged: _onSearchChanged,
+            decoration: InputDecoration(
+              hintText: 'Search by name, email, or username...',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _searchQuery.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        _onSearchChanged('');
+                      },
+                    )
+                  : null,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Filter controls
+          Row(
+            children: [
+              // Status filter
+              Expanded(
+                flex: 1,
+                child: DropdownButtonFormField<String>(
+                  initialValue: _selectedStatus,
+                  decoration: const InputDecoration(
+                    labelText: 'Status',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                  isExpanded: true,
+                  items: const [
+                    DropdownMenuItem(value: 'all', child: Text('All Status')),
+                    DropdownMenuItem(value: 'active', child: Text('Active')),
+                    DropdownMenuItem(value: 'inactive', child: Text('Inactive')),
+                    DropdownMenuItem(value: 'pending', child: Text('Pending')),
+                    DropdownMenuItem(value: 'forverification', child: Text('For Verification')),
+                  ],
+                  onChanged: (value) => _onStatusFilterChanged(value ?? 'all'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              
+              // Role filter
+              Expanded(
+                flex: 1,
+                child: DropdownButtonFormField<String>(
+                  initialValue: _selectedRole,
+                  decoration: const InputDecoration(
+                    labelText: 'Role',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                  isExpanded: true,
+                  items: const [
+                    DropdownMenuItem(value: 'all', child: Text('All Roles')),
+                    DropdownMenuItem(value: 'dean', child: Text('Dean')),
+                    DropdownMenuItem(value: 'instructor', child: Text('Instructor')),
+                    DropdownMenuItem(value: 'programchairperson', child: Text('Program Chair')),
+                  ],
+                  onChanged: (value) => _onRoleFilterChanged(value ?? 'all'),
+                ),
+              ),
+              
+              // College filter (only for program chairs)
+              if (_currentTabIndex == 3) ...[
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 1,
+                  child: DropdownButtonFormField<String>(
+                    initialValue: _selectedCollege,
+                    decoration: const InputDecoration(
+                      labelText: 'College',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                    ),
+                    isExpanded: true,
+                    items: [
+                      const DropdownMenuItem(value: 'all', child: Text('All Colleges')),
+                      ...colleges.map<DropdownMenuItem<String>>((college) {
+                        return DropdownMenuItem<String>(
+                          value: college['name']?.toString() ?? '',
+                          child: Text(
+                            college['name']?.toString() ?? '',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                    onChanged: (value) => _onCollegeFilterChanged(value ?? 'all'),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeansList() {
+    final usersToShow = _isSearching ? _filteredUsers : deansList;
+    final paginatedUsers = _getPaginatedUsers(usersToShow);
+    
+    return Column(
+      children: [
+        // Search bar only (no dropdown filters)
+        _buildSearchBar(),
+        
+        // Add Dean button
+        Container(
+          margin: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Deans (${usersToShow.length})',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: _openAddDeanModal,
+                icon: const Icon(Icons.add),
+                label: const Text('Add Dean'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3D1308),
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        // Users list
+        Expanded(
+          child: usersToShow.isEmpty
+              ? const EmptyStateWidget(
+                  icon: Icons.admin_panel_settings_rounded,
+                  title: 'No Deans Found',
+                  subtitle: 'There are no deans matching your search criteria.',
+                )
+              : Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+      padding: const EdgeInsets.all(16),
+                        itemCount: paginatedUsers.length,
       itemBuilder: (context, index) {
-        final dean = deansList[index];
+                          final dean = paginatedUsers[index];
         return _buildDeanCard(dean, index);
       },
+                      ),
+                    ),
+                    _buildPaginationControls(usersToShow),
+                  ],
+                ),
+        ),
+      ],
     );
   }
 
   Widget _buildInstructorsList() {
-    if (instructorsList.isEmpty) {
-      // If no instructors found, show all users as fallback for debugging
-      if (allUsersList.isNotEmpty) {
-        return Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.shade300),
+    final usersToShow = _isSearching ? _filteredUsers : instructorsList;
+    final paginatedUsers = _getPaginatedUsers(usersToShow);
+    
+    return Column(
+      children: [
+        // Search bar only (no dropdown filters)
+        _buildSearchBar(),
+        
+        // Add Instructor button
+        Container(
+          margin: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Instructors (${usersToShow.length})',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, color: Colors.blue.shade600),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'No instructors found with current filtering. Showing all users for debugging:',
-                      style: GoogleFonts.inter(
-                        color: Colors.blue.shade800,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
+              ElevatedButton.icon(
+                onPressed: _openAddInstructorModal,
+                icon: const Icon(Icons.add),
+                label: const Text('Add Instructor'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3D1308),
+                  foregroundColor: Colors.white,
+                ),
               ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: allUsersList.length,
-                itemBuilder: (context, index) {
-                  final user = allUsersList[index];
-                  return _buildUserCard(user, index);
-                },
-              ),
-            ),
-          ],
-        );
-      }
-      
-      return const EmptyStateWidget(
+            ],
+          ),
+        ),
+        
+        // Users list
+        Expanded(
+          child: usersToShow.isEmpty
+              ? const EmptyStateWidget(
         icon: Icons.person_rounded,
         title: 'No Instructors Found',
-        subtitle: 'There are no instructors in the system yet.',
-      );
-    }
-
-    return ListView.builder(
+                  subtitle: 'There are no instructors matching your search criteria.',
+                )
+              : Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: instructorsList.length,
+                        itemCount: paginatedUsers.length,
       itemBuilder: (context, index) {
-        final instructor = instructorsList[index];
+                          final instructor = paginatedUsers[index];
         return _buildInstructorCard(instructor, index);
       },
+                      ),
+                    ),
+                    _buildPaginationControls(usersToShow),
+                  ],
+                ),
+        ),
+      ],
     );
   }
 
   Widget _buildProgramChairsList() {
-    if (programChairsList.isEmpty) {
-      // If no program chairs found, show all users as fallback for debugging
-      if (allUsersList.isNotEmpty) {
-        return Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.shade300),
+    final usersToShow = _isSearching ? _filteredUsers : programChairsList;
+    final paginatedUsers = _getPaginatedUsers(usersToShow);
+    
+    return Column(
+      children: [
+        // Search bar only (no dropdown filters)
+        _buildSearchBar(),
+        
+        // Add Program Chair button
+        Container(
+          margin: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Program Chairs (${usersToShow.length})',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, color: Colors.green.shade600),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'No program chairs found with current filtering. Showing all users for debugging:',
-                      style: GoogleFonts.inter(
-                        color: Colors.green.shade800,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
+              ElevatedButton.icon(
+                onPressed: _openAddProgramChairModal,
+                icon: const Icon(Icons.add),
+                label: const Text('Add Program Chair'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3D1308),
+                  foregroundColor: Colors.white,
+                ),
               ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: allUsersList.length,
-                itemBuilder: (context, index) {
-                  final user = allUsersList[index];
-                  return _buildUserCard(user, index);
-                },
-              ),
-            ),
-          ],
-        );
-      }
-      
-      return const EmptyStateWidget(
+            ],
+          ),
+        ),
+        
+        // Users list
+        Expanded(
+          child: usersToShow.isEmpty
+              ? const EmptyStateWidget(
         icon: Icons.school_rounded,
         title: 'No Program Chairs Found',
-        subtitle: 'There are no program chairs in the system yet.',
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: programChairsList.length,
-      itemBuilder: (context, index) {
-        final programChair = programChairsList[index];
-        return _buildProgramChairCard(programChair, index);
-      },
+                  subtitle: 'There are no program chairs matching your search criteria.',
+                )
+              : Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: paginatedUsers.length,
+                        itemBuilder: (context, index) {
+                          final programChair = paginatedUsers[index];
+                          return _buildProgramChairCard(programChair, index);
+                        },
+                      ),
+                    ),
+                    _buildPaginationControls(usersToShow),
+                  ],
+                ),
+        ),
+      ],
     );
   }
 
   Widget _buildAllUsersList() {
-    if (allUsersList.isEmpty) {
-      return const EmptyStateWidget(
-        icon: Icons.people_rounded,
-        title: 'No Users Found',
-        subtitle: 'There are no users in the system yet.',
-      );
-    }
-
-    return ListView.builder(
+    final usersToShow = _isSearching ? _filteredUsers : allUsersList;
+    final paginatedUsers = _getPaginatedUsers(usersToShow);
+    
+    return Column(
+      children: [
+        // Search and filter controls
+        _buildSearchAndFilterControls(),
+        
+        // Users list
+        Expanded(
+          child: usersToShow.isEmpty
+              ? const EmptyStateWidget(
+                  icon: Icons.people_rounded,
+                  title: 'No Users Found',
+                  subtitle: 'There are no users matching your search criteria.',
+                )
+              : Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: allUsersList.length,
+                        itemCount: paginatedUsers.length,
       itemBuilder: (context, index) {
-        final user = allUsersList[index];
-        return _buildUserCard(user, index);
-      },
+                          final user = paginatedUsers[index];
+                          return _buildUserCard(user, index);
+                        },
+                      ),
+                    ),
+                    _buildPaginationControls(usersToShow),
+                  ],
+                ),
+        ),
+      ],
     );
   }
 
@@ -1305,11 +2164,10 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
             onSelected: (value) {
               switch (value) {
                 case 'edit':
-                  // TODO: Implement edit functionality
-                  ErrorHandler.showSnackBar(context, 'Edit functionality not implemented yet');
+                  _openEditUserModal(dean);
                   break;
                 case 'delete':
-                  _showDeleteDeanDialog(dean);
+                  _showDeleteUserDialog(dean);
                   break;
               }
             },
@@ -1408,11 +2266,10 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
             onSelected: (value) {
               switch (value) {
                 case 'edit':
-                  // TODO: Implement edit functionality
-                  ErrorHandler.showSnackBar(context, 'Edit functionality not implemented yet');
+                  _openEditUserModal(instructor);
                   break;
                 case 'delete':
-                  _showDeleteInstructorDialog(instructor);
+                  _showDeleteUserDialog(instructor);
                   break;
               }
             },
@@ -1511,11 +2368,10 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
             onSelected: (value) {
               switch (value) {
                 case 'edit':
-                  // TODO: Implement edit functionality
-                  ErrorHandler.showSnackBar(context, 'Edit functionality not implemented yet');
+                  _openEditUserModal(programChair);
                   break;
                 case 'delete':
-                  _showDeleteProgramChairDialog(programChair);
+                  _showDeleteUserDialog(programChair);
                   break;
               }
             },
@@ -1687,8 +2543,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                   ErrorHandler.showSnackBar(context, 'View details functionality not implemented yet');
                   break;
                 case 'edit':
-                  // TODO: Implement edit functionality
-                  ErrorHandler.showSnackBar(context, 'Edit functionality not implemented yet');
+                  _openEditUserModal(user);
                   break;
                 case 'delete':
                   _showDeleteUserDialog(user);
@@ -2213,7 +3068,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         
         // Show loading state if counts are empty
         if (counts.isEmpty) {
-          return Container(
+          return SizedBox(
             height: 200,
             child: const Center(
               child: CircularProgressIndicator(),
@@ -2361,41 +3216,53 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                     return Row(
                       children: [
                         Expanded(
+                          flex: 2,
                           child: _buildDropdown(
-                            'College',
-                            collegeValue,
-                            colleges.map<DropdownMenuItem<String>>((college) => DropdownMenuItem<String>(
-                              value: college['code'],
-                              child: Text(college['name']),
-                            )).toList(),
-                            (value) => _handleCollegeChange(value!),
-                            loadingColleges,
-                          ),
+                          'College',
+                          collegeValue,
+                          colleges.map<DropdownMenuItem<String>>((college) => DropdownMenuItem<String>(
+                            value: college['code'],
+                            child: Text(
+                              college['name'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )).toList(),
+                          (value) => _handleCollegeChange(value!),
+                          loadingColleges,
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildDropdown(
-                            'Course',
-                            courseValue,
-                            programs.map<DropdownMenuItem<String>>((program) => DropdownMenuItem<String>(
-                              value: program['code'].toString().toLowerCase(),
-                              child: Text(program['code'].toString().toUpperCase()),
-                            )).toList(),
-                            (value) => _handleCourseChange(value!),
-                            loadingCourses,
-                          ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 8),
                         Expanded(
+                          flex: 1,
                           child: _buildDropdown(
-                            'Room',
-                            roomValue,
-                            rooms.map<DropdownMenuItem<String>>((room) => DropdownMenuItem<String>(
-                              value: room['name'],
-                              child: Text(room['name']),
-                            )).toList(),
-                            (value) => _handleRoomChange(value!),
-                            false,
+                          'Course',
+                          courseValue,
+                          programs.map<DropdownMenuItem<String>>((program) => DropdownMenuItem<String>(
+                            value: program['code'].toString().toLowerCase(),
+                            child: Text(
+                              program['code'].toString().toUpperCase(),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )).toList(),
+                          (value) => _handleCourseChange(value!),
+                          loadingCourses,
+                        ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 1,
+                          child: _buildDropdown(
+                          'Room',
+                          roomValue,
+                          rooms.map<DropdownMenuItem<String>>((room) => DropdownMenuItem<String>(
+                            value: room['name'],
+                            child: Text(
+                              room['name'],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )).toList(),
+                          (value) => _handleRoomChange(value!),
+                          false,
                           ),
                         ),
                       ],
@@ -2430,11 +3297,14 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                 borderRadius: BorderRadius.circular(8),
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              isDense: true,
             ),
+            isExpanded: true,
             items: loading ? [
               DropdownMenuItem(
                 value: null,
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const SizedBox(
                       width: 16,
@@ -2442,7 +3312,12 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
                     const SizedBox(width: 8),
-                    Text('Loading...'),
+                    Flexible(
+                      child: Text(
+                        'Loading...',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -2859,30 +3734,466 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   }
 
   Widget _buildSettingsContent() {
-    return SingleChildScrollView(
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: AnimatedTheme(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOutCubic,
+          data: Theme.of(context),
+          child: TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 1000),
+            curve: Curves.easeOutCubic,
+            tween: Tween(begin: 0.0, end: 1.0),
+            builder: (context, value, child) {
+              return Transform.scale(
+                scale: 0.98 + (0.02 * value),
+                child: Opacity(
+                  opacity: value,
+                  child: SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Profile Section
-          _buildProfileSection(),
+                        TweenAnimationBuilder<double>(
+                          duration: const Duration(milliseconds: 600),
+                          curve: Curves.easeOutBack,
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          builder: (context, value, child) {
+                            return Transform.translate(
+                              offset: Offset(0, 30 * (1 - value)),
+                              child: Opacity(
+                                opacity: value,
+                                child: _buildProfileSection(),
+                              ),
+                            );
+                          },
+                        ),
           const SizedBox(height: 32),
           // App Settings
-          _buildAppSettingsSection(),
+                        TweenAnimationBuilder<double>(
+                          duration: const Duration(milliseconds: 700),
+                          curve: Curves.easeOutBack,
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          builder: (context, value, child) {
+                            return Transform.translate(
+                              offset: Offset(0, 30 * (1 - value)),
+                              child: Opacity(
+                                opacity: value,
+                                child: _buildAppSettingsSection(),
+                              ),
+                            );
+                          },
+                        ),
           const SizedBox(height: 32),
           // Account Settings
-          _buildAccountSection(),
+                        TweenAnimationBuilder<double>(
+                          duration: const Duration(milliseconds: 800),
+                          curve: Curves.easeOutBack,
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          builder: (context, value, child) {
+                            return Transform.translate(
+                              offset: Offset(0, 30 * (1 - value)),
+                              child: Opacity(
+                                opacity: value,
+                                child: _buildAccountSection(),
+                              ),
+                            );
+                          },
+                        ),
           const SizedBox(height: 32),
           // System Settings
-          _buildSystemSection(),
+                        TweenAnimationBuilder<double>(
+                          duration: const Duration(milliseconds: 900),
+                          curve: Curves.easeOutBack,
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          builder: (context, value, child) {
+                            return Transform.translate(
+                              offset: Offset(0, 30 * (1 - value)),
+                              child: Opacity(
+                                opacity: value,
+                                child: _buildSystemSection(),
+                              ),
+                            );
+                          },
+                        ),
           const SizedBox(height: 32),
           // Support Section
-          _buildSupportSection(),
+                        TweenAnimationBuilder<double>(
+                          duration: const Duration(milliseconds: 1000),
+                          curve: Curves.easeOutBack,
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          builder: (context, value, child) {
+                            return Transform.translate(
+                              offset: Offset(0, 30 * (1 - value)),
+                              child: Opacity(
+                                opacity: value,
+                                child: _buildSupportSection(),
+                              ),
+                            );
+                          },
+                        ),
           const SizedBox(height: 32),
           // Danger Zone
-          _buildDangerSection(),
-        ],
+                        TweenAnimationBuilder<double>(
+                          duration: const Duration(milliseconds: 1100),
+                          curve: Curves.easeOutBack,
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          builder: (context, value, child) {
+                            return Transform.translate(
+                              offset: Offset(0, 30 * (1 - value)),
+                              child: Opacity(
+                                opacity: value,
+                                child: _buildDangerSection(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _buildThemeModeSelector() {
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return TweenAnimationBuilder<double>(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOutCubic,
+          tween: Tween(begin: 0.0, end: 1.0),
+          builder: (context, value, child) {
+            return Transform.scale(
+              scale: 0.95 + (0.05 * value),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOutCubic,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 300),
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                      child: Row(
+                        children: [
+                          TweenAnimationBuilder<double>(
+                            duration: const Duration(milliseconds: 600),
+                            curve: Curves.elasticOut,
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            builder: (context, value, child) {
+                              return Transform.rotate(
+                                angle: value * 0.1,
+                                child: Icon(
+                                  Icons.palette_rounded,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 20,
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 12),
+                          const Text('Theme Mode'),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 300),
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                      child: const Text('Choose your preferred theme mode'),
+                    ),
+                    const SizedBox(height: 16),
+                    TweenAnimationBuilder<double>(
+                      duration: const Duration(milliseconds: 800),
+                      curve: Curves.easeOutBack,
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset(0, 20 * (1 - value)),
+                          child: Opacity(
+                            opacity: value,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: _buildThemeModeOption(
+                                    'Light',
+                                    Icons.light_mode_rounded,
+                                    ThemeMode.light,
+                                    themeProvider,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _buildThemeModeOption(
+                                    'Dark',
+                                    Icons.dark_mode_rounded,
+                                    ThemeMode.dark,
+                                    themeProvider,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _buildThemeModeOption(
+                                    'System',
+                                    Icons.settings_brightness_rounded,
+                                    ThemeMode.system,
+                                    themeProvider,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ));
+            },
+          );
+        },
+      );
+    }
+
+  Widget _buildThemeModeOption(String label, IconData icon, ThemeMode mode, ThemeProvider themeProvider) {
+    final isSelected = themeProvider.themeMode == mode;
+    
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeOutCubic,
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: 0.9 + (0.1 * value),
+          child: GestureDetector(
+            onTap: () {
+              // Add haptic feedback for better UX
+              HapticFeedback.lightImpact();
+              
+              // Animate the theme change
+              themeProvider.setThemeMode(mode);
+              
+              // Show centered square popup
+              showDialog(
+                context: context,
+                barrierDismissible: true,
+                barrierColor: Colors.black.withValues(alpha: 0.5),
+                builder: (BuildContext context) {
+                  return Dialog(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    child: TweenAnimationBuilder<double>(
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.elasticOut,
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      builder: (context, value, child) {
+                        return Transform.scale(
+                          scale: 0.7 + (0.3 * value),
+                          child: Container(
+                            width: 200,
+                            height: 200,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                TweenAnimationBuilder<double>(
+                                  duration: const Duration(milliseconds: 800),
+                                  curve: Curves.elasticOut,
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  builder: (context, animationValue, child) {
+                                    return Transform.rotate(
+                                      angle: animationValue * 0.5,
+                                      child: Icon(
+                                        icon,
+                                        color: Colors.white,
+                                        size: 48,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  '$label Mode',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Switched Successfully',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.8),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              );
+              
+              // Auto close after 2 seconds
+              Future.delayed(const Duration(milliseconds: 2000), () {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                }
+              });
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOutCubic,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              decoration: BoxDecoration(
+                color: isSelected 
+                    ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1)
+                    : Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected 
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                  width: isSelected ? 2.5 : 1,
+                ),
+                boxShadow: isSelected ? [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                    spreadRadius: 1,
+                  ),
+                ] : [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOutBack,
+                tween: Tween(begin: 0.0, end: 1.0),
+                builder: (context, value, child) {
+                  return Transform.translate(
+                    offset: Offset(0, 10 * (1 - value)),
+                    child: Opacity(
+                      opacity: value,
+                      child: Column(
+                        children: [
+                          TweenAnimationBuilder<double>(
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeInOutCubic,
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            builder: (context, value, child) {
+                              return Transform.scale(
+                                scale: 0.8 + (0.2 * value),
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 500),
+                                  transitionBuilder: (child, animation) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: ScaleTransition(
+                                        scale: animation,
+                                        child: child,
+                                      ),
+                                    );
+                                  },
+                                  child: Icon(
+                                    icon,
+                                    key: ValueKey('$icon-${isSelected}'),
+                                    color: isSelected 
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                    size: 22,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 6),
+                          TweenAnimationBuilder<double>(
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeOutCubic,
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            builder: (context, value, child) {
+                              return Transform.translate(
+                                offset: Offset(0, 5 * (1 - value)),
+                                child: Opacity(
+                                  opacity: value,
+                                  child: AnimatedDefaultTextStyle(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOutCubic,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                      color: isSelected 
+                                          ? Theme.of(context).colorScheme.primary
+                                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                    ),
+                                    child: Text(label),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -3006,26 +4317,264 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
           Icons.notifications_rounded,
           'Notifications',
           'Receive push notifications',
-          Switch(
-            value: true,
-            onChanged: (value) {
-              ErrorHandler.showSnackBar(context, 'Notification settings not implemented yet');
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeOutCubic,
+                tween: Tween(begin: 0.0, end: 1.0),
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: 0.95 + (0.05 * value),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: Switch(
+                        key: ValueKey('notification-switch'),
+                        value: notificationsEnabled,
+                        onChanged: (value) {
+                          setState(() {
+                            notificationsEnabled = value;
+                          });
+                          _saveNotificationSetting(value);
+                          // Add haptic feedback
+                          HapticFeedback.lightImpact();
+                          
+                          // Show centered square popup
+                          showDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            barrierColor: Colors.black.withValues(alpha: 0.5),
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                backgroundColor: Colors.transparent,
+                                elevation: 0,
+                                child: TweenAnimationBuilder<double>(
+                                  duration: const Duration(milliseconds: 600),
+                                  curve: Curves.elasticOut,
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  builder: (context, value, child) {
+                                    return Transform.scale(
+                                      scale: 0.7 + (0.3 * value),
+                                      child: Container(
+                                        width: 200,
+                                        height: 200,
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).colorScheme.primary,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                              blurRadius: 20,
+                                              offset: const Offset(0, 8),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            TweenAnimationBuilder<double>(
+                                              duration: const Duration(milliseconds: 800),
+                                              curve: Curves.elasticOut,
+                                              tween: Tween(begin: 0.0, end: 1.0),
+                                              builder: (context, animationValue, child) {
+                                                return Transform.rotate(
+                                                  angle: animationValue * 0.5,
+                                                  child: Icon(
+                                                    notificationsEnabled ? Icons.notifications_active_rounded : Icons.notifications_off_rounded,
+                                                    color: Colors.white,
+                                                    size: 48,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              notificationsEnabled ? 'Notifications On' : 'Notifications Off',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              notificationsEnabled ? 'You will receive notifications' : 'Notifications disabled',
+                                              style: TextStyle(
+                                                color: Colors.white.withValues(alpha: 0.8),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                          );
+                          
+                          // Auto close after 2 seconds
+                          Future.delayed(const Duration(milliseconds: 2000), () {
+                            if (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            }
+                          });
+                        },
+                        activeThumbColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                        inactiveThumbColor: Theme.of(context).colorScheme.outline,
+                        inactiveTrackColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                  );
+                },
+              );
             },
-            activeThumbColor: Theme.of(context).colorScheme.primary,
           ),
         ),
         _buildSettingItem(
           Icons.dark_mode_rounded,
           'Dark Mode',
           'Switch between light and dark themes',
-          Switch(
-            value: false,
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeOutCubic,
+                tween: Tween(begin: 0.0, end: 1.0),
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: 0.95 + (0.05 * value),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: Switch(
+                        key: ValueKey('switch-${themeProvider.isDarkMode}'),
+                        value: themeProvider.isDarkMode,
             onChanged: (value) {
-              ErrorHandler.showSnackBar(context, 'Theme toggle not implemented yet');
+                          // Add haptic feedback
+                          HapticFeedback.lightImpact();
+                          
+                          final newMode = value ? ThemeMode.dark : ThemeMode.light;
+                          themeProvider.setThemeMode(newMode);
+                          
+                          // Show centered square popup
+                          showDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            barrierColor: Colors.black.withValues(alpha: 0.5),
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                backgroundColor: Colors.transparent,
+                                elevation: 0,
+                                child: TweenAnimationBuilder<double>(
+                                  duration: const Duration(milliseconds: 600),
+                                  curve: Curves.elasticOut,
+                                  tween: Tween(begin: 0.0, end: 1.0),
+                                  builder: (context, value, child) {
+                                    return Transform.scale(
+                                      scale: 0.7 + (0.3 * value),
+                                      child: Container(
+                                        width: 200,
+                                        height: 200,
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).colorScheme.primary,
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                                              blurRadius: 20,
+                                              offset: const Offset(0, 8),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            TweenAnimationBuilder<double>(
+                                              duration: const Duration(milliseconds: 800),
+                                              curve: Curves.elasticOut,
+                                              tween: Tween(begin: 0.0, end: 1.0),
+                                              builder: (context, animationValue, child) {
+                                                return Transform.rotate(
+                                                  angle: animationValue * 0.5,
+                                                  child: Icon(
+                                                    themeProvider.isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                                                    color: Colors.white,
+                                                    size: 48,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              themeProvider.isDarkMode ? 'Dark Mode' : 'Light Mode',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Switched Successfully',
+                                              style: TextStyle(
+                                                color: Colors.white.withValues(alpha: 0.8),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                          );
+                          
+                          // Auto close after 2 seconds
+                          Future.delayed(const Duration(milliseconds: 2000), () {
+                            if (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            }
+                          });
             },
             activeThumbColor: Theme.of(context).colorScheme.primary,
+                        activeTrackColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                        inactiveThumbColor: Theme.of(context).colorScheme.outline,
+                        inactiveTrackColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ),
+        _buildThemeModeSelector(),
         _buildSettingItem(
           Icons.fingerprint_rounded,
           'Biometric Login',
@@ -3490,39 +5039,13 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     );
   }
 
-  void _showDeleteDeanDialog(Map<String, dynamic> dean) {
-    ErrorHandler.showConfirmDialog(
-      context,
-      'Delete Dean',
-      'Are you sure you want to delete ${dean['firstName']} ${dean['lastName']}? This action cannot be undone.',
-      () => _deleteDean(dean['id']),
-    );
-  }
-
-  void _showDeleteInstructorDialog(Map<String, dynamic> instructor) {
-    ErrorHandler.showConfirmDialog(
-      context,
-      'Delete Instructor',
-      'Are you sure you want to delete ${instructor['firstName']} ${instructor['lastName']}? This action cannot be undone.',
-      () => _deleteInstructor(instructor['id']),
-    );
-  }
-
-  void _showDeleteProgramChairDialog(Map<String, dynamic> programChair) {
-    ErrorHandler.showConfirmDialog(
-      context,
-      'Delete Program Chair',
-      'Are you sure you want to delete ${programChair['firstName']} ${programChair['lastName']}? This action cannot be undone.',
-      () => _deleteProgramChair(programChair['id']),
-    );
-  }
 
   void _showDeleteUserDialog(Map<String, dynamic> user) {
     ErrorHandler.showConfirmDialog(
       context,
       'Delete User',
       'Are you sure you want to delete ${user['firstName']} ${user['lastName']}? This action cannot be undone.',
-      () => _deleteUser(user['id']),
+      () => _handleDeleteUser(user['id'], user['role']),
     );
   }
 
@@ -3605,140 +5128,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     }
   }
 
-  Future<void> _deleteDean(String deanId) async {
-    try {
-      ErrorHandler.showLoadingDialog(context, 'Deleting dean...');
-      await ApiService.deleteDean(deanId);
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showSuccessDialog(context, 'Dean deleted successfully');
-      _fetchDeansList();
-    } catch (e) {
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
-    }
-  }
 
-  // Add Dean function from React code
-  Future<void> _addDean(Map<String, dynamic> deanData) async {
-    try {
-      ErrorHandler.showLoadingDialog(context, 'Adding dean...');
-      await ApiService.addDean(deanData);
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showSuccessDialog(context, 'Dean added successfully');
-      _fetchDeansList();
-    } catch (e) {
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
-    }
-  }
-
-  Future<void> _deleteUser(String userId) async {
-    try {
-      ErrorHandler.showLoadingDialog(context, 'Deleting user...');
-      // For now, just refresh the all users list since we don't have a specific delete user API
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showSuccessDialog(context, 'User deleted successfully');
-      _loadAllUsers();
-    } catch (e) {
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
-    }
-  }
-
-  // Generate username function from React code
-  String _generateUsername(String firstName, String lastName) {
-    final first = firstName.substring(0, 3).toUpperCase();
-    final last = lastName.substring(0, 3).toUpperCase();
-    return last + first;
-  }
-
-  // Fetch courses by college function from React code
-  Future<void> _fetchCoursesByCollege(String collegeCode) async {
-    try {
-      final data = await ApiService.getSuperadminCourses(collegeCode);
-      if (mounted) {
-        setState(() {
-          programs = data;
-        });
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          programs = [];
-        });
-      }
-    }
-  }
-
-  Future<void> _deleteInstructor(String instructorId) async {
-    try {
-      ErrorHandler.showLoadingDialog(context, 'Deleting instructor...');
-      await ApiService.deleteInstructor(instructorId);
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showSuccessDialog(context, 'Instructor deleted successfully');
-      _fetchInstructorsList();
-    } catch (e) {
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
-    }
-  }
-
-  Future<void> _deleteProgramChair(String programChairId) async {
-    try {
-      ErrorHandler.showLoadingDialog(context, 'Deleting program chair...');
-      await ApiService.deleteProgramChair(programChairId);
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showSuccessDialog(context, 'Program chair deleted successfully');
-      _fetchProgramChairsList();
-    } catch (e) {
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
-    }
-  }
-
-  // Pending faculty functions from React code
-  Future<void> _acceptFaculty(String facultyId) async {
-    try {
-      ErrorHandler.showLoadingDialog(context, 'Accepting faculty...');
-      await ApiService.approveFaculty(facultyId);
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showSuccessDialog(context, 'Faculty accepted successfully');
-      _fetchPendingDeans();
-      _fetchPendingInstructors();
-      _fetchPendingProgramChairs();
-    } catch (e) {
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
-    }
-  }
-
-  Future<void> _rejectFaculty(String facultyId) async {
-    try {
-      ErrorHandler.showLoadingDialog(context, 'Rejecting faculty...');
-      await ApiService.rejectFaculty(facultyId);
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showSuccessDialog(context, 'Faculty rejected successfully');
-      _fetchPendingDeans();
-      _fetchPendingInstructors();
-      _fetchPendingProgramChairs();
-    } catch (e) {
-      ErrorHandler.hideLoadingDialog(context);
-      ErrorHandler.showErrorDialog(context, ErrorHandler.getErrorMessage(e));
-    }
-  }
-
-  // Pagination functions from React code
-  void _handleChangePage(int newPage) {
-    setState(() {
-      // Update page state for pagination
-    });
-  }
-
-  void _handleChangeRowsPerPage(int newRowsPerPage) {
-    setState(() {
-      // Update rows per page state for pagination
-    });
-  }
 
   // Sample data methods
   List<dynamic> _getSampleFacultyLogs() {
@@ -3776,88 +5166,8 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     ];
   }
 
-  List<dynamic> _getSampleDeansData() {
-    return [
-      {
-        '_id': '1',
-        'first_name': 'Dr. Sarah',
-        'last_name': 'Wilson',
-        'middle_name': 'A',
-        'username': 'WILSAR',
-        'email': 'sarah.wilson@university.edu',
-        'role': 'dean',
-        'college': {'name': 'College of Computer Science', 'code': 'CCS'},
-        'status': 'active',
-      },
-      {
-        '_id': '2',
-        'first_name': 'Dr. Michael',
-        'last_name': 'Brown',
-        'middle_name': 'B',
-        'username': 'BROMIC',
-        'email': 'michael.brown@university.edu',
-        'role': 'dean',
-        'college': {'name': 'College of Engineering', 'code': 'COE'},
-        'status': 'active',
-      },
-    ];
-  }
 
-  List<dynamic> _getSampleInstructorsData() {
-    return [
-      {
-        '_id': '1',
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'middle_name': 'C',
-        'username': 'DOEJOH',
-        'email': 'john.doe@university.edu',
-        'role': 'instructor',
-        'college': {'name': 'College of Computer Science', 'code': 'CCS'},
-        'course': 'BS Computer Science',
-        'status': 'active',
-      },
-      {
-        '_id': '2',
-        'first_name': 'Jane',
-        'last_name': 'Smith',
-        'middle_name': 'D',
-        'username': 'SMIJAN',
-        'email': 'jane.smith@university.edu',
-        'role': 'instructor',
-        'college': {'name': 'College of Engineering', 'code': 'COE'},
-        'course': 'BS Information Technology',
-        'status': 'active',
-      },
-    ];
-  }
 
-  List<dynamic> _getSampleProgramChairsData() {
-    return [
-      {
-        '_id': '1',
-        'first_name': 'Dr. Robert',
-        'last_name': 'Davis',
-        'middle_name': 'E',
-        'username': 'DAVROB',
-        'email': 'robert.davis@university.edu',
-        'role': 'programchairperson',
-        'college': {'name': 'College of Computer Science', 'code': 'CCS'},
-        'status': 'active',
-      },
-      {
-        '_id': '2',
-        'first_name': 'Dr. Lisa',
-        'last_name': 'Garcia',
-        'middle_name': 'F',
-        'username': 'GARLIS',
-        'email': 'lisa.garcia@university.edu',
-        'role': 'programchairperson',
-        'college': {'name': 'College of Engineering', 'code': 'COE'},
-        'status': 'active',
-      },
-    ];
-  }
 
   List<dynamic> _getSamplePendingDeansData() {
     return [

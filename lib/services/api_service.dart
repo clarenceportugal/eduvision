@@ -903,4 +903,153 @@ class ApiService {
       body: programChairData,
     );
   }
+
+  // Update user methods
+  static Future<Map<String, dynamic>> updateUser(String userId, Map<String, dynamic> userData) async {
+    return await _makeRequest(
+      method: 'PUT',
+      endpoint: '/superadmin/users/$userId',
+      body: userData,
+    );
+  }
+
+  // Search users by query
+  static Future<List<dynamic>> searchUsers(String query) async {
+    try {
+      final allUsers = await getAllUsers();
+      final searchQuery = query.toLowerCase();
+      
+      return allUsers.where((user) {
+        final firstName = user['firstName']?.toString().toLowerCase() ?? '';
+        final lastName = user['lastName']?.toString().toLowerCase() ?? '';
+        final email = user['email']?.toString().toLowerCase() ?? '';
+        final username = user['username']?.toString().toLowerCase() ?? '';
+        
+        return firstName.contains(searchQuery) ||
+               lastName.contains(searchQuery) ||
+               email.contains(searchQuery) ||
+               username.contains(searchQuery);
+      }).toList();
+    } catch (e) {
+      print('Error searching users: $e');
+      return [];
+    }
+  }
+
+  // Filter users by status
+  static Future<List<dynamic>> filterUsersByStatus(String status) async {
+    try {
+      final allUsers = await getAllUsers();
+      
+      if (status == 'all') {
+        return allUsers;
+      }
+      
+      return allUsers.where((user) {
+        final userStatus = user['status']?.toString().toLowerCase() ?? '';
+        return userStatus == status.toLowerCase();
+      }).toList();
+    } catch (e) {
+      print('Error filtering users by status: $e');
+      return [];
+    }
+  }
+
+  // Filter users by role
+  static Future<List<dynamic>> filterUsersByRole(String role) async {
+    try {
+      final allUsers = await getAllUsers();
+      
+      return allUsers.where((user) {
+        final userRole = user['role']?.toString().toLowerCase() ?? '';
+        return userRole == role.toLowerCase();
+      }).toList();
+    } catch (e) {
+      print('Error filtering users by role: $e');
+      return [];
+    }
+  }
+
+  // Get user by ID
+  static Future<Map<String, dynamic>> getUserById(String userId) async {
+    try {
+      final allUsers = await getAllUsers();
+      return allUsers.firstWhere(
+        (user) => user['id'] == userId,
+        orElse: () => <String, dynamic>{},
+      );
+    } catch (e) {
+      print('Error getting user by ID: $e');
+      return <String, dynamic>{};
+    }
+  }
+
+  // Generate username from first and last name
+  static String generateUsername(String firstName, String lastName) {
+    final first = firstName.substring(0, firstName.length > 3 ? 3 : firstName.length).toUpperCase();
+    final last = lastName.substring(0, lastName.length > 3 ? 3 : lastName.length).toUpperCase();
+    return '$last$first';
+  }
+
+  // Validate email format
+  static bool isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  // Get courses by college
+  static Future<List<dynamic>> getCoursesByCollege(String collegeCode) async {
+    return await _makeListRequest(
+      method: 'POST',
+      endpoint: '/superadmin/selected-college',
+      body: {'collegeCode': collegeCode},
+    );
+  }
+
+  // Get all courses
+  static Future<List<dynamic>> getAllCourses() async {
+    return await _makeListRequest(
+      method: 'GET',
+      endpoint: '/superadmin/courses',
+    );
+  }
+
+  // Get all rooms
+  static Future<List<dynamic>> getAllRooms() async {
+    return await _makeListRequest(
+      method: 'GET',
+      endpoint: '/superadmin/rooms',
+    );
+  }
+
+  // Get user statistics
+  static Future<Map<String, dynamic>> getUserStatistics() async {
+    try {
+      final allUsers = await getAllUsers();
+      
+      int totalUsers = allUsers.length;
+      int activeUsers = allUsers.where((user) => user['status'] == 'active').length;
+      int pendingUsers = allUsers.where((user) => 
+        user['status'] == 'pending' || 
+        user['status'] == 'waiting' || 
+        user['status'] == 'approval' || 
+        user['status'] == 'forverification'
+      ).length;
+      int inactiveUsers = allUsers.where((user) => user['status'] == 'inactive').length;
+      
+      return {
+        'totalUsers': totalUsers,
+        'activeUsers': activeUsers,
+        'pendingUsers': pendingUsers,
+        'inactiveUsers': inactiveUsers,
+      };
+    } catch (e) {
+      print('Error getting user statistics: $e');
+      return {
+        'totalUsers': 0,
+        'activeUsers': 0,
+        'pendingUsers': 0,
+        'inactiveUsers': 0,
+      };
+    }
+  }
 }
