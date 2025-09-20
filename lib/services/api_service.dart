@@ -670,93 +670,51 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>> acceptDean(String deanId) async {
-    try {
-      return await _makeRequest(
-        method: 'POST',
-        endpoint: '/superadmin/dean/accept',
-        body: {'deanId': deanId},
-      );
-    } catch (e) {
-      if (e.toString().contains('404')) {
-        throw Exception('Dean acceptance endpoint not available. Please contact administrator.');
-      }
-      rethrow;
-    }
+    return await _makeRequest(
+      method: 'POST',
+      endpoint: '/superadmin/dean/accept',
+      body: {'deanId': deanId},
+    );
   }
 
   static Future<Map<String, dynamic>> rejectDean(String deanId) async {
-    try {
-      return await _makeRequest(
-        method: 'POST',
-        endpoint: '/superadmin/dean/reject',
-        body: {'deanId': deanId},
-      );
-    } catch (e) {
-      if (e.toString().contains('404')) {
-        throw Exception('Dean rejection endpoint not available. Please contact administrator.');
-      }
-      rethrow;
-    }
+    return await _makeRequest(
+      method: 'POST',
+      endpoint: '/superadmin/dean/reject',
+      body: {'deanId': deanId},
+    );
   }
 
   static Future<Map<String, dynamic>> acceptInstructor(String instructorId) async {
-    try {
-      return await _makeRequest(
-        method: 'POST',
-        endpoint: '/superadmin/instructor/accept',
-        body: {'instructorId': instructorId},
-      );
-    } catch (e) {
-      if (e.toString().contains('404')) {
-        throw Exception('Instructor acceptance endpoint not available. Please contact administrator.');
-      }
-      rethrow;
-    }
+    return await _makeRequest(
+      method: 'POST',
+      endpoint: '/superadmin/instructor/accept',
+      body: {'instructorId': instructorId},
+    );
   }
 
   static Future<Map<String, dynamic>> rejectInstructor(String instructorId) async {
-    try {
-      return await _makeRequest(
-        method: 'POST',
-        endpoint: '/superadmin/instructor/reject',
-        body: {'instructorId': instructorId},
-      );
-    } catch (e) {
-      if (e.toString().contains('404')) {
-        throw Exception('Instructor rejection endpoint not available. Please contact administrator.');
-      }
-      rethrow;
-    }
+    return await _makeRequest(
+      method: 'POST',
+      endpoint: '/superadmin/instructor/reject',
+      body: {'instructorId': instructorId},
+    );
   }
 
   static Future<Map<String, dynamic>> acceptProgramChair(String programChairId) async {
-    try {
-      return await _makeRequest(
-        method: 'POST',
-        endpoint: '/superadmin/program-chair/accept',
-        body: {'programChairId': programChairId},
-      );
-    } catch (e) {
-      if (e.toString().contains('404')) {
-        throw Exception('Program Chair acceptance endpoint not available. Please contact administrator.');
-      }
-      rethrow;
-    }
+    return await _makeRequest(
+      method: 'POST',
+      endpoint: '/superadmin/program-chair/accept',
+      body: {'programChairId': programChairId},
+    );
   }
 
   static Future<Map<String, dynamic>> rejectProgramChair(String programChairId) async {
-    try {
-      return await _makeRequest(
-        method: 'POST',
-        endpoint: '/superadmin/program-chair/reject',
-        body: {'programChairId': programChairId},
-      );
-    } catch (e) {
-      if (e.toString().contains('404')) {
-        throw Exception('Program Chair rejection endpoint not available. Please contact administrator.');
-      }
-      rethrow;
-    }
+    return await _makeRequest(
+      method: 'POST',
+      endpoint: '/superadmin/program-chair/reject',
+      body: {'programChairId': programChairId},
+    );
   }
 
   // Additional Program Chair API methods

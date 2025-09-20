@@ -806,10 +806,7 @@ app.listen(port, '0.0.0.0', () => {
 // Superadmin endpoints
 app.get('/api/superadmin/deans', async (req, res) => {
   try {
-    const deans = await db.collection(COLLECTION_NAME).find({ 
-      role: 'dean',
-      status: { $ne: 'pending' } // Exclude pending deans
-    }).toArray();
+    const deans = await db.collection(COLLECTION_NAME).find({ role: 'dean' }).toArray();
     res.json(deans);
   } catch (error) {
     console.error('Error fetching deans:', error);
@@ -819,10 +816,7 @@ app.get('/api/superadmin/deans', async (req, res) => {
 
 app.get('/api/superadmin/instructors', async (req, res) => {
   try {
-    const instructors = await db.collection(COLLECTION_NAME).find({ 
-      role: 'instructor',
-      status: { $ne: 'pending' } // Exclude pending instructors
-    }).toArray();
+    const instructors = await db.collection(COLLECTION_NAME).find({ role: 'instructor' }).toArray();
     res.json(instructors);
   } catch (error) {
     console.error('Error fetching instructors:', error);
@@ -832,10 +826,7 @@ app.get('/api/superadmin/instructors', async (req, res) => {
 
 app.get('/api/superadmin/program-chairs', async (req, res) => {
   try {
-    const programChairs = await db.collection(COLLECTION_NAME).find({ 
-      role: 'programChairperson',
-      status: { $ne: 'pending' } // Exclude pending program chairs
-    }).toArray();
+    const programChairs = await db.collection(COLLECTION_NAME).find({ role: 'programChairperson' }).toArray();
     res.json(programChairs);
   } catch (error) {
     console.error('Error fetching program chairs:', error);
@@ -879,151 +870,6 @@ app.get('/api/superadmin/pending-program-chairs', async (req, res) => {
   } catch (error) {
     console.error('Error fetching pending program chairs:', error);
     res.status(500).json({ error: 'Failed to fetch pending program chairs' });
-  }
-});
-
-// Accept/Reject endpoints for pending users
-app.post('/api/superadmin/instructor/accept', async (req, res) => {
-  try {
-    const { instructorId } = req.body;
-    
-    if (!instructorId) {
-      return res.status(400).json({ error: 'Instructor ID is required' });
-    }
-
-    const result = await db.collection(COLLECTION_NAME).updateOne(
-      { _id: new ObjectId(instructorId), role: 'instructor' },
-      { $set: { status: 'approved' } }
-    );
-
-    if (result.matchedCount === 0) {
-      return res.status(404).json({ error: 'Instructor not found' });
-    }
-
-    res.json({ success: true, message: 'Instructor accepted successfully' });
-  } catch (error) {
-    console.error('Error accepting instructor:', error);
-    res.status(500).json({ error: 'Failed to accept instructor' });
-  }
-});
-
-app.post('/api/superadmin/instructor/reject', async (req, res) => {
-  try {
-    const { instructorId } = req.body;
-    
-    if (!instructorId) {
-      return res.status(400).json({ error: 'Instructor ID is required' });
-    }
-
-    const result = await db.collection(COLLECTION_NAME).updateOne(
-      { _id: new ObjectId(instructorId), role: 'instructor' },
-      { $set: { status: 'rejected' } }
-    );
-
-    if (result.matchedCount === 0) {
-      return res.status(404).json({ error: 'Instructor not found' });
-    }
-
-    res.json({ success: true, message: 'Instructor rejected successfully' });
-  } catch (error) {
-    console.error('Error rejecting instructor:', error);
-    res.status(500).json({ error: 'Failed to reject instructor' });
-  }
-});
-
-app.post('/api/superadmin/dean/accept', async (req, res) => {
-  try {
-    const { deanId } = req.body;
-    
-    if (!deanId) {
-      return res.status(400).json({ error: 'Dean ID is required' });
-    }
-
-    const result = await db.collection(COLLECTION_NAME).updateOne(
-      { _id: new ObjectId(deanId), role: 'dean' },
-      { $set: { status: 'approved' } }
-    );
-
-    if (result.matchedCount === 0) {
-      return res.status(404).json({ error: 'Dean not found' });
-    }
-
-    res.json({ success: true, message: 'Dean accepted successfully' });
-  } catch (error) {
-    console.error('Error accepting dean:', error);
-    res.status(500).json({ error: 'Failed to accept dean' });
-  }
-});
-
-app.post('/api/superadmin/dean/reject', async (req, res) => {
-  try {
-    const { deanId } = req.body;
-    
-    if (!deanId) {
-      return res.status(400).json({ error: 'Dean ID is required' });
-    }
-
-    const result = await db.collection(COLLECTION_NAME).updateOne(
-      { _id: new ObjectId(deanId), role: 'dean' },
-      { $set: { status: 'rejected' } }
-    );
-
-    if (result.matchedCount === 0) {
-      return res.status(404).json({ error: 'Dean not found' });
-    }
-
-    res.json({ success: true, message: 'Dean rejected successfully' });
-  } catch (error) {
-    console.error('Error rejecting dean:', error);
-    res.status(500).json({ error: 'Failed to reject dean' });
-  }
-});
-
-app.post('/api/superadmin/program-chair/accept', async (req, res) => {
-  try {
-    const { programChairId } = req.body;
-    
-    if (!programChairId) {
-      return res.status(400).json({ error: 'Program Chair ID is required' });
-    }
-
-    const result = await db.collection(COLLECTION_NAME).updateOne(
-      { _id: new ObjectId(programChairId), role: 'programChairperson' },
-      { $set: { status: 'approved' } }
-    );
-
-    if (result.matchedCount === 0) {
-      return res.status(404).json({ error: 'Program Chair not found' });
-    }
-
-    res.json({ success: true, message: 'Program Chair accepted successfully' });
-  } catch (error) {
-    console.error('Error accepting program chair:', error);
-    res.status(500).json({ error: 'Failed to accept program chair' });
-  }
-});
-
-app.post('/api/superadmin/program-chair/reject', async (req, res) => {
-  try {
-    const { programChairId } = req.body;
-    
-    if (!programChairId) {
-      return res.status(400).json({ error: 'Program Chair ID is required' });
-    }
-
-    const result = await db.collection(COLLECTION_NAME).updateOne(
-      { _id: new ObjectId(programChairId), role: 'programChairperson' },
-      { $set: { status: 'rejected' } }
-    );
-
-    if (result.matchedCount === 0) {
-      return res.status(404).json({ error: 'Program Chair not found' });
-    }
-
-    res.json({ success: true, message: 'Program Chair rejected successfully' });
-  } catch (error) {
-    console.error('Error rejecting program chair:', error);
-    res.status(500).json({ error: 'Failed to reject program chair' });
   }
 });
 

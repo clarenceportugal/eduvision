@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/api_service.dart';
-import '../../services/optimized_api_service.dart';
-import '../../services/data_cache_service.dart';
 import '../../models/schedule_model.dart';
 import '../../widgets/common/stat_card.dart';
 import '../../widgets/common/timeline_chart.dart';
 import '../../widgets/common/responsive_table.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/common/empty_state_widget.dart';
-import '../../widgets/error_display_widget.dart';
 import '../../utils/error_handler.dart';
 import '../../main.dart' show LoginScreen;
 import '../face_registration_screen.dart';
@@ -46,7 +43,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   bool loading = false;
   bool isRefreshing = false;
   String? errorMessage;
-  List<String> partialErrors = [];
 
   String courseName = "";
   String collegeName = "";
@@ -98,29 +94,12 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     _initializeAnimations();
     _initializeData();
     userData = widget.userData;
-    
-    // Preload critical data and cleanup expired cache
-    _preloadData();
-  }
-
-  /// Preload critical data for better performance
-  Future<void> _preloadData() async {
-    try {
-      // Clean up expired cache entries
-      await OptimizedApiService.cleanupExpiredCache();
-      
-      // Preload critical data in background
-      await OptimizedApiService.preloadCriticalData();
-    } catch (e) {
-      // Silently fail preloading
-      print('Preload failed: $e');
-    }
   }
 
   Future<void> _initializeData() async {
     await _loadUserData();
     if (mounted) {
-      await _fetchDataOptimized();
+      await _fetchData();
     }
   }
 
@@ -212,135 +191,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     }
   }
 
-  /// Optimized data fetching with caching and parallel loading
-  Future<void> _fetchDataOptimized() async {
-    if (!mounted) return;
-    
-    setState(() {
-      loading = true;
-      errorMessage = null;
-    });
-
-    try {
-      // Load dashboard data in parallel with caching
-      final dashboardResult = await OptimizedApiService.loadDashboardData(
-        collegeName: collegeName,
-        courseName: courseName,
-      );
-
-      if (mounted) {
-        setState(() {
-          // Update counts
-          if (dashboardResult['data']['userCounts'] != null) {
-            counts = Map<String, int>.from(dashboardResult['data']['userCounts']);
-          }
-          
-          // Update colleges
-          if (dashboardResult['data']['colleges'] != null) {
-            colleges = dashboardResult['data']['colleges'];
-          }
-          
-          // Update rooms
-          if (dashboardResult['data']['rooms'] != null) {
-            rooms = dashboardResult['data']['rooms'];
-          }
-          
-          // Update schedules
-          if (dashboardResult['data']['schedules'] != null) {
-            schedules = (dashboardResult['data']['schedules'] as List)
-                .map((item) => Schedule.fromJson(item))
-                .toList();
-            _generateChartData();
-          }
-          
-          // Update faculty logs
-          if (dashboardResult['data']['facultyLogs'] != null) {
-            allFacultiesLogs = dashboardResult['data']['facultyLogs'];
-          }
-        });
-      }
-
-      // Load user management data in parallel
-      final userManagementResult = await OptimizedApiService.loadUserManagementData();
-      
-      if (mounted) {
-        setState(() {
-          if (userManagementResult['data']['deans'] != null) {
-            deansList = userManagementResult['data']['deans'];
-          }
-          if (userManagementResult['data']['instructors'] != null) {
-            instructorsList = userManagementResult['data']['instructors'];
-          }
-          if (userManagementResult['data']['programChairs'] != null) {
-            programChairsList = userManagementResult['data']['programChairs'];
-          }
-          if (userManagementResult['data']['allUsers'] != null) {
-            allUsersList = userManagementResult['data']['allUsers'];
-          }
-        });
-      }
-
-      // Load pending approvals data in parallel
-      final pendingResult = await OptimizedApiService.loadPendingApprovalsData();
-      
-      if (mounted) {
-        setState(() {
-          if (pendingResult['data']['pendingDeans'] != null) {
-            pendingDeans = pendingResult['data']['pendingDeans'];
-          }
-          if (pendingResult['data']['pendingInstructors'] != null) {
-            pendingInstructors = pendingResult['data']['pendingInstructors'];
-          }
-          if (pendingResult['data']['pendingProgramChairs'] != null) {
-            pendingProgramChairs = pendingResult['data']['pendingProgramChairs'];
-          }
-        });
-      }
-
-      // Handle any errors from the parallel requests
-      final allErrors = <String, String>{};
-      allErrors.addAll(dashboardResult['errors'] ?? {});
-      allErrors.addAll(userManagementResult['errors'] ?? {});
-      allErrors.addAll(pendingResult['errors'] ?? {});
-
-      // Only show error if critical data failed to load
-      final criticalErrors = allErrors.keys.where((key) => 
-        ['userCounts', 'colleges'].contains(key)
-      ).toList();
-      
-      if (criticalErrors.isNotEmpty && mounted) {
-        setState(() {
-          errorMessage = 'Critical data failed to load: ${criticalErrors.join(', ')}';
-        });
-      } else if (allErrors.isNotEmpty && mounted) {
-        // Track non-critical errors for partial error display
-        setState(() {
-          partialErrors = allErrors.keys.toList();
-          errorMessage = null; // Clear any previous errors
-        });
-        print('Non-critical data failed to load: ${allErrors.keys.join(', ')}');
-      } else if (mounted) {
-        setState(() {
-          partialErrors = [];
-          errorMessage = null;
-        });
-      }
-
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          errorMessage = ErrorHandler.getErrorMessage(e);
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          loading = false;
-        });
-      }
-    }
-  }
-
   Future<void> _refreshData() async {
     if (!mounted) return;
     
@@ -350,9 +200,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     });
 
     try {
-      // Clear cache before refreshing to get fresh data
-      await OptimizedApiService.invalidateAllCache();
-      await _fetchDataOptimized();
+      await _fetchData();
     } finally {
       if (mounted) {
         setState(() {
@@ -643,7 +491,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
 
     setState(() => loadingCourses = true);
     try {
-      final data = await OptimizedApiService.loadCourses(code);
+      final data = await ApiService.getSuperadminCourses(code);
       if (mounted) {
         setState(() {
           programs = data;
@@ -662,36 +510,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     setState(() {
       courseValue = value;
     });
-    _fetchSchedulesOptimized();
-  }
-
-  /// Optimized schedule fetching with caching
-  Future<void> _fetchSchedulesOptimized() async {
-    if (!mounted) return;
-    
-    try {
-      final shortCourseValue = courseValue.replaceAll(RegExp(r'^bs', caseSensitive: false), '').toUpperCase();
-      final data = await OptimizedApiService.getCachedData(
-        '${DataCacheService.schedules}_$shortCourseValue',
-        () => ApiService.getSuperadminSchedules(shortCourseValue),
-        cacheDuration: DataCacheService.schedulesDuration,
-      );
-      
-      if (mounted) {
-        setState(() {
-          schedules = data.map((item) => Schedule.fromJson(item)).toList();
-          _generateChartData();
-        });
-      }
-    } catch (error) {
-      print('Schedule loading failed: $error');
-      if (mounted) {
-        setState(() {
-          schedules = [];
-          // Don't show error for schedules as it's not critical
-        });
-      }
-    }
+    _fetchSchedules();
   }
 
   void _handleRoomChange(String value) {
@@ -736,28 +555,28 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   Future<void> _loadTabData() async {
     switch (_currentTabIndex) {
       case 1: // Deans
-        await _fetchDeansListOptimized();
+        await _fetchDeansList();
         break;
       case 2: // Instructors
-        await _fetchInstructorsListOptimized();
+        await _fetchInstructorsList();
         break;
       case 3: // Program Chairs
-        await _fetchProgramChairsListOptimized();
+        await _fetchProgramChairsList();
         break;
       case 4: // Pending Deans
-        await _fetchPendingDeansOptimized();
+        await _fetchPendingDeans();
         break;
       case 5: // Pending Instructors
-        await _fetchPendingInstructorsOptimized();
+        await _fetchPendingInstructors();
         break;
       case 6: // Pending Program Chairs
-        await _fetchPendingProgramChairsOptimized();
+        await _fetchPendingProgramChairs();
         break;
       case 7: // All Users
-        await _loadAllUsersOptimized();
+        await _loadAllUsers();
         break;
       case 8: // Live Video
-        await _checkLiveStatusOptimized();
+        await _checkLiveStatus();
         break;
       case 9: // Settings
         await _loadUserData();
@@ -766,216 +585,6 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   }
 
   // Data fetching methods for consolidated screens
-
-  /// Optimized individual data fetching methods with caching
-  Future<void> _fetchDeansListOptimized() async {
-    if (!mounted) return;
-    
-    try {
-      final data = await OptimizedApiService.getCachedData(
-        DataCacheService.deans,
-        () => ApiService.getSuperadminDeans(),
-        cacheDuration: DataCacheService.deansDuration,
-      );
-      
-      if (mounted) {
-        setState(() {
-          deansList = data;
-        });
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          deansList = [];
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchInstructorsListOptimized() async {
-    if (!mounted) return;
-    
-    try {
-      final data = await OptimizedApiService.getCachedData(
-        DataCacheService.instructors,
-        () => ApiService.getSuperadminInstructors(),
-        cacheDuration: DataCacheService.instructorsDuration,
-      );
-      
-      if (mounted) {
-        setState(() {
-          instructorsList = data;
-        });
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          instructorsList = [];
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchProgramChairsListOptimized() async {
-    if (!mounted) return;
-    
-    try {
-      final data = await OptimizedApiService.getCachedData(
-        DataCacheService.programChairs,
-        () => ApiService.getSuperadminProgramChairs(),
-        cacheDuration: DataCacheService.programChairsDuration,
-      );
-      
-      if (mounted) {
-        setState(() {
-          programChairsList = data;
-        });
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          programChairsList = [];
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchPendingDeansOptimized() async {
-    if (!mounted) return;
-    
-    try {
-      final data = await OptimizedApiService.getCachedData(
-        DataCacheService.pendingDeans,
-        () => ApiService.getSuperadminPendingDeans(),
-        cacheDuration: DataCacheService.pendingDeansDuration,
-      );
-      
-      if (mounted) {
-        setState(() {
-          pendingDeans = data;
-        });
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          pendingDeans = _getSamplePendingDeansData();
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchPendingInstructorsOptimized() async {
-    if (!mounted) return;
-    
-    try {
-      final data = await OptimizedApiService.getCachedData(
-        DataCacheService.pendingInstructors,
-        () => ApiService.getSuperadminPendingInstructors(),
-        cacheDuration: DataCacheService.pendingInstructorsDuration,
-      );
-      
-      if (mounted) {
-        setState(() {
-          pendingInstructors = data;
-        });
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          pendingInstructors = _getSamplePendingInstructorsData();
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchPendingProgramChairsOptimized() async {
-    if (!mounted) return;
-    
-    try {
-      final data = await OptimizedApiService.getCachedData(
-        DataCacheService.pendingProgramChairs,
-        () => ApiService.getSuperadminPendingProgramChairs(),
-        cacheDuration: DataCacheService.pendingProgramChairsDuration,
-      );
-      
-      if (mounted) {
-        setState(() {
-          pendingProgramChairs = data;
-        });
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          pendingProgramChairs = _getSamplePendingProgramChairsData();
-        });
-      }
-    }
-  }
-
-  Future<void> _loadAllUsersOptimized() async {
-    if (!mounted) return;
-    
-    setState(() {
-      allUsersLoading = true;
-      allUsersErrorMessage = null;
-    });
-
-    try {
-      final data = await OptimizedApiService.getCachedData(
-        DataCacheService.allUsers,
-        () => ApiService.getAllUsers(),
-        cacheDuration: DataCacheService.allUsersDuration,
-      );
-      
-      if (mounted) {
-        setState(() {
-          allUsersList = data;
-          allUsersLoading = false;
-        });
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          allUsersList = [];
-          allUsersLoading = false;
-          allUsersErrorMessage = 'Failed to load users: ${error.toString()}';
-        });
-      }
-    }
-  }
-
-  Future<void> _checkLiveStatusOptimized() async {
-    if (!mounted) return;
-    
-    setState(() {
-      liveLoading = true;
-      liveErrorMessage = null;
-    });
-
-    try {
-      final data = await OptimizedApiService.loadLiveStatus(collegeName);
-      
-      if (mounted) {
-        setState(() {
-          isLive = data['isLive'] ?? false;
-          streamUrl = data['streamUrl'];
-          streamKey = data['streamKey'];
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          liveErrorMessage = ErrorHandler.getErrorMessage(e);
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          liveLoading = false;
-        });
-      }
-    }
-  }
 
   Future<void> _checkLiveStatus() async {
     if (!mounted) return;
@@ -1289,21 +898,12 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         slivers: [
           if (errorMessage != null)
             SliverToBoxAdapter(
-              child: ErrorDisplayWidget(
-                errorMessage: errorMessage,
-                onRetry: _refreshData,
-                isLoading: isRefreshing,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ErrorHandler.buildErrorWidget(errorMessage!, onRetry: _refreshData),
               ),
             )
-          else if (partialErrors.isNotEmpty)
-            SliverToBoxAdapter(
-              child: PartialErrorWidget(
-                failedItems: partialErrors,
-                onRetry: _refreshData,
-              ),
-            ),
-          
-          if (errorMessage == null)
+          else
             SliverToBoxAdapter(
               child: FadeTransition(
                 opacity: _fadeAnimation,
