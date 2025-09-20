@@ -390,7 +390,7 @@ class ApiService {
         method: 'GET',
         endpoint: '/colleges',
       );
-      return response['colleges'] as List<dynamic>;
+      return response as List<dynamic>;
     } catch (e) {
       print('Error fetching colleges: $e');
       return [];
@@ -580,11 +580,22 @@ class ApiService {
       
       // Create a map for quick college lookup
       final collegeMap = <String, String>{};
-      for (final college in colleges) {
-        final collegeId = college['_id']?.toString() ?? '';
-        final collegeName = college['name'] ?? 'Unknown College';
-        collegeMap[collegeId] = collegeName;
-        print('Mapped college: $collegeId -> $collegeName');
+      
+      if (colleges.isNotEmpty) {
+        // Debug: Print college data
+        for (int i = 0; i < colleges.length && i < 3; i++) {
+          final college = colleges[i];
+          print('College ${i + 1}: id="${college['_id']}", name="${college['name']}"');
+        }
+        
+        for (final college in colleges) {
+          final collegeId = college['_id']?.toString() ?? '';
+          final collegeName = college['name'] ?? 'Unknown College';
+          collegeMap[collegeId] = collegeName;
+          print('Mapped college: $collegeId -> $collegeName');
+        }
+      } else {
+        print('No colleges fetched - college names will show as "College ID: [ID]"');
       }
       
       // Normalize the data structure for consistent display
@@ -613,8 +624,7 @@ class ApiService {
         
         // Get college name
         final collegeId = user['college']?.toString() ?? '';
-        final collegeName = collegeMap[collegeId] ?? 'No College';
-        print('User ${user['first_name']} ${user['last_name']}: collegeId="$collegeId", collegeName="$collegeName"');
+        final collegeName = collegeMap[collegeId] ?? (collegeId.isNotEmpty ? 'College ID: $collegeId' : 'No College');
         
         return {
           'id': user['_id']?.toString() ?? user['id']?.toString() ?? '',
@@ -635,6 +645,7 @@ class ApiService {
       for (int i = 0; i < normalizedUsers.length && i < 3; i++) {
         final user = normalizedUsers[i];
         print('Normalized User ${i + 1}: role="${user['role']}", status="${user['status']}", name="${user['firstName']} ${user['lastName']}", college="${user['college']}"');
+        print('User college mapping: collegeId="${user['collegeId']}", collegeName="${user['college']}", collegeMap contains key: ${collegeMap.containsKey(user['collegeId'])}');
       }
       
       return normalizedUsers;

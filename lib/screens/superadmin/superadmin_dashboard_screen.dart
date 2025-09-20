@@ -2213,7 +2213,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         
         // Show loading state if counts are empty
         if (counts.isEmpty) {
-          return SizedBox(
+          return Container(
             height: 200,
             child: const Center(
               child: CircularProgressIndicator(),
