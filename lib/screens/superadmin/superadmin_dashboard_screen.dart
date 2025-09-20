@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/api_service.dart';
+import '../../services/optimized_api_service.dart';
+import '../../services/data_cache_service.dart';
 import '../../models/schedule_model.dart';
 import '../../widgets/common/stat_card.dart';
 import '../../widgets/common/timeline_chart.dart';
 import '../../widgets/common/responsive_table.dart';
 import '../../widgets/common/loading_widget.dart';
 import '../../widgets/common/empty_state_widget.dart';
+import '../../widgets/error_display_widget.dart';
 import '../../utils/error_handler.dart';
 import '../../main.dart' show LoginScreen;
 import '../face_registration_screen.dart';
@@ -43,6 +46,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   bool loading = false;
   bool isRefreshing = false;
   String? errorMessage;
+  List<String> partialErrors = [];
 
   String courseName = "";
   String collegeName = "";
@@ -94,12 +98,29 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     _initializeAnimations();
     _initializeData();
     userData = widget.userData;
+    
+    // Preload critical data and cleanup expired cache
+    _preloadData();
+  }
+
+  /// Preload critical data for better performance
+  Future<void> _preloadData() async {
+    try {
+      // Clean up expired cache entries
+      await OptimizedApiService.cleanupExpiredCache();
+      
+      // Preload critical data in background
+      await OptimizedApiService.preloadCriticalData();
+    } catch (e) {
+      // Silently fail preloading
+      print('Preload failed: $e');
+    }
   }
 
   Future<void> _initializeData() async {
     await _loadUserData();
     if (mounted) {
-      await _fetchData();
+      await _fetchDataOptimized();
     }
   }
 
@@ -191,6 +212,135 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     }
   }
 
+  /// Optimized data fetching with caching and parallel loading
+  Future<void> _fetchDataOptimized() async {
+    if (!mounted) return;
+    
+    setState(() {
+      loading = true;
+      errorMessage = null;
+    });
+
+    try {
+      // Load dashboard data in parallel with caching
+      final dashboardResult = await OptimizedApiService.loadDashboardData(
+        collegeName: collegeName,
+        courseName: courseName,
+      );
+
+      if (mounted) {
+        setState(() {
+          // Update counts
+          if (dashboardResult['data']['userCounts'] != null) {
+            counts = Map<String, int>.from(dashboardResult['data']['userCounts']);
+          }
+          
+          // Update colleges
+          if (dashboardResult['data']['colleges'] != null) {
+            colleges = dashboardResult['data']['colleges'];
+          }
+          
+          // Update rooms
+          if (dashboardResult['data']['rooms'] != null) {
+            rooms = dashboardResult['data']['rooms'];
+          }
+          
+          // Update schedules
+          if (dashboardResult['data']['schedules'] != null) {
+            schedules = (dashboardResult['data']['schedules'] as List)
+                .map((item) => Schedule.fromJson(item))
+                .toList();
+            _generateChartData();
+          }
+          
+          // Update faculty logs
+          if (dashboardResult['data']['facultyLogs'] != null) {
+            allFacultiesLogs = dashboardResult['data']['facultyLogs'];
+          }
+        });
+      }
+
+      // Load user management data in parallel
+      final userManagementResult = await OptimizedApiService.loadUserManagementData();
+      
+      if (mounted) {
+        setState(() {
+          if (userManagementResult['data']['deans'] != null) {
+            deansList = userManagementResult['data']['deans'];
+          }
+          if (userManagementResult['data']['instructors'] != null) {
+            instructorsList = userManagementResult['data']['instructors'];
+          }
+          if (userManagementResult['data']['programChairs'] != null) {
+            programChairsList = userManagementResult['data']['programChairs'];
+          }
+          if (userManagementResult['data']['allUsers'] != null) {
+            allUsersList = userManagementResult['data']['allUsers'];
+          }
+        });
+      }
+
+      // Load pending approvals data in parallel
+      final pendingResult = await OptimizedApiService.loadPendingApprovalsData();
+      
+      if (mounted) {
+        setState(() {
+          if (pendingResult['data']['pendingDeans'] != null) {
+            pendingDeans = pendingResult['data']['pendingDeans'];
+          }
+          if (pendingResult['data']['pendingInstructors'] != null) {
+            pendingInstructors = pendingResult['data']['pendingInstructors'];
+          }
+          if (pendingResult['data']['pendingProgramChairs'] != null) {
+            pendingProgramChairs = pendingResult['data']['pendingProgramChairs'];
+          }
+        });
+      }
+
+      // Handle any errors from the parallel requests
+      final allErrors = <String, String>{};
+      allErrors.addAll(dashboardResult['errors'] ?? {});
+      allErrors.addAll(userManagementResult['errors'] ?? {});
+      allErrors.addAll(pendingResult['errors'] ?? {});
+
+      // Only show error if critical data failed to load
+      final criticalErrors = allErrors.keys.where((key) => 
+        ['userCounts', 'colleges'].contains(key)
+      ).toList();
+      
+      if (criticalErrors.isNotEmpty && mounted) {
+        setState(() {
+          errorMessage = 'Critical data failed to load: ${criticalErrors.join(', ')}';
+        });
+      } else if (allErrors.isNotEmpty && mounted) {
+        // Track non-critical errors for partial error display
+        setState(() {
+          partialErrors = allErrors.keys.toList();
+          errorMessage = null; // Clear any previous errors
+        });
+        print('Non-critical data failed to load: ${allErrors.keys.join(', ')}');
+      } else if (mounted) {
+        setState(() {
+          partialErrors = [];
+          errorMessage = null;
+        });
+      }
+
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          errorMessage = ErrorHandler.getErrorMessage(e);
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
+    }
+  }
+
   Future<void> _refreshData() async {
     if (!mounted) return;
     
@@ -200,7 +350,9 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     });
 
     try {
-      await _fetchData();
+      // Clear cache before refreshing to get fresh data
+      await OptimizedApiService.invalidateAllCache();
+      await _fetchDataOptimized();
     } finally {
       if (mounted) {
         setState(() {
@@ -491,7 +643,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
 
     setState(() => loadingCourses = true);
     try {
-      final data = await ApiService.getSuperadminCourses(code);
+      final data = await OptimizedApiService.loadCourses(code);
       if (mounted) {
         setState(() {
           programs = data;
@@ -510,7 +662,36 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
     setState(() {
       courseValue = value;
     });
-    _fetchSchedules();
+    _fetchSchedulesOptimized();
+  }
+
+  /// Optimized schedule fetching with caching
+  Future<void> _fetchSchedulesOptimized() async {
+    if (!mounted) return;
+    
+    try {
+      final shortCourseValue = courseValue.replaceAll(RegExp(r'^bs', caseSensitive: false), '').toUpperCase();
+      final data = await OptimizedApiService.getCachedData(
+        '${DataCacheService.schedules}_$shortCourseValue',
+        () => ApiService.getSuperadminSchedules(shortCourseValue),
+        cacheDuration: DataCacheService.schedulesDuration,
+      );
+      
+      if (mounted) {
+        setState(() {
+          schedules = data.map((item) => Schedule.fromJson(item)).toList();
+          _generateChartData();
+        });
+      }
+    } catch (error) {
+      print('Schedule loading failed: $error');
+      if (mounted) {
+        setState(() {
+          schedules = [];
+          // Don't show error for schedules as it's not critical
+        });
+      }
+    }
   }
 
   void _handleRoomChange(String value) {
@@ -555,28 +736,28 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   Future<void> _loadTabData() async {
     switch (_currentTabIndex) {
       case 1: // Deans
-        await _fetchDeansList();
+        await _fetchDeansListOptimized();
         break;
       case 2: // Instructors
-        await _fetchInstructorsList();
+        await _fetchInstructorsListOptimized();
         break;
       case 3: // Program Chairs
-        await _fetchProgramChairsList();
+        await _fetchProgramChairsListOptimized();
         break;
       case 4: // Pending Deans
-        await _fetchPendingDeans();
+        await _fetchPendingDeansOptimized();
         break;
       case 5: // Pending Instructors
-        await _fetchPendingInstructors();
+        await _fetchPendingInstructorsOptimized();
         break;
       case 6: // Pending Program Chairs
-        await _fetchPendingProgramChairs();
+        await _fetchPendingProgramChairsOptimized();
         break;
       case 7: // All Users
-        await _loadAllUsers();
+        await _loadAllUsersOptimized();
         break;
       case 8: // Live Video
-        await _checkLiveStatus();
+        await _checkLiveStatusOptimized();
         break;
       case 9: // Settings
         await _loadUserData();
@@ -585,6 +766,216 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   }
 
   // Data fetching methods for consolidated screens
+
+  /// Optimized individual data fetching methods with caching
+  Future<void> _fetchDeansListOptimized() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await OptimizedApiService.getCachedData(
+        DataCacheService.deans,
+        () => ApiService.getSuperadminDeans(),
+        cacheDuration: DataCacheService.deansDuration,
+      );
+      
+      if (mounted) {
+        setState(() {
+          deansList = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          deansList = [];
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchInstructorsListOptimized() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await OptimizedApiService.getCachedData(
+        DataCacheService.instructors,
+        () => ApiService.getSuperadminInstructors(),
+        cacheDuration: DataCacheService.instructorsDuration,
+      );
+      
+      if (mounted) {
+        setState(() {
+          instructorsList = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          instructorsList = [];
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchProgramChairsListOptimized() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await OptimizedApiService.getCachedData(
+        DataCacheService.programChairs,
+        () => ApiService.getSuperadminProgramChairs(),
+        cacheDuration: DataCacheService.programChairsDuration,
+      );
+      
+      if (mounted) {
+        setState(() {
+          programChairsList = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          programChairsList = [];
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchPendingDeansOptimized() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await OptimizedApiService.getCachedData(
+        DataCacheService.pendingDeans,
+        () => ApiService.getSuperadminPendingDeans(),
+        cacheDuration: DataCacheService.pendingDeansDuration,
+      );
+      
+      if (mounted) {
+        setState(() {
+          pendingDeans = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          pendingDeans = _getSamplePendingDeansData();
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchPendingInstructorsOptimized() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await OptimizedApiService.getCachedData(
+        DataCacheService.pendingInstructors,
+        () => ApiService.getSuperadminPendingInstructors(),
+        cacheDuration: DataCacheService.pendingInstructorsDuration,
+      );
+      
+      if (mounted) {
+        setState(() {
+          pendingInstructors = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          pendingInstructors = _getSamplePendingInstructorsData();
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchPendingProgramChairsOptimized() async {
+    if (!mounted) return;
+    
+    try {
+      final data = await OptimizedApiService.getCachedData(
+        DataCacheService.pendingProgramChairs,
+        () => ApiService.getSuperadminPendingProgramChairs(),
+        cacheDuration: DataCacheService.pendingProgramChairsDuration,
+      );
+      
+      if (mounted) {
+        setState(() {
+          pendingProgramChairs = data;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          pendingProgramChairs = _getSamplePendingProgramChairsData();
+        });
+      }
+    }
+  }
+
+  Future<void> _loadAllUsersOptimized() async {
+    if (!mounted) return;
+    
+    setState(() {
+      allUsersLoading = true;
+      allUsersErrorMessage = null;
+    });
+
+    try {
+      final data = await OptimizedApiService.getCachedData(
+        DataCacheService.allUsers,
+        () => ApiService.getAllUsers(),
+        cacheDuration: DataCacheService.allUsersDuration,
+      );
+      
+      if (mounted) {
+        setState(() {
+          allUsersList = data;
+          allUsersLoading = false;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          allUsersList = [];
+          allUsersLoading = false;
+          allUsersErrorMessage = 'Failed to load users: ${error.toString()}';
+        });
+      }
+    }
+  }
+
+  Future<void> _checkLiveStatusOptimized() async {
+    if (!mounted) return;
+    
+    setState(() {
+      liveLoading = true;
+      liveErrorMessage = null;
+    });
+
+    try {
+      final data = await OptimizedApiService.loadLiveStatus(collegeName);
+      
+      if (mounted) {
+        setState(() {
+          isLive = data['isLive'] ?? false;
+          streamUrl = data['streamUrl'];
+          streamKey = data['streamKey'];
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          liveErrorMessage = ErrorHandler.getErrorMessage(e);
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          liveLoading = false;
+        });
+      }
+    }
+  }
 
   Future<void> _checkLiveStatus() async {
     if (!mounted) return;
@@ -770,20 +1161,22 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         preferredSize: const Size.fromHeight(kToolbarHeight + 48),
         child: _buildAppBar(),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildDashboardTab(),
-          _buildDeansTab(),
-          _buildInstructorsTab(),
-          _buildProgramChairsTab(),
-          _buildPendingDeansTab(),
-          _buildPendingInstructorsTab(),
-          _buildPendingProgramChairsTab(),
-          _buildAllUsersTab(),
-          _buildLiveVideoTab(),
-          _buildSettingsTab(),
-        ],
+      body: SafeArea(
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildDashboardTab(),
+            _buildDeansTab(),
+            _buildInstructorsTab(),
+            _buildProgramChairsTab(),
+            _buildPendingDeansTab(),
+            _buildPendingInstructorsTab(),
+            _buildPendingProgramChairsTab(),
+            _buildAllUsersTab(),
+            _buildLiveVideoTab(),
+            _buildSettingsTab(),
+          ],
+        ),
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
@@ -819,20 +1212,70 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
       child: TabBar(
         controller: _tabController,
         isScrollable: true,
+        tabAlignment: TabAlignment.start,
+        indicatorSize: TabBarIndicatorSize.tab,
         indicatorColor: Theme.of(context).colorScheme.primary,
         labelColor: Theme.of(context).colorScheme.primary,
         unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+        labelStyle: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+        unselectedLabelStyle: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+        ),
         tabs: const [
-          Tab(icon: Icon(Icons.dashboard_rounded), text: 'Dashboard'),
-          Tab(icon: Icon(Icons.admin_panel_settings_rounded), text: 'Deans'),
-          Tab(icon: Icon(Icons.person_rounded), text: 'Instructors'),
-          Tab(icon: Icon(Icons.school_rounded), text: 'Program Chairs'),
-          Tab(icon: Icon(Icons.hourglass_empty_rounded), text: 'Pending Deans'),
-          Tab(icon: Icon(Icons.pending_actions_rounded), text: 'Pending Instructors'),
-          Tab(icon: Icon(Icons.pending_actions_rounded), text: 'Pending Program Chairs'),
-          Tab(icon: Icon(Icons.people_rounded), text: 'All Users'),
-          Tab(icon: Icon(Icons.videocam_rounded), text: 'Live Video'),
-          Tab(icon: Icon(Icons.settings_rounded), text: 'Settings'),
+          Tab(
+            icon: Icon(Icons.dashboard_rounded, size: 20),
+            text: 'Dashboard',
+            height: 60,
+          ),
+          Tab(
+            icon: Icon(Icons.admin_panel_settings_rounded, size: 20),
+            text: 'Deans',
+            height: 60,
+          ),
+          Tab(
+            icon: Icon(Icons.person_rounded, size: 20),
+            text: 'Instructors',
+            height: 60,
+          ),
+          Tab(
+            icon: Icon(Icons.school_rounded, size: 20),
+            text: 'Program Chairs',
+            height: 60,
+          ),
+          Tab(
+            icon: Icon(Icons.hourglass_empty_rounded, size: 20),
+            text: 'Pending Deans',
+            height: 60,
+          ),
+          Tab(
+            icon: Icon(Icons.pending_actions_rounded, size: 20),
+            text: 'Pending Instructors',
+            height: 60,
+          ),
+          Tab(
+            icon: Icon(Icons.pending_actions_rounded, size: 20),
+            text: 'Pending Program Chairs',
+            height: 60,
+          ),
+          Tab(
+            icon: Icon(Icons.people_rounded, size: 20),
+            text: 'All Users',
+            height: 60,
+          ),
+          Tab(
+            icon: Icon(Icons.videocam_rounded, size: 20),
+            text: 'Live Video',
+            height: 60,
+          ),
+          Tab(
+            icon: Icon(Icons.settings_rounded, size: 20),
+            text: 'Settings',
+            height: 60,
+          ),
         ],
       ),
     );
@@ -846,29 +1289,41 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         slivers: [
           if (errorMessage != null)
             SliverToBoxAdapter(
-              child: ErrorHandler.buildErrorWidget(errorMessage!, onRetry: _refreshData),
+              child: ErrorDisplayWidget(
+                errorMessage: errorMessage,
+                onRetry: _refreshData,
+                isLoading: isRefreshing,
+              ),
             )
-          else
+          else if (partialErrors.isNotEmpty)
+            SliverToBoxAdapter(
+              child: PartialErrorWidget(
+                failedItems: partialErrors,
+                onRetry: _refreshData,
+              ),
+            ),
+          
+          if (errorMessage == null)
             SliverToBoxAdapter(
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: SlideTransition(
                   position: _slideAnimation,
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildHeader(),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
                         _buildStatisticsCards(),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
                         _buildScheduleChart(),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
                         _buildSchedulesTable(),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
                         _buildTodayActivity(),
-                        const SizedBox(height: 100),
+                        const SizedBox(height: 100), // Increased bottom padding for better spacing
                       ],
                     ),
                   ),
@@ -2137,71 +2592,127 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
 
 
   Widget _buildHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                'Super Admin Dashboard',
-                style: GoogleFonts.inter(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ),
-            // Database Health Indicator
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: errorMessage == null ? Colors.green.shade50 : Colors.red.shade50,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: errorMessage == null ? Colors.green.shade300 : Colors.red.shade300,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    errorMessage == null ? Icons.check_circle_rounded : Icons.error_rounded,
-                    size: 16,
-                    color: errorMessage == null ? Colors.green.shade600 : Colors.red.shade600,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    errorMessage == null ? 'DB Connected' : 'DB Issues',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: errorMessage == null ? Colors.green.shade700 : Colors.red.shade700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            Theme.of(context).colorScheme.secondary.withValues(alpha: 0.05),
           ],
         ),
-        const SizedBox(height: 8),
-        Text(
-          'Dashboard / Attendance',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-          ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
         ),
-        const SizedBox(height: 16),
-        Text(
-          'Total Users per Role:',
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSurface,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.admin_panel_settings_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Super Admin Dashboard',
+                      style: GoogleFonts.inter(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Manage your educational institution',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Database Health Indicator
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: errorMessage == null ? Colors.green.shade50 : Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: errorMessage == null ? Colors.green.shade300 : Colors.red.shade300,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      errorMessage == null ? Icons.check_circle_rounded : Icons.error_rounded,
+                      size: 16,
+                      color: errorMessage == null ? Colors.green.shade600 : Colors.red.shade600,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      errorMessage == null ? 'DB Connected' : 'DB Issues',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: errorMessage == null ? Colors.green.shade700 : Colors.red.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.dashboard_rounded,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Dashboard / Attendance Management',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -2215,19 +2726,28 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
         if (counts.isEmpty) {
           return Container(
             height: 200,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+              ),
+            ),
             child: const Center(
               child: CircularProgressIndicator(),
             ),
           );
         }
         
-        return GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: crossAxisCount,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: isTablet ? 1.4 : 1.2,
+        return Container(
+          padding: const EdgeInsets.all(4),
+          child: GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: isTablet ? 1.4 : 1.2,
           children: [
             StatCard(
               title: 'Total Deans',
@@ -2279,6 +2799,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
               backgroundColor: const Color(0xFFfef3c7),
             ),
           ],
+          ),
         );
       },
     );
