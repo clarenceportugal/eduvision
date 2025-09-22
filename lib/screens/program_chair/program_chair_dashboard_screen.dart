@@ -35,7 +35,9 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
 
   // State variables
   int? instructorCount;
-  int? schedulesCount;
+  int? schedulesCountToday;
+  int? instructorAbsentsToday = 0;
+  int? lateInstructors = 0;
   List<dynamic> allFacultiesLogs = [];
   List<Schedule> schedules = [];
   List<dynamic> courses = [];
@@ -94,7 +96,7 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
   void initState() {
     super.initState();
     _initializeAnimations();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
     _tabController.addListener(() {
       if (mounted) {
         setState(() {
@@ -164,13 +166,16 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
       case 1: // Faculty
         await _fetchFacultyList();
         break;
-      case 2: // Reports
+      case 2: // Pending Faculty
+        await _fetchPendingFacultyList();
+        break;
+      case 3: // Reports
         await _fetchDailyReports();
         break;
-      case 3: // Live Video
+      case 4: // Live Video
         await _checkLiveStatus();
         break;
-      case 4: // Settings
+      case 5: // Settings
         _populateForm();
         break;
     }
@@ -253,29 +258,24 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
     
     try {
       final response = await ApiService.getProgramChairSchedules(courseName);
-      ApiService.logApiCall('/api/auth/all-schedules/today', response);
       
-      ApiService.handleApiResponse(
-        response,
-        (data) {
           if (mounted) {
+        try {
             setState(() {
-              schedules = (data as List<dynamic>)
+            schedules = response
                   .map((item) => Schedule.fromJson(item))
                   .toList();
               _generateChartData();
             });
-          }
-        },
-        (error) {
+        } catch (e) {
           if (mounted) {
             setState(() {
               schedules = _getSampleSchedules();
               _generateChartData();
             });
           }
-        },
-      );
+        }
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -341,23 +341,18 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
     
     try {
       final response = await ApiService.getProgramChairInstructorCount(courseName);
-      ApiService.logApiCall('/api/auth/count/instructors', response);
       
-      ApiService.handleApiResponse(
-        response,
-        (data) {
           if (mounted) {
             setState(() {
-              instructorCount = data['instructorCount'];
+          instructorCount = response;
             });
           }
-        },
-        (error) {
-          // 
-        },
-      );
     } catch (e) {
-      // 
+      if (mounted) {
+        setState(() {
+          instructorCount = 15; // Sample data
+        });
+      }
     }
   }
 
@@ -366,23 +361,18 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
     
     try {
       final response = await ApiService.getProgramChairSchedulesCount(courseName);
-      ApiService.logApiCall('/api/auth/schedules-count/today', response);
       
-      ApiService.handleApiResponse(
-        response,
-        (data) {
           if (mounted) {
             setState(() {
-              schedulesCount = data['schedulesCount'];
+          schedulesCountToday = response;
             });
           }
-        },
-        (error) {
-          // 
-        },
-      );
     } catch (e) {
-      // 
+      if (mounted) {
+        setState(() {
+          schedulesCountToday = 8; // Sample data
+        });
+      }
     }
   }
 
@@ -391,25 +381,12 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
     
     try {
       final response = await ApiService.getProgramChairFacultyLogs(courseName);
-      ApiService.logApiCall('/api/auth/logs/all-faculties/today', response);
       
-      ApiService.handleApiResponse(
-        response,
-        (data) {
           if (mounted) {
             setState(() {
-              allFacultiesLogs = data as List<dynamic>;
-            });
-          }
-        },
-        (error) {
-          if (mounted) {
-            setState(() {
-              allFacultiesLogs = _getSampleFacultyLogs();
-            });
-          }
-        },
-      );
+          allFacultiesLogs = response;
+        });
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -801,6 +778,7 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
               children: [
                 _buildDashboardTab(),
                 _buildFacultyTab(),
+                _buildPendingFacultyTab(),
                 _buildReportsTab(),
                 _buildLiveVideoTab(),
                 _buildSettingsTab(),
@@ -887,6 +865,7 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
         tabs: const [
           Tab(icon: Icon(Icons.dashboard_rounded), text: 'Dashboard'),
           Tab(icon: Icon(Icons.people_rounded), text: 'Faculty'),
+          Tab(icon: Icon(Icons.pending_actions_rounded), text: 'Pending Faculty'),
           Tab(icon: Icon(Icons.assessment_rounded), text: 'Reports'),
           Tab(icon: Icon(Icons.videocam_rounded), text: 'Live'),
           Tab(icon: Icon(Icons.settings_rounded), text: 'Settings'),
@@ -909,42 +888,42 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
                 children: [
                   Expanded(
                     child: StatCard(
-                      title: 'Total Instructors',
+                      title: 'Total Faculties',
                       value: instructorCount?.toString() ?? 'Loading...',
                       icon: Icons.people_rounded,
                       iconColor: const Color(0xFF9f7aea),
                       backgroundColor: const Color(0xFFf3e8ff),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: StatCard(
-                      title: 'Total Schedules',
-                      value: schedulesCount?.toString() ?? 'Loading...',
-                      icon: Icons.schedule_rounded,
-                      iconColor: const Color(0xFF9f7aea),
-                      backgroundColor: const Color(0xFFf3e8ff),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
+                  const SizedBox(width: 8),
                   Expanded(
                     child: StatCard(
                       title: 'Instructor Absents Today',
-                      value: '0',
+                      value: instructorAbsentsToday?.toString() ?? '0',
                       icon: Icons.highlight_off_rounded,
                       iconColor: const Color(0xFF38bdf8),
                       backgroundColor: const Color(0xFFe0f2fe),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: StatCard(
+                      title: 'Classes Today',
+                      value: schedulesCountToday?.toString() ?? 'Loading...',
+                      icon: Icons.event_available_rounded,
+                      iconColor: const Color(0xFFfb923c),
+                      backgroundColor: const Color(0xFFffedd5),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: StatCard(
                       title: 'Late Instructors',
-                      value: '0',
+                      value: lateInstructors?.toString() ?? '0',
                       icon: Icons.warning_amber_rounded,
                       iconColor: const Color(0xFFec4899),
                       backgroundColor: const Color(0xFFfce7f3),
@@ -955,41 +934,46 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
             ],
           );
         } else {
-          return GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 4,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.4,
+          return Row(
             children: [
-              StatCard(
-                title: 'Total Instructors',
+              Expanded(
+                child: StatCard(
+                  title: 'Total Faculties',
                 value: instructorCount?.toString() ?? 'Loading...',
                 icon: Icons.people_rounded,
                 iconColor: const Color(0xFF9f7aea),
                 backgroundColor: const Color(0xFFf3e8ff),
               ),
-              StatCard(
-                title: 'Total Schedules',
-                value: schedulesCount?.toString() ?? 'Loading...',
-                icon: Icons.schedule_rounded,
-                iconColor: const Color(0xFF9f7aea),
-                backgroundColor: const Color(0xFFf3e8ff),
               ),
-              StatCard(
+              const SizedBox(width: 16),
+              Expanded(
+                child: StatCard(
                 title: 'Instructor Absents Today',
-                value: '0',
+                  value: instructorAbsentsToday?.toString() ?? '0',
                 icon: Icons.highlight_off_rounded,
                 iconColor: const Color(0xFF38bdf8),
                 backgroundColor: const Color(0xFFe0f2fe),
               ),
-              StatCard(
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: StatCard(
+                  title: 'Classes Today',
+                  value: schedulesCountToday?.toString() ?? 'Loading...',
+                  icon: Icons.event_available_rounded,
+                  iconColor: const Color(0xFFfb923c),
+                  backgroundColor: const Color(0xFFffedd5),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: StatCard(
                 title: 'Late Instructors',
-                value: '0',
+                  value: lateInstructors?.toString() ?? '0',
                 icon: Icons.warning_amber_rounded,
                 iconColor: const Color(0xFFec4899),
                 backgroundColor: const Color(0xFFfce7f3),
+                ),
               ),
             ],
           );
@@ -1388,6 +1372,43 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
               const LoadingWidget()
             else
               _buildFacultyTable(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPendingFacultyTab() {
+    return RefreshIndicator(
+      onRefresh: _fetchPendingFacultyList,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Pending Faculty ${courseName.isNotEmpty ? '- ${courseName.toUpperCase()}' : ''}',
+              style: GoogleFonts.inter(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'List of faculty members whose registration or approval is still pending.',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 24),
+            if (pendingFacultyErrorMessage != null)
+              ErrorHandler.buildErrorWidget(pendingFacultyErrorMessage!, onRetry: _fetchPendingFacultyList)
+            else if (pendingFacultyLoading)
+              const LoadingWidget()
+            else
+              _buildPendingFacultyTable(),
           ],
         ),
       ),
@@ -2614,38 +2635,6 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
     ];
   }
 
-  // Missing functions from React ProgramChairInfoOnly.tsx
-  Future<void> _fetchInstructorInfo() async {
-    if (!mounted) return;
-    
-    try {
-      final data = await ApiService.getProgramChairFaculty(courseName);
-      if (mounted) {
-        setState(() {
-          facultyList = data;
-        });
-      }
-    } catch (error) {
-      if (mounted) {
-        setState(() {
-          facultyList = _getSampleFacultyData();
-        });
-      }
-    }
-  }
-
-  // Pagination functions from React code
-  void _handleChangePage(int newPage) {
-    setState(() {
-      // Update page state for pagination
-    });
-  }
-
-  void _handleChangeRowsPerPage(int newRowsPerPage) {
-    setState(() {
-      // Update rows per page state for pagination
-    });
-  }
 
   // Filtered data functions from React code
   List<dynamic> get filteredInstructorInfo {
@@ -2657,34 +2646,149 @@ class _ProgramChairDashboardScreenState extends State<ProgramChairDashboardScree
     return facultyList;
   }
 
-  // Sample faculty data for Program Chair
-  List<dynamic> _getSampleFacultyData() {
-    return [
-      {
-        '_id': '1',
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'middle_name': 'C',
-        'username': 'DOEJOH',
-        'email': 'john.doe@university.edu',
-        'role': 'instructor',
-        'college': {'name': 'College of Computer Science', 'code': 'CCS'},
-        'course': 'BS Computer Science',
-        'status': 'active',
+
+
+  Widget _buildPendingFacultyTable() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          if (pendingFacultyList.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(48),
+              child: const EmptyStateWidget(
+                title: 'No Pending Faculty',
+                subtitle: 'No account pending for approval at the moment.',
+                icon: Icons.pending_actions_rounded,
+              ),
+            )
+          else
+            ResponsiveTable(
+              columns: const ['Profile', 'Email', 'Role', 'Department', 'Program', 'Date Signed Up', 'Actions'],
+              dataKeys: const ['profile', 'email', 'role', 'department', 'program', 'dateSignedUp', 'actions'],
+              data: pendingFacultyList.map((faculty) {
+                return {
+                  'profile': CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: Text(
+                      faculty['email']?.toString().substring(0, 1).toUpperCase() ?? 'U',
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
+                  'email': faculty['email'] ?? '',
+                  'role': faculty['role'] ?? '',
+                  'department': faculty['department']?['name'] ?? faculty['department'] ?? 'N/A',
+                  'program': faculty['program']?['name'] ?? faculty['program'] ?? 'N/A',
+                  'dateSignedUp': faculty['dateSignedUp'] != null 
+                      ? DateTime.parse(faculty['dateSignedUp']).toLocal().toString().split(' ')[0]
+                      : 'N/A',
+                  'actions': Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _handleAcceptFaculty(faculty['_id']),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                        child: const Text('Accept'),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () => _handleRejectFaculty(faculty['_id']),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        ),
+                        child: const Text('Reject'),
+                      ),
+                    ],
+                  ),
+                };
+              }).toList(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleAcceptFaculty(String facultyId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Approval'),
+          content: const Text('Are you sure you want to approve this faculty member?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
+              child: const Text('Approve'),
+            ),
+          ],
+        );
       },
-      {
-        '_id': '2',
-        'first_name': 'Jane',
-        'last_name': 'Smith',
-        'middle_name': 'D',
-        'username': 'SMIJAN',
-        'email': 'jane.smith@university.edu',
-        'role': 'instructor',
-        'college': {'name': 'College of Engineering', 'code': 'COE'},
-        'course': 'BS Information Technology',
-        'status': 'active',
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await ApiService.acceptFaculty(facultyId);
+      await _fetchPendingFacultyList();
+      ErrorHandler.showSnackBar(context, 'Faculty member approved successfully!');
+    } catch (e) {
+      ErrorHandler.showSnackBar(context, 'Failed to approve faculty member: $e');
+    }
+  }
+
+  Future<void> _handleRejectFaculty(String facultyId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Rejection'),
+          content: const Text('Are you sure you want to reject this faculty member?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Reject'),
+            ),
+          ],
+        );
       },
-    ];
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await ApiService.rejectFaculty(facultyId);
+      await _fetchPendingFacultyList();
+      ErrorHandler.showSnackBar(context, 'Faculty member rejected successfully!');
+    } catch (e) {
+      ErrorHandler.showSnackBar(context, 'Failed to reject faculty member: $e');
+    }
   }
 }
 

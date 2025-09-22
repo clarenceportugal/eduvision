@@ -94,7 +94,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
   // Pagination state
   int _currentPage = 0;
   int _rowsPerPage = 10;
-  List<int> _rowsPerPageOptions = [5, 10, 25, 50];
+  final List<int> _rowsPerPageOptions = [5, 10, 25, 50];
 
   // Modal state
   bool _showAddDeanModal = false;
@@ -1798,7 +1798,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                             overflow: TextOverflow.ellipsis,
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                     onChanged: (value) => _onCollegeFilterChanged(value ?? 'all'),
                   ),
@@ -4148,7 +4148,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                                   },
                                   child: Icon(
                                     icon,
-                                    key: ValueKey('$icon-${isSelected}'),
+                                    key: ValueKey('$icon-$isSelected'),
                                     color: isSelected 
                                         ? Theme.of(context).colorScheme.primary
                                         : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
@@ -4340,7 +4340,7 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                       child: Switch(
                         key: ValueKey('notification-switch'),
                         value: notificationsEnabled,
-                        onChanged: (value) {
+            onChanged: (value) {
                           setState(() {
                             notificationsEnabled = value;
                           });
@@ -4430,8 +4430,8 @@ class _SuperadminDashboardScreenState extends State<SuperadminDashboardScreen>
                               Navigator.pop(context);
                             }
                           });
-                        },
-                        activeThumbColor: Theme.of(context).colorScheme.primary,
+            },
+            activeThumbColor: Theme.of(context).colorScheme.primary,
                         activeTrackColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                         inactiveThumbColor: Theme.of(context).colorScheme.outline,
                         inactiveTrackColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),

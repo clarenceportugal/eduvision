@@ -107,18 +107,46 @@ class ResponsiveTable extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              for (int i = 0; i < columns.length && i < dataKeys.length; i++)
-                if (dataKeys[i] != 'time' && item[dataKeys[i]] != null)
-                  Padding(
+              ...dataKeys.asMap().entries.where((entry) {
+                final i = entry.key;
+                final key = entry.value;
+                return i < columns.length && key != 'time' && item[key] != null;
+              }).map((entry) {
+                final i = entry.key;
+                final key = entry.value;
+                final value = item[key];
+                if (value is Widget) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${columns[i]}:',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        value,
+                      ],
+                    ),
+                  );
+                } else {
+                  return Padding(
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Text(
-                      '${columns[i]}: ${item[dataKeys[i]]}',
+                      '${columns[i]}: ${value.toString()}',
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                       ),
                     ),
-                  ),
+                  );
+                }
+              }).toList(),
             ],
           ),
         );
@@ -163,9 +191,14 @@ class ResponsiveTable extends StatelessWidget {
                         ? Colors.transparent
                         : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   ),
-                  cells: dataKeys.map((key) => DataCell(
-                    Text(item[key]?.toString() ?? ''),
-                  )).toList(),
+                  cells: dataKeys.map((key) {
+                    final value = item[key];
+                    if (value is Widget) {
+                      return DataCell(value);
+                    } else {
+                      return DataCell(Text(value?.toString() ?? ''));
+                    }
+                  }).toList(),
                 );
               }).toList(),
       ),
